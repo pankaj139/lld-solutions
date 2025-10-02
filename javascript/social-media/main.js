@@ -1,32 +1,142 @@
-// Social Media Platform - JavaScript Implementation
-// Complete social networking system with real-time features
+/**
+ * Social Media Platform - JavaScript Implementation
+ * ================================================
+ * 
+ * Modern social networking system demonstrating cutting-edge Design Patterns:
+ * 
+ * DESIGN PATTERNS USED:
+ * 1. Observer Pattern: Real-time notifications, news feed updates, activity streams
+ * 2. Strategy Pattern: Different content algorithms (trending, chronological, personalized)
+ * 3. Command Pattern: User actions (like, comment, share, follow)
+ * 4. Factory Pattern: Content creation (posts, messages, notifications)
+ * 5. Decorator Pattern: Enhanced user features (verified accounts, premium features)
+ * 6. Composite Pattern: Complex content with nested comments and reactions
+ * 7. Chain of Responsibility: Content moderation and spam filtering
+ * 8. Mediator Pattern: Communication between users through platform
+ * 9. State Pattern: User status management (online, offline, away)
+ * 10. Publisher-Subscriber: Real-time messaging and live updates
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Encapsulation: Private user data, content privacy settings
+ * 2. Inheritance: Different user types (regular, influencer, business)
+ * 3. Polymorphism: Various content types, same interaction interface
+ * 4. Composition: Complex social relationships and content structures
+ * 5. Association: Friend networks, follower relationships
+ * 6. Aggregation: Timeline aggregation from multiple sources
+ * 
+ * SOCIAL MEDIA FEATURES:
+ * - Real-time messaging with delivery status
+ * - Advanced privacy controls and content filtering
+ * - Intelligent news feed with personalization algorithms
+ * - Comprehensive notification system
+ * - Rich media support (images, videos, links)
+ * - Social graph management with friend recommendations
+ * - Content moderation with automated filtering
+ * - Analytics and engagement tracking
+ * 
+ * REAL-TIME FEATURES:
+ * - Live chat with typing indicators
+ * - Real-time notifications and alerts
+ * - Live activity feeds and status updates
+ * - Instant content synchronization
+ */
 
-const UserStatus = { ONLINE: 'ONLINE', OFFLINE: 'OFFLINE', AWAY: 'AWAY', BUSY: 'BUSY' };
-const PostType = { TEXT: 'TEXT', IMAGE: 'IMAGE', VIDEO: 'VIDEO', LINK: 'LINK' };
-const MessageType = { TEXT: 'TEXT', IMAGE: 'IMAGE', FILE: 'FILE' };
-const NotificationType = { LIKE: 'LIKE', COMMENT: 'COMMENT', FRIEND_REQUEST: 'FRIEND_REQUEST', MESSAGE: 'MESSAGE' };
+// User status enumeration - State Pattern for presence management
+const UserStatus = { 
+    ONLINE: 'ONLINE',     // User actively using the platform
+    OFFLINE: 'OFFLINE',   // User not connected to platform
+    AWAY: 'AWAY',         // User idle but connected
+    BUSY: 'BUSY'          // User online but unavailable for chat
+};
 
-function generateUUID() { return 'xxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
+// Post type enumeration - Strategy Pattern for content types
+const PostType = { 
+    TEXT: 'TEXT',         // Text-only posts
+    IMAGE: 'IMAGE',       // Image posts with captions
+    VIDEO: 'VIDEO',       // Video content posts
+    LINK: 'LINK'          // Link sharing with preview
+};
 
+// Message type enumeration - Strategy Pattern for communication
+const MessageType = { 
+    TEXT: 'TEXT',         // Plain text messages
+    IMAGE: 'IMAGE',       // Image messages
+    FILE: 'FILE'          // File attachments
+};
+
+// Notification type enumeration - Observer Pattern for user alerts
+const NotificationType = { 
+    LIKE: 'LIKE',                     // Post or comment liked
+    COMMENT: 'COMMENT',               // New comment on post
+    FRIEND_REQUEST: 'FRIEND_REQUEST', // Incoming friend request
+    MESSAGE: 'MESSAGE'                // New private message
+};
+
+// Utility function for unique identifier generation
+function generateUUID() { 
+    return 'xxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, c => { 
+        const r = Math.random() * 16 | 0; 
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); 
+    }); 
+}
+
+/**
+ * User Class - Core entity representing platform members
+ * 
+ * DESIGN PATTERNS:
+ * - State Pattern: User status and activity tracking
+ * - Observer Pattern: User activity notifications
+ * - Strategy Pattern: Privacy settings and content visibility
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: User data and social connections
+ * - Composition: Complex social graph relationships
+ * - Association: Friend networks and follower relationships
+ */
 class User {
     constructor(userId, username, email, name) {
-        this.userId = userId;
-        this.username = username;
-        this.email = email;
-        this.name = name;
-        this.status = UserStatus.OFFLINE;
-        this.friends = new Set();
-        this.followers = new Set();
-        this.following = new Set();
-        this.posts = [];
-        this.profilePicture = null;
-        this.bio = '';
-        this.joinDate = new Date();
-        this.lastSeen = new Date();
-        this.privacySettings = { profilePublic: true, postsPublic: true };
+        // Core Identity
+        this.userId = userId;           // Unique user identifier
+        this.username = username;       // Unique username for mentions
+        this.email = email;            // Contact email
+        this.name = name;              // Display name
+        
+        // State Management
+        this.status = UserStatus.OFFLINE; // Current online status
+        
+        // Social Graph (using Set for O(1) operations)
+        this.friends = new Set();       // Bidirectional friend connections
+        this.followers = new Set();     // Users following this user
+        this.following = new Set();     // Users this user follows
+        
+        // Content Management
+        this.posts = [];               // User's posts timeline
+        this.profilePicture = null;    // Profile image URL
+        this.bio = '';                 // User biography
+        
+        // Metadata
+        this.joinDate = new Date();    // Account creation date
+        this.lastSeen = new Date();    // Last activity timestamp
+        
+        // Privacy Controls (Strategy Pattern)
+        this.privacySettings = { 
+            profilePublic: true,       // Profile visibility
+            postsPublic: true          // Post visibility to non-friends
+        };
     }
     
-    updateStatus(status) { this.status = status; this.lastSeen = new Date(); }
+    /**
+     * State Pattern: User status management
+     */
+    updateStatus(status) { 
+        this.status = status; 
+        this.lastSeen = new Date(); 
+    }
+    
+    /**
+     * Social Graph Management Methods
+     * Demonstrate association and relationship management
+     */
     addFriend(userId) { this.friends.add(userId); }
     removeFriend(userId) { this.friends.delete(userId); }
     follow(userId) { this.following.add(userId); }
@@ -35,19 +145,35 @@ class User {
     removeFollower(userId) { this.followers.delete(userId); }
 }
 
+/**
+ * Post Class - Represents content shared by users
+ * 
+ * DESIGN PATTERNS:
+ * - Composite Pattern: Posts can contain nested comments
+ * - Strategy Pattern: Different post types with different behaviors
+ * - Observer Pattern: Post interactions trigger notifications
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: Post data and interaction tracking
+ * - Polymorphism: Different post types handled uniformly
+ */
 class Post {
     constructor(postId, authorId, content, type = PostType.TEXT) {
-        this.postId = postId;
-        this.authorId = authorId;
-        this.content = content;
-        this.type = type;
-        this.timestamp = new Date();
-        this.likes = new Set();
-        this.comments = [];
-        this.shares = 0;
-        this.attachments = [];
-        this.tags = [];
-        this.isPublic = true;
+        this.postId = postId;          // Unique post identifier
+        this.authorId = authorId;      // Post creator ID
+        this.content = content;        // Post content/text
+        this.type = type;              // Content type for rendering
+        this.timestamp = new Date();   // Creation timestamp
+        
+        // Engagement Tracking
+        this.likes = new Set();        // Users who liked the post
+        this.comments = [];            // Comment thread
+        this.shares = 0;               // Share count
+        
+        // Rich Content
+        this.attachments = [];         // Media attachments
+        this.tags = [];                // Hashtags and mentions
+        this.isPublic = true;          // Visibility setting
     }
     
     addLike(userId) { this.likes.add(userId); }

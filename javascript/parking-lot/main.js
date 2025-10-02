@@ -1,3 +1,32 @@
+/**
+ * Parking Lot Management System Implementation in JavaScript
+ * =========================================================
+ * 
+ * This implementation demonstrates several key Design Patterns and OOP Concepts:
+ * 
+ * DESIGN PATTERNS USED:
+ * 1. Strategy Pattern: Different parking strategies for different vehicle types
+ * 2. Abstract Factory Pattern: Vehicle creation (Vehicle abstract class)
+ * 3. State Pattern: Parking spot status management
+ * 4. Observer Pattern: Payment status updates
+ * 5. Command Pattern: Parking and exit operations
+ * 6. Composite Pattern: ParkingLot composed of multiple ParkingSpots
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Inheritance: Vehicle -> Motorcycle/Car/Truck hierarchy
+ * 2. Polymorphism: Different vehicle types, same interface
+ * 3. Encapsulation: Private validation methods, internal state
+ * 4. Abstraction: Vehicle abstract class, clear interfaces
+ * 5. Composition: ParkingLot contains ParkingSpots, Tickets contain Vehicles
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Single Responsibility: Each class handles one concern
+ * - Open/Closed: Easy to add new vehicle types or payment methods
+ * - Liskov Substitution: Any vehicle can be parked using same interface
+ * - Interface Segregation: Focused, minimal interfaces
+ * - Dependency Inversion: High-level modules don't depend on low-level details
+ */
+
 // Simple UUID generator (no external dependencies)
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -26,64 +55,127 @@ const PaymentStatus = {
     FAILED: 'FAILED'
 };
 
-// Vehicle classes
+/**
+ * Abstract Vehicle Class - Base class for all vehicle types
+ * 
+ * DESIGN PATTERNS:
+ * - Abstract Factory Pattern: Base class for vehicle creation
+ * - Template Method Pattern: Common vehicle structure
+ * 
+ * OOP CONCEPTS:
+ * - Inheritance: Base class for vehicle hierarchy
+ * - Encapsulation: Vehicle properties and type management
+ * - Abstraction: Cannot be instantiated directly (abstract class simulation)
+ */
 class Vehicle {
     constructor(licensePlate, vehicleType) {
+        // Abstract Class Pattern: Prevent direct instantiation
         if (this.constructor === Vehicle) {
             throw new Error("Cannot instantiate abstract class Vehicle");
         }
-        this.licensePlate = licensePlate;
-        this.vehicleType = vehicleType;
+        this.licensePlate = licensePlate;  // Unique identifier
+        this.vehicleType = vehicleType;    // Type classification
     }
 }
 
+/**
+ * Concrete Vehicle Classes - Inheritance and Polymorphism demonstration
+ * 
+ * These classes demonstrate:
+ * - Inheritance: Extending Vehicle base class
+ * - Polymorphism: Different types, same interface
+ * - Specialization: Each vehicle type has specific characteristics
+ */
+
+// Motorcycle: Smallest vehicle, can fit in any spot
 class Motorcycle extends Vehicle {
     constructor(licensePlate) {
-        super(licensePlate, VehicleType.MOTORCYCLE);
+        super(licensePlate, VehicleType.MOTORCYCLE);  // Call parent constructor
     }
 }
 
+// Car: Medium vehicle, fits in car and truck spots
 class Car extends Vehicle {
     constructor(licensePlate) {
         super(licensePlate, VehicleType.CAR);
     }
 }
 
+// Truck: Largest vehicle, only fits in truck spots
 class Truck extends Vehicle {
     constructor(licensePlate) {
         super(licensePlate, VehicleType.TRUCK);
     }
 }
 
-// Parking spot class
+/**
+ * ParkingSpot Class - Represents individual parking spaces
+ * 
+ * DESIGN PATTERNS:
+ * - State Pattern: Manages occupied/available states
+ * - Strategy Pattern: Different fitting strategies for different spot types
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: Spot state and vehicle management
+ * - Business Logic: Vehicle-spot compatibility rules
+ * - State Management: Tracks occupancy and vehicle assignment
+ */
 class ParkingSpot {
     constructor(spotId, spotType) {
-        this.spotId = spotId;
-        this.spotType = spotType;
-        this.isOccupied = false;
-        this.vehicle = null;
+        this.spotId = spotId;          // Unique spot identifier
+        this.spotType = spotType;      // Spot size classification
+        this.isOccupied = false;       // State: occupancy status
+        this.vehicle = null;           // Currently parked vehicle (if any)
     }
 
+    /**
+     * Command Pattern: Park vehicle operation
+     * 
+     * Demonstrates:
+     * - Pre-condition validation
+     * - State mutation
+     * - Business rule enforcement
+     */
     parkVehicle(vehicle) {
+        // Pre-condition: Check if spot is available
         if (this.isOccupied) {
             throw new Error("Parking spot is already occupied");
         }
 
+        // Business Rule: Validate vehicle-spot compatibility
         if (!this._canFitVehicle(vehicle)) {
             throw new Error("Vehicle cannot fit in this spot");
         }
 
+        // State Change: Mark as occupied and assign vehicle
         this.isOccupied = true;
         this.vehicle = vehicle;
     }
 
+    /**
+     * Command Pattern: Remove vehicle operation
+     * 
+     * Demonstrates:
+     * - State reset
+     * - Return value pattern
+     */
     removeVehicle() {
         this.isOccupied = false;
         const vehicle = this.vehicle;
         this.vehicle = null;
-        return vehicle;
+        return vehicle;  // Return removed vehicle for confirmation
     }
 
+    /**
+     * Strategy Pattern: Vehicle fitting algorithm
+     * 
+     * Business Rules (Flexible Parking Strategy):
+     * - Trucks: Only truck spots
+     * - Cars: Car spots or truck spots (if needed)
+     * - Motorcycles: Any spot type (most flexible)
+     * 
+     * This private method encapsulates the parking strategy logic
+     */
     _canFitVehicle(vehicle) {
         return (this.spotType === ParkingSpotType.TRUCK ||
                 (this.spotType === ParkingSpotType.CAR && vehicle.vehicleType !== VehicleType.TRUCK) ||

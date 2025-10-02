@@ -1,27 +1,72 @@
+/**
+ * Library Management System Implementation in JavaScript
+ * =====================================================
+ * 
+ * This comprehensive library system demonstrates advanced Design Patterns and OOP Concepts:
+ * 
+ * DESIGN PATTERNS USED:
+ * 1. Strategy Pattern: Different user permission strategies (Member, Librarian, Admin)
+ * 2. State Pattern: Book status management (Available, Issued, Reserved, Lost)
+ * 3. Observer Pattern: Notification system for due dates and reservations
+ * 4. Command Pattern: Library operations (issue, return, reserve)
+ * 5. Factory Pattern: User and book object creation
+ * 6. Template Method Pattern: Common search and validation workflows
+ * 7. Chain of Responsibility: Permission checking with role hierarchy
+ * 8. Decorator Pattern: Enhanced user features (premium membership)
+ * 9. Facade Pattern: Simplified library interface hiding complexity
+ * 10. Repository Pattern: Book and user data management
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Inheritance: User type hierarchy (Member, Librarian, Admin)
+ * 2. Polymorphism: Different user types, same interface
+ * 3. Encapsulation: Private validation methods, internal state
+ * 4. Abstraction: User abstract class, clean library interfaces
+ * 5. Composition: Library composed of books, users, transactions
+ * 6. Association: Complex relationships between entities
+ * 
+ * BUSINESS FEATURES:
+ * - Multi-user role system with different permissions
+ * - Advanced book search with multiple criteria
+ * - Reservation system with priority queues
+ * - Fine calculation with configurable rates
+ * - Due date tracking and automatic notifications
+ * - Comprehensive reporting and analytics
+ * - Book recommendation system
+ * - Digital resource management
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Role-based access control
+ * - Event-driven notification system
+ * - Transactional book operations
+ * - Scalable catalog management
+ */
+
 // Library Management System in JavaScript
 
-// Enums
+// User type enumeration - Strategy Pattern for role-based permissions
 const UserType = {
-    MEMBER: 'MEMBER',
-    LIBRARIAN: 'LIBRARIAN', 
-    ADMIN: 'ADMIN'
+    MEMBER: 'MEMBER',         // Regular library member with basic privileges
+    LIBRARIAN: 'LIBRARIAN',   // Library staff with book management privileges
+    ADMIN: 'ADMIN'            // System administrator with full access
 };
 
+// Book status enumeration - State Pattern for book lifecycle
 const BookStatus = {
-    AVAILABLE: 'AVAILABLE',
-    ISSUED: 'ISSUED',
-    RESERVED: 'RESERVED',
-    LOST: 'LOST'
+    AVAILABLE: 'AVAILABLE',   // Book available for checkout
+    ISSUED: 'ISSUED',         // Book currently checked out to a member
+    RESERVED: 'RESERVED',     // Book reserved for a specific member
+    LOST: 'LOST'              // Book reported as lost or damaged
 };
 
+// Reservation status enumeration - State Pattern for reservation workflow
 const ReservationStatus = {
-    ACTIVE: 'ACTIVE',
-    FULFILLED: 'FULFILLED',
-    CANCELLED: 'CANCELLED',
-    EXPIRED: 'EXPIRED'
+    ACTIVE: 'ACTIVE',         // Reservation active and waiting
+    FULFILLED: 'FULFILLED',   // Reservation fulfilled, book issued
+    CANCELLED: 'CANCELLED',   // Reservation cancelled by user or system
+    EXPIRED: 'EXPIRED'        // Reservation expired due to timeout
 };
 
-// Simple UUID generator
+// Simple UUID generator for unique identifiers
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
@@ -30,15 +75,27 @@ function generateUUID() {
     });
 }
 
-// User classes
+/**
+ * Abstract User Class - Base class for all library users
+ * 
+ * DESIGN PATTERNS:
+ * - Strategy Pattern: Different user types have different privileges
+ * - Template Method Pattern: Common user operations structure
+ * 
+ * OOP CONCEPTS:
+ * - Inheritance: Base class for user type hierarchy
+ * - Abstraction: Cannot be instantiated directly
+ * - Encapsulation: User data and common operations
+ */
 class User {
     constructor(userId, name, email, userType) {
+        // Abstract Class Pattern: Prevent direct instantiation
         if (this.constructor === User) {
             throw new Error("Cannot instantiate abstract class User");
         }
-        this.userId = userId;
-        this.name = name;
-        this.email = email;
+        this.userId = userId;      // Unique user identifier
+        this.name = name;          // User full name
+        this.email = email;        // Contact email for notifications
         this.userType = userType;
         this.dateJoined = new Date();
     }

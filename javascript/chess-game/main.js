@@ -2,12 +2,38 @@
  * Chess Game Implementation in JavaScript
  * =======================================
  * 
- * This implementation demonstrates:
- * - Strategy Pattern: Different piece movement strategies
- * - State Pattern: Game state management
- * - Command Pattern: Move operations
- * - Factory Pattern: Piece creation
- * - Template Method: Common move validation structure
+ * This implementation demonstrates advanced Design Patterns and OOP Concepts:
+ * 
+ * DESIGN PATTERNS USED:
+ * 1. Strategy Pattern: Each piece type has different movement strategies
+ * 2. State Pattern: Game state management (active, check, checkmate, etc.)
+ * 3. Command Pattern: Move operations as executable commands
+ * 4. Factory Pattern: PieceFactory for creating different piece types
+ * 5. Template Method Pattern: Common move validation structure across pieces
+ * 6. Composite Pattern: Board composed of pieces, Game composed of board
+ * 7. Observer Pattern: Game state changes notify UI/players
+ * 8. Memento Pattern: Move history for undo functionality
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Inheritance: Piece -> King/Queen/Rook/Bishop/Knight/Pawn hierarchy
+ * 2. Polymorphism: All pieces implement getPossibleMoves() differently
+ * 3. Encapsulation: Private validation methods, internal game state
+ * 4. Abstraction: Piece abstract class, clean game interface
+ * 5. Composition: Game contains Board, Board contains Pieces
+ * 6. Association: Pieces know their position, moves reference pieces
+ * 
+ * ADVANCED CONCEPTS:
+ * - Complex game rules (castling, en passant, promotion)
+ * - Move validation with check detection
+ * - State machines for game flow
+ * - Algorithm implementation (move generation, validation)
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Single Responsibility: Each piece handles its own movement
+ * - Open/Closed: Easy to add new piece types or game variants
+ * - Liskov Substitution: Any piece can be used polymorphically
+ * - Interface Segregation: Minimal, focused interfaces
+ * - Dependency Inversion: Game depends on abstractions, not concretions
  */
 
 // Enums using JavaScript objects
@@ -75,23 +101,51 @@ class Move {
 }
 
 
+/**
+ * Abstract Piece Class - Base class for all chess pieces
+ * 
+ * DESIGN PATTERNS:
+ * - Strategy Pattern: Each piece type implements different movement strategy
+ * - Template Method Pattern: Common structure for move validation
+ * 
+ * OOP CONCEPTS:
+ * - Inheritance: Base class for all piece types
+ * - Polymorphism: getPossibleMoves() implemented differently by each piece
+ * - Encapsulation: Piece state (color, position, moved status)
+ * - Abstraction: Abstract interface for piece operations
+ */
 class Piece {
     constructor(color, position) {
-        this.color = color;
-        this.position = position;
-        this.hasMoved = false;
-        this.pieceType = null;
+        this.color = color;           // WHITE or BLACK
+        this.position = position;     // Current board position
+        this.hasMoved = false;        // Important for castling and pawn rules
+        this.pieceType = null;        // Set by concrete classes
     }
     
-    // Abstract method - to be implemented by subclasses
+    /**
+     * Abstract Method - Strategy Pattern Implementation
+     * 
+     * Each piece type must implement its own movement strategy.
+     * This demonstrates polymorphism - same interface, different behavior.
+     */
     getPossibleMoves(board) {
         throw new Error('getPossibleMoves must be implemented by subclass');
     }
     
+    /**
+     * Template Method Pattern: Common move validation structure
+     * 
+     * This method provides a consistent interface for move validation
+     * across all piece types, delegating to the specific strategy.
+     */
     isMoveValid(toPos, board) {
         return this.getPossibleMoves(board).some(pos => pos.equals(toPos));
     }
     
+    /**
+     * String representation for debugging and display
+     * Demonstrates encapsulation of display logic
+     */
     toString() {
         const colorSymbol = this.color === Color.WHITE ? 'W' : 'B';
         return `${colorSymbol}${this.pieceType.charAt(0).toUpperCase()}`;
@@ -99,14 +153,38 @@ class Piece {
 }
 
 
+/**
+ * King Class - Most important piece with special movement rules
+ * 
+ * DESIGN PATTERNS:
+ * - Strategy Pattern: King-specific movement algorithm
+ * - State Pattern: Tracks if king has moved (affects castling)
+ * 
+ * OOP CONCEPTS:
+ * - Inheritance: Extends Piece base class
+ * - Encapsulation: Private methods for castling logic
+ * - Complex Business Rules: Castling, check avoidance
+ */
 class King extends Piece {
     constructor(color, position) {
         super(color, position);
         this.pieceType = PieceType.KING;
     }
     
+    /**
+     * Strategy Pattern: King movement algorithm
+     * 
+     * King Movement Rules:
+     * 1. Can move one square in any direction (8 directions)
+     * 2. Cannot move into check
+     * 3. Special move: Castling (if hasn't moved)
+     * 
+     * Demonstrates complex business logic implementation
+     */
     getPossibleMoves(board) {
         const moves = [];
+        
+        // Standard king moves: one square in all 8 directions
         const directions = [[0, 1], [1, 0], [0, -1], [-1, 0], 
                            [1, 1], [1, -1], [-1, 1], [-1, -1]];
         
@@ -117,13 +195,14 @@ class King extends Piece {
             
             if (newPos.isValid()) {
                 const targetPiece = board.getPiece(newPos);
+                // Can move to empty square or capture opponent piece
                 if (!targetPiece || targetPiece.color !== this.color) {
                     moves.push(newPos);
                 }
             }
         }
         
-        // Add castling moves
+        // Special moves: Add castling moves if possible
         moves.push(...this._getCastlingMoves(board));
         return moves;
     }

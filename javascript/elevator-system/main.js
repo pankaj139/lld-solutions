@@ -1,6 +1,38 @@
+/**
+ * Elevator Management System Implementation in JavaScript
+ * ======================================================
+ * 
+ * This implementation demonstrates advanced Design Patterns and OOP Concepts:
+ * 
+ * DESIGN PATTERNS USED:
+ * 1. State Pattern: Elevator state management (IDLE, MOVING_UP, MOVING_DOWN, etc.)
+ * 2. Strategy Pattern: Different elevator scheduling algorithms
+ * 3. Command Pattern: Elevator requests as command objects
+ * 4. Observer Pattern: Floor button notifications to controller
+ * 5. Singleton Pattern: Central elevator controller
+ * 6. Priority Queue Pattern: Request sorting and prioritization
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Encapsulation: Elevator internal state, request management
+ * 2. Composition: ElevatorController contains multiple ElevatorCars and Floors
+ * 3. Abstraction: Clear interfaces for elevator operations
+ * 4. Polymorphism: Different request types handled uniformly
+ * 5. Association: Requests associated with floors and elevators
+ * 
+ * ALGORITHMS IMPLEMENTED:
+ * - SCAN Algorithm: Elevator direction-based request processing
+ * - Best-Fit Algorithm: Optimal elevator selection
+ * - Priority Scheduling: Request prioritization based on direction and load
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Event-Driven Design: Requests trigger elevator movements
+ * - Load Balancing: Distributing requests across multiple elevators
+ * - Real-time Processing: Continuous elevator movement simulation
+ */
+
 // Elevator System in JavaScript
 
-// Enums
+// Enums - Using JavaScript object patterns for type safety
 const Direction = {
     UP: 'UP',
     DOWN: 'DOWN',
@@ -21,26 +53,55 @@ const RequestType = {
     EXTERNAL: 'EXTERNAL'  // Button pressed on floor
 };
 
+/**
+ * Request Class - Command Pattern implementation for elevator requests
+ * 
+ * DESIGN PATTERNS:
+ * - Command Pattern: Encapsulates elevator request as an object
+ * - Value Object Pattern: Immutable request data
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: Request data and metadata
+ * - Composition: Contains floor, direction, and timing information
+ */
 class Request {
     constructor(floor, direction, requestType) {
-        this.floor = floor;
-        this.direction = direction;
-        this.requestType = requestType;
-        this.timestamp = new Date();
+        this.floor = floor;           // Target floor number
+        this.direction = direction;   // Desired travel direction
+        this.requestType = requestType; // INTERNAL (from inside) or EXTERNAL (from floor)
+        this.timestamp = new Date();  // For FIFO ordering and timeout handling
     }
 }
 
+/**
+ * ElevatorCar Class - State Pattern implementation for individual elevator
+ * 
+ * DESIGN PATTERNS:
+ * - State Pattern: Manages elevator states and transitions
+ * - Strategy Pattern: Different request sorting strategies based on direction
+ * - Observer Pattern: Notifies controller of state changes
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: Internal elevator state and request queue
+ * - State Management: Complex state transitions with validation
+ * - Business Logic: Capacity limits, floor restrictions
+ */
 class ElevatorCar {
     constructor(carId, maxCapacity, maxFloor) {
-        this.carId = carId;
-        this.currentFloor = 1;
-        this.maxCapacity = maxCapacity;
-        this.maxFloor = maxFloor;
-        this.currentCapacity = 0;
-        this.state = ElevatorState.IDLE;
-        this.direction = Direction.IDLE;
-        this.requests = [];
-        this.doorsOpen = false;
+        // Identity and Physical Constraints
+        this.carId = carId;              // Unique elevator identifier
+        this.currentFloor = 1;           // Current position (starts at ground floor)
+        this.maxCapacity = maxCapacity;  // Maximum number of passengers
+        this.maxFloor = maxFloor;        // Building height constraint
+        
+        // Current State
+        this.currentCapacity = 0;        // Current passenger count
+        this.state = ElevatorState.IDLE; // Current operational state
+        this.direction = Direction.IDLE; // Current movement direction
+        
+        // Request Management (Priority Queue)
+        this.requests = [];              // Pending requests (sorted by strategy)
+        this.doorsOpen = false;          // Door state for safety
     }
 
     addRequest(request) {

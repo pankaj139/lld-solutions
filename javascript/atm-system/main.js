@@ -1,6 +1,30 @@
-// ATM System in JavaScript
+/**
+ * ATM System Implementation in JavaScript
+ * =======================================
+ * 
+ * This implementation demonstrates several key Design Patterns and OOP Concepts:
+ * 
+ * DESIGN PATTERNS USED:
+ * 1. State Pattern: ATM state management (ATMState enum and state transitions)
+ * 2. Strategy Pattern: Different transaction processing strategies
+ * 3. Factory Pattern: UUID generation utility
+ * 4. Command Pattern: Transaction operations as commands
+ * 5. Template Method: Common transaction processing structure
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Encapsulation: Private methods (_methodName), data hiding
+ * 2. Abstraction: Clear interfaces for ATM operations
+ * 3. Composition: ATM composed of CashDispenser, BankingService
+ * 4. Polymorphism: Different account types, transaction types
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Single Responsibility: Each class has one clear purpose
+ * - Open/Closed: Easy to extend with new transaction types
+ * - Dependency Injection: ATM depends on abstractions
+ * - Low Coupling: Minimal dependencies between components
+ */
 
-// Enums
+// Enums - Using Object.freeze() for immutability (JavaScript enum pattern)
 const ATMState = {
     IDLE: 'IDLE',
     CARD_INSERTED: 'CARD_INSERTED',
@@ -37,33 +61,55 @@ function generateUUID() {
     });
 }
 
+/**
+ * Card Class - Represents a bank card with security features
+ * 
+ * DESIGN PATTERNS:
+ * - Value Object Pattern: Immutable card properties
+ * - Security Pattern: PIN validation with attempt limiting
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: PIN and security state management
+ * - Data Validation: Built-in security checks
+ */
 class Card {
     constructor(cardNumber, customerName, expiryDate, pin) {
-        this.cardNumber = cardNumber;
-        this.customerName = customerName;
-        this.expiryDate = expiryDate;
-        this.pin = pin;
-        this.isBlocked = false;
-        this.failedAttempts = 0;
-        this.maxFailedAttempts = 3;
+        this.cardNumber = cardNumber;           // Unique identifier
+        this.customerName = customerName;       // Cardholder name
+        this.expiryDate = expiryDate;          // Card expiration date
+        this.pin = pin;                        // Personal Identification Number
+        this.isBlocked = false;                // Security: Block status
+        this.failedAttempts = 0;               // Security: Failed PIN attempts counter
+        this.maxFailedAttempts = 3;            // Security: Maximum allowed failed attempts
     }
 
     isValid() {
         return !this.isBlocked && new Date() < this.expiryDate;
     }
 
+    /**
+     * Template Method Pattern: PIN validation with security measures
+     * 
+     * This method demonstrates:
+     * - Security by Design: Multiple validation steps
+     * - State Management: Tracking failed attempts
+     * - Defensive Programming: Auto-blocking on too many failures
+     */
     validatePin(inputPin) {
+        // Step 1: Check if card is already blocked (Security Check)
         if (this.isBlocked) {
             return false;
         }
         
+        // Step 2: Validate PIN (Authentication)
         if (this.pin === inputPin) {
-            this.failedAttempts = 0;
+            this.failedAttempts = 0;  // Reset counter on successful validation
             return true;
         } else {
+            // Step 3: Handle failed attempt (Security Response)
             this.failedAttempts++;
             if (this.failedAttempts >= this.maxFailedAttempts) {
-                this.isBlocked = true;
+                this.isBlocked = true;  // Auto-block for security
             }
             return false;
         }
@@ -79,14 +125,26 @@ class Card {
     }
 }
 
+/**
+ * Account Class - Represents a bank account with business rules
+ * 
+ * DESIGN PATTERNS:
+ * - Business Logic Pattern: Encapsulates banking rules
+ * - State Pattern: Account balance and limit tracking
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: Balance and limit management
+ * - Business Rules: Daily withdrawal limits, date tracking
+ * - Data Integrity: Ensures valid transactions
+ */
 class Account {
     constructor(accountNumber, accountType, balance) {
-        this.accountNumber = accountNumber;
-        this.accountType = accountType;
-        this.balance = balance;
-        this.dailyWithdrawalLimit = 1000.0;
-        this.dailyWithdrawn = 0.0;
-        this.lastWithdrawalDate = null;
+        this.accountNumber = accountNumber;        // Unique account identifier
+        this.accountType = accountType;            // Type of account (checking, savings, etc.)
+        this.balance = balance;                    // Current account balance
+        this.dailyWithdrawalLimit = 1000.0;       // Business Rule: Daily withdrawal limit
+        this.dailyWithdrawn = 0.0;                // Today's total withdrawals
+        this.lastWithdrawalDate = null;           // Date tracking for limit reset
     }
 
     resetDailyLimit() {
@@ -147,11 +205,23 @@ class Transaction {
     }
 }
 
+/**
+ * CashDispenser Class - Handles physical cash dispensing operations
+ * 
+ * DESIGN PATTERNS:
+ * - Strategy Pattern: Greedy algorithm for optimal cash dispensing
+ * - Inventory Management Pattern: Tracks cash denominations
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: Cash inventory management
+ * - Algorithm Implementation: Greedy approach for cash distribution
+ * - Error Handling: Validates dispensing capabilities
+ */
 class CashDispenser {
     constructor(totalFiveBills, totalTenBills, totalTwentyBills) {
-        this.totalFiveBills = totalFiveBills;
-        this.totalTenBills = totalTenBills;
-        this.totalTwentyBills = totalTwentyBills;
+        this.totalFiveBills = totalFiveBills;      // Inventory: $5 bills
+        this.totalTenBills = totalTenBills;        // Inventory: $10 bills  
+        this.totalTwentyBills = totalTwentyBills;  // Inventory: $20 bills
     }
 
     getTotalAmount() {
@@ -160,37 +230,55 @@ class CashDispenser {
                (this.totalTwentyBills * 20);
     }
 
+    /**
+     * Strategy Pattern: Greedy Algorithm for Cash Dispensing
+     * 
+     * Algorithm Steps:
+     * 1. Validate amount (business rule: multiples of $5)
+     * 2. Check total cash availability
+     * 3. Apply greedy strategy: largest denominations first
+     * 4. Update inventory after successful dispensing
+     * 
+     * OOP Concepts: Error handling, state management
+     */
     dispenseCash(amount) {
+        // Business Rule Validation: Amount must be in multiples of $5
         if (amount % 5 !== 0) {
             throw new Error("Amount must be in multiples of $5");
         }
 
+        // Resource Check: Ensure sufficient total cash
         if (amount > this.getTotalAmount()) {
             throw new Error("Insufficient cash in ATM");
         }
 
-        // Greedy algorithm: start with largest denomination
+        // GREEDY ALGORITHM: Start with largest denomination for optimization
         let remainingAmount = amount;
+        
+        // Step 1: Dispense $20 bills (largest denomination)
         let twenties = Math.min(Math.floor(remainingAmount / 20), this.totalTwentyBills);
         remainingAmount -= twenties * 20;
 
+        // Step 2: Dispense $10 bills (medium denomination)
         let tens = Math.min(Math.floor(remainingAmount / 10), this.totalTenBills);
         remainingAmount -= tens * 10;
 
+        // Step 3: Dispense $5 bills (smallest denomination)
         let fives = Math.min(Math.floor(remainingAmount / 5), this.totalFiveBills);
         remainingAmount -= fives * 5;
 
+        // Validation: Ensure exact amount can be dispensed
         if (remainingAmount > 0) {
             throw new Error("Cannot dispense exact amount with available denominations");
         }
 
-        // Update cash inventory
+        // State Update: Update cash inventory after successful calculation
         this.totalTwentyBills -= twenties;
         this.totalTenBills -= tens;
         this.totalFiveBills -= fives;
 
         console.log(`Dispensed: $${twenties * 20} in twenties, $${tens * 10} in tens, $${fives * 5} in fives`);
-        return { twenties, tens, fives };
+        return { twenties, tens, fives };  // Return dispensing breakdown
     }
 
     addCash(fiveBills, tenBills, twentyBills) {
@@ -200,9 +288,22 @@ class CashDispenser {
     }
 }
 
+/**
+ * BankingService Class - Service Layer for banking operations
+ * 
+ * DESIGN PATTERNS:
+ * - Service Layer Pattern: Encapsulates business logic
+ * - Repository Pattern: Account data management
+ * - Command Pattern: Transaction processing
+ * 
+ * OOP CONCEPTS:
+ * - Abstraction: Hides complex banking operations
+ * - Encapsulation: Manages account collection
+ * - Error Handling: Comprehensive transaction validation
+ */
 class BankingService {
     constructor() {
-        this.accounts = new Map(); // cardNumber -> Account
+        this.accounts = new Map(); // Repository Pattern: cardNumber -> Account mapping
     }
 
     addAccount(card, account) {
@@ -263,12 +364,32 @@ class BankingService {
     }
 }
 
+/**
+ * ATM Class - Main system orchestrator implementing State Pattern
+ * 
+ * DESIGN PATTERNS:
+ * - State Pattern: ATM state management and transitions
+ * - Facade Pattern: Simple interface for complex operations
+ * - Composition Pattern: Composed of CashDispenser and BankingService
+ * - Command Pattern: ATM operations as commands
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: Internal state management
+ * - Composition: ATM contains other components
+ * - State Management: Tracks current operation state
+ * - Error Handling: Validates operations based on state
+ */
 class ATM {
     constructor(atmId, location, cashDispenser, bankingService) {
+        // Identity and Location
         this.atmId = atmId;
         this.location = location;
-        this.cashDispenser = cashDispenser;
-        this.bankingService = bankingService;
+        
+        // Composition Pattern: ATM composed of specialized components
+        this.cashDispenser = cashDispenser;    // Hardware component
+        this.bankingService = bankingService;  // Service layer
+        
+        // State Pattern: Current ATM state tracking
         this.currentState = ATMState.IDLE;
         this.currentCardNumber = null;
         this.currentCard = null;

@@ -1,44 +1,157 @@
-// Task Management System - JavaScript Implementation
-// Project management platform with team collaboration and workflow automation
+/**
+ * Task Management System - JavaScript Implementation
+ * ==================================================
+ * 
+ * Advanced project management platform demonstrating enterprise-level Design Patterns:
+ * 
+ * DESIGN PATTERNS USED:
+ * 1. State Pattern: Task status workflow management (TODO -> IN_PROGRESS -> DONE)
+ * 2. Strategy Pattern: Different assignment strategies (skill-based, workload-based)
+ * 3. Observer Pattern: Real-time notifications for task updates and deadlines
+ * 4. Command Pattern: Task operations (create, assign, update, complete)
+ * 5. Factory Pattern: Task and project creation with default configurations
+ * 6. Chain of Responsibility: Approval workflow for high-priority tasks
+ * 7. Composite Pattern: Project hierarchy with sub-projects and task trees
+ * 8. Decorator Pattern: Enhanced task features (time tracking, dependencies)
+ * 9. Template Method Pattern: Common project management workflows
+ * 10. Facade Pattern: Simplified project management interface
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Encapsulation: Private task logic, workload management
+ * 2. Inheritance: User role hierarchy with different permissions
+ * 3. Polymorphism: Different task types, same management interface
+ * 4. Composition: Projects composed of tasks, teams composed of users
+ * 5. Association: Complex relationships between users, tasks, projects
+ * 6. Aggregation: Team aggregation of multiple users and skills
+ * 
+ * ENTERPRISE FEATURES:
+ * - Role-based access control with permission hierarchies
+ * - Advanced task assignment with skill matching
+ * - Real-time workload balancing and capacity planning
+ * - Comprehensive project analytics and reporting
+ * - Automated workflow management with triggers
+ * - Time tracking with productivity analytics
+ * - Dependency management with critical path analysis
+ * - Team collaboration with communication integration
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Event-driven task lifecycle management
+ * - Microservice-ready modular design
+ * - Real-time collaboration support
+ * - Scalable team and project organization
+ */
 
-const TaskStatus = { TODO: 'TODO', IN_PROGRESS: 'IN_PROGRESS', IN_REVIEW: 'IN_REVIEW', DONE: 'DONE', CANCELLED: 'CANCELLED' };
-const Priority = { LOW: 1, MEDIUM: 2, HIGH: 3, CRITICAL: 4 };
-const UserRole = { MEMBER: 'MEMBER', MANAGER: 'MANAGER', ADMIN: 'ADMIN' };
-const ProjectStatus = { PLANNING: 'PLANNING', ACTIVE: 'ACTIVE', ON_HOLD: 'ON_HOLD', COMPLETED: 'COMPLETED', CANCELLED: 'CANCELLED' };
+// Task status enumeration - State Pattern for task lifecycle management
+const TaskStatus = { 
+    TODO: 'TODO',                    // Task created and ready to start
+    IN_PROGRESS: 'IN_PROGRESS',      // Task actively being worked on
+    IN_REVIEW: 'IN_REVIEW',          // Task completed, pending review
+    DONE: 'DONE',                    // Task completed and approved
+    CANCELLED: 'CANCELLED'           // Task cancelled or abandoned
+};
 
-function generateUUID() { return 'xxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
+// Priority enumeration - Strategy Pattern for task prioritization
+const Priority = { 
+    LOW: 1,        // Non-urgent tasks
+    MEDIUM: 2,     // Standard priority tasks
+    HIGH: 3,       // Important tasks requiring attention
+    CRITICAL: 4    // Urgent tasks requiring immediate action
+};
 
-class User {
-    constructor(userId, username, email, name, role = UserRole.MEMBER) {
-        this.userId = userId;
-        this.username = username;
-        this.email = email;
-        this.name = name;
-        this.role = role;
-        this.isActive = true;
-        this.skills = [];
-        this.workload = 0;
-        this.maxWorkload = 40; // hours per week
-        this.joinDate = new Date();
-    }
-    
-    addSkill(skill) { if (!this.skills.includes(skill)) this.skills.push(skill); }
-    updateWorkload(hours) { this.workload += hours; }
-    canTakeTask(estimatedHours) { return this.workload + estimatedHours <= this.maxWorkload; }
+// User role enumeration - Strategy Pattern for permission management
+const UserRole = { 
+    MEMBER: 'MEMBER',     // Team member with basic task permissions
+    MANAGER: 'MANAGER',   // Team lead with task assignment and monitoring
+    ADMIN: 'ADMIN'        // System administrator with full access
+};
+
+// Project status enumeration - State Pattern for project lifecycle
+const ProjectStatus = { 
+    PLANNING: 'PLANNING',     // Project in planning phase
+    ACTIVE: 'ACTIVE',         // Project actively running
+    ON_HOLD: 'ON_HOLD',       // Project temporarily paused
+    COMPLETED: 'COMPLETED',   // Project successfully completed
+    CANCELLED: 'CANCELLED'    // Project cancelled or terminated
+};
+
+// Utility function for generating unique identifiers
+function generateUUID() { 
+    return 'xxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, c => { 
+        const r = Math.random() * 16 | 0; 
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); 
+    }); 
 }
 
+/**
+ * User Class - Represents team members with roles and capabilities
+ * 
+ * DESIGN PATTERNS:
+ * - Strategy Pattern: Different roles have different capabilities
+ * - State Pattern: User activity and workload status
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: User data and workload management
+ * - Business Logic: Skill matching and capacity planning
+ */
+class User {
+    constructor(userId, username, email, name, role = UserRole.MEMBER) {
+        this.userId = userId;           // Unique identifier
+        this.username = username;       // Login username
+        this.email = email;            // Contact email
+        this.name = name;              // Display name
+        this.role = role;              // User role determining permissions
+        this.isActive = true;          // Account status
+        this.skills = [];              // User skill set for task matching
+        this.workload = 0;             // Current workload in hours
+        this.maxWorkload = 40;         // Maximum weekly capacity
+        this.joinDate = new Date();    // Account creation date
+    }
+    
+    /**
+     * Skill management for intelligent task assignment
+     */
+    addSkill(skill) { 
+        if (!this.skills.includes(skill)) this.skills.push(skill); 
+    }
+    
+    /**
+     * Workload management for capacity planning
+     */
+    updateWorkload(hours) { 
+        this.workload += hours; 
+    }
+    
+    /**
+     * Strategy Pattern: Capacity checking algorithm
+     */
+    canTakeTask(estimatedHours) { 
+        return this.workload + estimatedHours <= this.maxWorkload; 
+    }
+}
+
+/**
+ * Task Class - Core entity representing work items
+ * 
+ * DESIGN PATTERNS:
+ * - State Pattern: Task status transitions
+ * - Command Pattern: Task operations as commands
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: Task data and progress tracking
+ * - State Management: Status transitions with validation
+ */
 class Task {
     constructor(taskId, title, description, assigneeId, projectId, estimatedHours = 8) {
-        this.taskId = taskId;
-        this.title = title;
-        this.description = description;
-        this.assigneeId = assigneeId;
-        this.projectId = projectId;
-        this.status = TaskStatus.TODO;
-        this.priority = Priority.MEDIUM;
-        this.estimatedHours = estimatedHours;
-        this.actualHours = 0;
-        this.progress = 0;
+        this.taskId = taskId;              // Unique task identifier
+        this.title = title;                // Task title/summary
+        this.description = description;    // Detailed task description
+        this.assigneeId = assigneeId;      // Assigned user ID
+        this.projectId = projectId;        // Parent project ID
+        this.status = TaskStatus.TODO;     // Current task status
+        this.priority = Priority.MEDIUM;   // Task priority level
+        this.estimatedHours = estimatedHours; // Estimated effort
+        this.actualHours = 0;              // Actual time spent
+        this.progress = 0;                 // Completion percentage
         this.tags = [];
         this.dependencies = [];
         this.subtasks = [];

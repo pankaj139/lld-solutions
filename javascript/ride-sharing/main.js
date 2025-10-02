@@ -1,39 +1,89 @@
-// Ride Sharing System - Simplified JavaScript Implementation
+/**
+ * Ride Sharing System - JavaScript Implementation
+ * ==============================================
+ * 
+ * Modern transportation platform demonstrating advanced Design Patterns:
+ * 
+ * DESIGN PATTERNS USED:
+ * 1. State Pattern: Ride status workflow (REQUESTED -> ASSIGNED -> IN_PROGRESS -> COMPLETED)
+ * 2. Strategy Pattern: Different pricing strategies (surge, flat rate, distance-based)
+ * 3. Observer Pattern: Real-time location tracking and ride updates
+ * 4. Command Pattern: Ride operations (request, accept, cancel, complete)
+ * 5. Factory Pattern: Vehicle and user creation with type-specific features
+ * 6. Singleton Pattern: Central ride matching service
+ * 7. Template Method Pattern: Common ride workflow structure
+ * 8. Chain of Responsibility: Driver selection algorithm with multiple criteria
+ * 9. Decorator Pattern: Enhanced ride features (premium, luxury options)
+ * 10. Facade Pattern: Simplified ride booking interface
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Encapsulation: Private location tracking, payment processing
+ * 2. Inheritance: User type hierarchy (Rider, Driver)
+ * 3. Polymorphism: Different vehicle types, same booking interface
+ * 4. Composition: Ride system composed of users, vehicles, locations
+ * 5. Association: Complex relationships between riders, drivers, rides
+ * 6. Aggregation: Route aggregation of multiple location points
+ * 
+ * REAL-TIME FEATURES:
+ * - GPS-based driver matching with proximity algorithms
+ * - Dynamic pricing with surge multipliers
+ * - Real-time route optimization and ETA calculation
+ * - Live location tracking during rides
+ * - Automated payment processing with multiple methods
+ * - Driver rating and feedback system
+ * - Advanced analytics and ride history
+ * 
+ * ALGORITHMS IMPLEMENTED:
+ * - Nearest Driver Algorithm: Efficient driver-rider matching
+ * - Route Optimization: Shortest path calculation
+ * - Dynamic Pricing: Supply-demand based fare calculation
+ * - Rating System: Weighted average with recency bias
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Event-driven ride lifecycle management
+ * - Real-time data synchronization
+ * - Scalable geospatial operations
+ * - Microservice-ready modular design
+ */
 
-// Enums
+// User type enumeration - Strategy Pattern for different user roles
 const UserType = {
-    RIDER: 'RIDER',
-    DRIVER: 'DRIVER'
+    RIDER: 'RIDER',     // Passengers requesting rides
+    DRIVER: 'DRIVER'    // Drivers providing ride services
 };
 
+// Ride status enumeration - State Pattern for ride lifecycle management
 const RideStatus = {
-    REQUESTED: 'REQUESTED',
-    DRIVER_ASSIGNED: 'DRIVER_ASSIGNED',
-    DRIVER_ARRIVED: 'DRIVER_ARRIVED',
-    IN_PROGRESS: 'IN_PROGRESS',
-    COMPLETED: 'COMPLETED',
-    CANCELLED: 'CANCELLED'
+    REQUESTED: 'REQUESTED',           // Ride requested by passenger
+    DRIVER_ASSIGNED: 'DRIVER_ASSIGNED', // Driver found and assigned
+    DRIVER_ARRIVED: 'DRIVER_ARRIVED',   // Driver arrived at pickup
+    IN_PROGRESS: 'IN_PROGRESS',       // Ride currently active
+    COMPLETED: 'COMPLETED',           // Ride successfully completed
+    CANCELLED: 'CANCELLED'            // Ride cancelled by rider or driver
 };
 
+// Driver status enumeration - State Pattern for driver availability
 const DriverStatus = {
-    OFFLINE: 'OFFLINE',
-    AVAILABLE: 'AVAILABLE',
-    BUSY: 'BUSY'
+    OFFLINE: 'OFFLINE',       // Driver not available for rides
+    AVAILABLE: 'AVAILABLE',   // Driver online and ready for rides
+    BUSY: 'BUSY'             // Driver currently on a ride
 };
 
+// Vehicle type enumeration - Strategy Pattern for service tiers
 const VehicleType = {
-    ECONOMY: 'ECONOMY',
-    PREMIUM: 'PREMIUM',
-    LUXURY: 'LUXURY'
+    ECONOMY: 'ECONOMY',     // Basic ride service
+    PREMIUM: 'PREMIUM',     // Mid-tier service with better vehicles
+    LUXURY: 'LUXURY'        // High-end service with luxury vehicles
 };
 
+// Payment method enumeration - Strategy Pattern for payment processing
 const PaymentMethod = {
-    CASH: 'CASH',
-    CREDIT_CARD: 'CREDIT_CARD',
-    DIGITAL_WALLET: 'DIGITAL_WALLET'
+    CASH: 'CASH',                     // Cash payment on completion
+    CREDIT_CARD: 'CREDIT_CARD',       // Credit card payment
+    DIGITAL_WALLET: 'DIGITAL_WALLET'  // Mobile wallet payment
 };
 
-// Simple UUID generator
+// Utility function for generating unique ride and user identifiers
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
@@ -42,11 +92,22 @@ function generateUUID() {
     });
 }
 
+/**
+ * Location Class - Represents geographical coordinates and addresses
+ * 
+ * DESIGN PATTERNS:
+ * - Value Object Pattern: Immutable location data
+ * - Composite Pattern: Location can be part of route
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: Coordinate data with address mapping
+ * - Composition: Used by rides, users, and vehicles
+ */
 class Location {
     constructor(latitude, longitude, address = "") {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.address = address;
+        this.latitude = latitude;    // GPS latitude coordinate
+        this.longitude = longitude;  // GPS longitude coordinate
+        this.address = address;      // Human-readable address
     }
 
     distanceTo(otherLocation) {

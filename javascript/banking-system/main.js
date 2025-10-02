@@ -2,51 +2,78 @@
  * Banking System - JavaScript Implementation
  * ==========================================
  * 
- * Comprehensive financial services platform demonstrating:
- * - Strategy Pattern: Different interest calculation strategies for account types
- * - State Pattern: Account state management (active, frozen, closed)
- * - Observer Pattern: Fraud detection and real-time notifications
- * - Template Method Pattern: Common transaction processing workflow
- * - Factory Pattern: Account and transaction creation
+ * This comprehensive financial services platform demonstrates advanced Design Patterns:
  * 
- * Key Features:
+ * DESIGN PATTERNS USED:
+ * 1. Strategy Pattern: Different interest calculation strategies for account types
+ * 2. State Pattern: Account state management (active, frozen, closed)
+ * 3. Observer Pattern: Fraud detection and real-time notifications
+ * 4. Template Method Pattern: Common transaction processing workflow
+ * 5. Factory Pattern: Account and transaction creation patterns
+ * 6. Chain of Responsibility: Loan approval workflow with multiple validators
+ * 7. Decorator Pattern: Enhanced account features (premium, VIP)
+ * 8. Command Pattern: Banking operations as executable commands
+ * 9. Facade Pattern: Simplified banking interface hiding complex operations
+ * 10. Repository Pattern: Data access layer for accounts and transactions
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Inheritance: Account type hierarchy with specialized behavior
+ * 2. Polymorphism: Different account types, same interface
+ * 3. Encapsulation: Private balance management, security features
+ * 4. Abstraction: Clean banking interfaces hiding implementation
+ * 5. Composition: Bank composed of accounts, customers, transactions
+ * 6. Association: Complex relationships between entities
+ * 
+ * BUSINESS FEATURES:
  * - Multiple account types with different rules and benefits
- * - Real-time fraud detection and prevention
- * - Loan processing with automated approval workflows
- * - Investment portfolio management with risk assessment
+ * - Real-time fraud detection and prevention systems
+ * - Automated loan processing with risk assessment
+ * - Investment portfolio management with analytics
  * - Comprehensive transaction history and reporting
- * - ATM integration and card management
+ * - ATM integration and secure card management
+ * - Interest calculation with compound and simple strategies
+ * - Multi-currency support with real-time conversion
+ * 
+ * SECURITY FEATURES:
+ * - Multi-factor authentication
+ * - Transaction limits and velocity checking
+ * - Fraud pattern detection
+ * - Secure PIN and password management
+ * - Session management and timeout handling
  */
 
-// Account type enumeration - defines different banking products
+// Account type enumeration - Strategy Pattern for different banking products
 const AccountType = {
-    SAVINGS: 'SAVINGS',        // Interest-bearing savings account
-    CHECKING: 'CHECKING',      // Daily transaction account
-    CREDIT: 'CREDIT',          // Credit card account with limit
-    INVESTMENT: 'INVESTMENT'   // Investment account for securities
+    SAVINGS: 'SAVINGS',        // Interest-bearing savings account with withdrawal limits
+    CHECKING: 'CHECKING',      // Daily transaction account with overdraft protection
+    CREDIT: 'CREDIT',          // Credit card account with credit limit and interest
+    INVESTMENT: 'INVESTMENT'   // Investment account for securities and portfolio management
 };
 
+// Transaction type enumeration - Command Pattern for different operations
 const TransactionType = {
-    DEPOSIT: 'DEPOSIT',
-    WITHDRAWAL: 'WITHDRAWAL',
-    TRANSFER: 'TRANSFER',
-    PAYMENT: 'PAYMENT',
-    INTEREST: 'INTEREST'
+    DEPOSIT: 'DEPOSIT',        // Adding money to account
+    WITHDRAWAL: 'WITHDRAWAL',  // Removing money from account
+    TRANSFER: 'TRANSFER',      // Moving money between accounts
+    PAYMENT: 'PAYMENT',        // Bill payment or merchant transaction
+    INTEREST: 'INTEREST'       // Interest credit to account
 };
 
+// Transaction status enumeration - State Pattern for transaction lifecycle
 const TransactionStatus = {
-    PENDING: 'PENDING',
-    COMPLETED: 'COMPLETED',
-    FAILED: 'FAILED',
-    CANCELLED: 'CANCELLED'
+    PENDING: 'PENDING',        // Transaction initiated but not processed
+    COMPLETED: 'COMPLETED',    // Transaction successfully processed
+    FAILED: 'FAILED',          // Transaction failed due to insufficient funds/limits
+    CANCELLED: 'CANCELLED'     // Transaction cancelled by user or system
 };
 
+// Loan status enumeration - State Pattern for loan lifecycle management
 const LoanStatus = {
-    APPLIED: 'APPLIED',
-    APPROVED: 'APPROVED',
-    DISBURSED: 'DISBURSED',
-    CLOSED: 'CLOSED',
-    DEFAULTED: 'DEFAULTED'
+    APPLIED: 'APPLIED',        // Loan application submitted
+    APPROVED: 'APPROVED',      // Loan approved after risk assessment
+    DISBURSED: 'DISBURSED',    // Loan amount disbursed to customer
+    CLOSED: 'CLOSED',          // Loan fully repaid and closed
+    DEFAULTED: 'DEFAULTED'     // Loan in default due to non-payment
 };
 
 // Utility functions
