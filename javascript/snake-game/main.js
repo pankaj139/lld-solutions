@@ -1,12 +1,29 @@
-// Snake Game - JavaScript Implementation
-// Real-time arcade game with intelligent pathfinding and collision detection
+/**
+ * Snake Game - JavaScript Implementation
+ * =====================================
+ * 
+ * Real-time arcade game demonstrating:
+ * - Observer Pattern: Score updates and game event notifications
+ * - State Pattern: Game state management (playing, paused, game over)
+ * - Strategy Pattern: Different food generation and AI movement strategies
+ * - Command Pattern: Input handling and movement commands
+ * 
+ * Key Features:
+ * - Smooth real-time movement with collision detection
+ * - Progressive difficulty with speed increases
+ * - Multiple food types with different effects
+ * - AI simulation for automated gameplay
+ * - Score tracking and high score management
+ * - Boundary and self-collision detection
+ * - Power foods with temporary effects
+ */
 
-// Enums
+// Direction enumeration - defines snake movement directions
 const Direction = {
-    UP: 'UP',
-    DOWN: 'DOWN',
-    LEFT: 'LEFT',
-    RIGHT: 'RIGHT'
+    UP: 'UP',        // Move towards top of grid
+    DOWN: 'DOWN',    // Move towards bottom of grid
+    LEFT: 'LEFT',    // Move towards left side
+    RIGHT: 'RIGHT'   // Move towards right side
 };
 
 const GameState = {

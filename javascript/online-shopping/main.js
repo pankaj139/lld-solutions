@@ -1,11 +1,29 @@
-// Online Shopping System - JavaScript Implementation
-// E-commerce platform with multi-vendor support, shopping cart, and payment processing
+/**
+ * Online Shopping System - JavaScript Implementation
+ * ==================================================
+ * 
+ * Multi-vendor e-commerce platform demonstrating:
+ * - Strategy Pattern: Multiple payment processing strategies
+ * - State Pattern: Order lifecycle management
+ * - Observer Pattern: Real-time notifications for orders and inventory
+ * - Factory Pattern: User and product creation
+ * - Command Pattern: Shopping cart operations
+ * 
+ * Key Features:
+ * - Multi-vendor marketplace with seller management
+ * - Real-time inventory tracking and validation
+ * - Advanced shopping cart with session persistence
+ * - Multiple payment methods and processing
+ * - Order tracking and fulfillment workflow
+ * - Product reviews and rating system
+ * - Dynamic pricing and discount management
+ */
 
-// Enums
+// User role enumeration - defines access levels and permissions
 const UserRole = {
-    CUSTOMER: 'CUSTOMER',
-    SELLER: 'SELLER',
-    ADMIN: 'ADMIN'
+    CUSTOMER: 'CUSTOMER',    // Regular buyers with shopping privileges
+    SELLER: 'SELLER',        // Vendors who can list and sell products
+    ADMIN: 'ADMIN'           // Platform administrators with full access
 };
 
 const OrderStatus = {

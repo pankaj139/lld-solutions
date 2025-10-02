@@ -1,12 +1,29 @@
-// Banking System - JavaScript Implementation
-// Comprehensive financial services platform with multiple account types and fraud detection
+/**
+ * Banking System - JavaScript Implementation
+ * ==========================================
+ * 
+ * Comprehensive financial services platform demonstrating:
+ * - Strategy Pattern: Different interest calculation strategies for account types
+ * - State Pattern: Account state management (active, frozen, closed)
+ * - Observer Pattern: Fraud detection and real-time notifications
+ * - Template Method Pattern: Common transaction processing workflow
+ * - Factory Pattern: Account and transaction creation
+ * 
+ * Key Features:
+ * - Multiple account types with different rules and benefits
+ * - Real-time fraud detection and prevention
+ * - Loan processing with automated approval workflows
+ * - Investment portfolio management with risk assessment
+ * - Comprehensive transaction history and reporting
+ * - ATM integration and card management
+ */
 
-// Enums
+// Account type enumeration - defines different banking products
 const AccountType = {
-    SAVINGS: 'SAVINGS',
-    CHECKING: 'CHECKING',
-    CREDIT: 'CREDIT',
-    INVESTMENT: 'INVESTMENT'
+    SAVINGS: 'SAVINGS',        // Interest-bearing savings account
+    CHECKING: 'CHECKING',      // Daily transaction account
+    CREDIT: 'CREDIT',          // Credit card account with limit
+    INVESTMENT: 'INVESTMENT'   // Investment account for securities
 };
 
 const TransactionType = {
