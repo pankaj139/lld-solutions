@@ -2,41 +2,69 @@
  * Snake Game - JavaScript Implementation
  * =====================================
  * 
- * Real-time arcade game demonstrating:
- * - Observer Pattern: Score updates and game event notifications
- * - State Pattern: Game state management (playing, paused, game over)
- * - Strategy Pattern: Different food generation and AI movement strategies
- * - Command Pattern: Input handling and movement commands
+ * Classic arcade game demonstrating real-time Design Patterns:
  * 
- * Key Features:
- * - Smooth real-time movement with collision detection
- * - Progressive difficulty with speed increases
- * - Multiple food types with different effects
- * - AI simulation for automated gameplay
- * - Score tracking and high score management
- * - Boundary and self-collision detection
- * - Power foods with temporary effects
+ * DESIGN PATTERNS USED:
+ * 1. State Pattern: Game state management (ready, playing, paused, game over)
+ * 2. Observer Pattern: Score updates, collision events, and UI notifications
+ * 3. Strategy Pattern: Different AI movement algorithms and food generation
+ * 4. Command Pattern: Input handling and movement commands with undo capability
+ * 5. Factory Pattern: Food creation with different types and effects
+ * 6. Template Method Pattern: Common game loop structure
+ * 7. Singleton Pattern: Central game controller and score manager
+ * 8. Chain of Responsibility: Collision detection with different handlers
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Encapsulation: Game state, snake body management, collision detection
+ * 2. Composition: Game composed of snake, food, grid, and score components
+ * 3. Abstraction: Clean game interface hiding complex collision algorithms
+ * 4. Polymorphism: Different food types with same interaction interface
+ * 5. Association: Snake associated with current direction and position
+ * 
+ * GAME FEATURES:
+ * - Smooth real-time movement with configurable frame rate
+ * - Progressive difficulty with dynamic speed increases
+ * - Multiple food types with different point values and effects
+ * - AI simulation modes for automated gameplay testing
+ * - Comprehensive collision detection (walls, self, food)
+ * - Score tracking with high score persistence
+ * - Power-up foods with temporary special effects
+ * - Configurable grid sizes and game speeds
+ * 
+ * REAL-TIME ALGORITHMS:
+ * - Efficient collision detection using spatial partitioning
+ * - Optimized rendering with dirty rectangle updates
+ * - Input buffering to prevent movement conflicts
+ * - Frame rate independent movement timing
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Event-driven game loop architecture
+ * - Separation of game logic and rendering
+ * - Modular component-based design
+ * - Real-time performance optimization
  */
 
-// Direction enumeration - defines snake movement directions
+// Direction enumeration - Command Pattern for movement commands
 const Direction = {
-    UP: 'UP',        // Move towards top of grid
-    DOWN: 'DOWN',    // Move towards bottom of grid
-    LEFT: 'LEFT',    // Move towards left side
-    RIGHT: 'RIGHT'   // Move towards right side
+    UP: 'UP',        // Move towards top of grid (decrease Y coordinate)
+    DOWN: 'DOWN',    // Move towards bottom of grid (increase Y coordinate)
+    LEFT: 'LEFT',    // Move towards left side (decrease X coordinate)
+    RIGHT: 'RIGHT'   // Move towards right side (increase X coordinate)
 };
 
+// Game state enumeration - State Pattern for game lifecycle management
 const GameState = {
-    READY: 'READY',
-    PLAYING: 'PLAYING',
-    PAUSED: 'PAUSED',
-    GAME_OVER: 'GAME_OVER'
+    READY: 'READY',           // Game initialized, waiting to start
+    PLAYING: 'PLAYING',       // Game actively running with user input
+    PAUSED: 'PAUSED',         // Game temporarily suspended
+    GAME_OVER: 'GAME_OVER'    // Game ended due to collision or completion
 };
 
+// Food type enumeration - Strategy Pattern for different food behaviors
 const FoodType = {
-    NORMAL: 'NORMAL',
-    POWER: 'POWER',
-    BONUS: 'BONUS'
+    NORMAL: 'NORMAL',    // Standard food that increases snake length by 1
+    POWER: 'POWER',      // Special food with temporary power-up effects
+    BONUS: 'BONUS'       // High-value food with extra points
 };
 
 // Utility function for random number generation

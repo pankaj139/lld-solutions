@@ -2,43 +2,78 @@
  * Online Shopping System - JavaScript Implementation
  * ==================================================
  * 
- * Multi-vendor e-commerce platform demonstrating:
- * - Strategy Pattern: Multiple payment processing strategies
- * - State Pattern: Order lifecycle management
- * - Observer Pattern: Real-time notifications for orders and inventory
- * - Factory Pattern: User and product creation
- * - Command Pattern: Shopping cart operations
+ * Enterprise-grade e-commerce platform demonstrating advanced Design Patterns:
  * 
- * Key Features:
- * - Multi-vendor marketplace with seller management
- * - Real-time inventory tracking and validation
- * - Advanced shopping cart with session persistence
- * - Multiple payment methods and processing
- * - Order tracking and fulfillment workflow
- * - Product reviews and rating system
- * - Dynamic pricing and discount management
+ * DESIGN PATTERNS USED:
+ * 1. Strategy Pattern: Multiple payment processing strategies and shipping options
+ * 2. State Pattern: Order lifecycle management (pending -> confirmed -> shipped -> delivered)
+ * 3. Observer Pattern: Real-time notifications for orders, inventory, and price changes
+ * 4. Factory Pattern: Product and user creation with type-specific features
+ * 5. Command Pattern: Shopping cart operations (add, remove, update)
+ * 6. Decorator Pattern: Enhanced product features (warranties, gift wrapping)
+ * 7. Chain of Responsibility: Order validation and approval workflow
+ * 8. Template Method Pattern: Common order processing structure
+ * 9. Facade Pattern: Simplified shopping interface hiding complexity
+ * 10. Repository Pattern: Product and order data management
+ * 11. Singleton Pattern: Central inventory management service
+ * 12. Builder Pattern: Complex order and product configuration
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Inheritance: User role hierarchy (Customer, Seller, Admin)
+ * 2. Polymorphism: Different product types, same shopping interface
+ * 3. Encapsulation: Private inventory management, payment processing
+ * 4. Abstraction: Clean shopping and payment interfaces
+ * 5. Composition: Shopping cart composed of products, orders contain items
+ * 6. Association: Complex relationships between users, products, orders
+ * 
+ * E-COMMERCE FEATURES:
+ * - Multi-vendor marketplace with seller dashboards
+ * - Real-time inventory tracking with low-stock alerts
+ * - Advanced shopping cart with session persistence and recommendations
+ * - Multiple payment gateways with fraud detection
+ * - Comprehensive order tracking and fulfillment workflow
+ * - Product reviews and rating system with moderation
+ * - Dynamic pricing with promotions and discount management
+ * - Search and filtering with recommendation algorithms
+ * - Wishlist and favorites with sharing capabilities
+ * 
+ * BUSINESS LOGIC:
+ * - Complex pricing rules with bulk discounts
+ * - Inventory management with supplier integration
+ * - Tax calculation with geographic rules
+ * - Shipping cost calculation with carrier integration
+ * - Return and refund processing
+ * - Customer loyalty programs and points system
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Event-driven order processing
+ * - Microservice-ready modular design
+ * - Real-time inventory synchronization
+ * - Scalable product catalog management
  */
 
-// User role enumeration - defines access levels and permissions
+// User role enumeration - Strategy Pattern for role-based permissions and features
 const UserRole = {
-    CUSTOMER: 'CUSTOMER',    // Regular buyers with shopping privileges
-    SELLER: 'SELLER',        // Vendors who can list and sell products
-    ADMIN: 'ADMIN'           // Platform administrators with full access
+    CUSTOMER: 'CUSTOMER',    // Regular buyers with shopping and review privileges
+    SELLER: 'SELLER',        // Vendors who can list products and manage inventory
+    ADMIN: 'ADMIN'           // Platform administrators with full system access
 };
 
+// Order status enumeration - State Pattern for order lifecycle management
 const OrderStatus = {
-    PENDING: 'PENDING',
-    CONFIRMED: 'CONFIRMED',
-    SHIPPED: 'SHIPPED',
-    DELIVERED: 'DELIVERED',
-    CANCELLED: 'CANCELLED'
+    PENDING: 'PENDING',       // Order created but payment not processed
+    CONFIRMED: 'CONFIRMED',   // Payment confirmed, order being prepared
+    SHIPPED: 'SHIPPED',       // Order dispatched for delivery
+    DELIVERED: 'DELIVERED',   // Order successfully delivered to customer
+    CANCELLED: 'CANCELLED'    // Order cancelled by customer or system
 };
 
+// Payment method enumeration - Strategy Pattern for payment processing
 const PaymentMethod = {
-    CREDIT_CARD: 'CREDIT_CARD',
-    PAYPAL: 'PAYPAL',
-    DIGITAL_WALLET: 'DIGITAL_WALLET',
-    CASH_ON_DELIVERY: 'CASH_ON_DELIVERY'
+    CREDIT_CARD: 'CREDIT_CARD',           // Credit/debit card payment
+    PAYPAL: 'PAYPAL',                     // PayPal payment gateway
+    DIGITAL_WALLET: 'DIGITAL_WALLET',     // Mobile wallet payment
+    CASH_ON_DELIVERY: 'CASH_ON_DELIVERY'  // Cash payment on delivery
 };
 
 const PaymentStatus = {

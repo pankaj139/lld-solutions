@@ -1,27 +1,118 @@
-// Stock Trading System - JavaScript Implementation
-// Advanced trading platform with portfolio management and market data
+/**
+ * Stock Trading System - JavaScript Implementation
+ * ==============================================
+ * 
+ * Advanced financial trading platform demonstrating enterprise Design Patterns:
+ * 
+ * DESIGN PATTERNS USED:
+ * 1. Strategy Pattern: Different order execution strategies (market, limit, stop)
+ * 2. Observer Pattern: Real-time price updates and portfolio notifications
+ * 3. Command Pattern: Trading operations (buy, sell, cancel) as commands
+ * 4. State Pattern: Order status lifecycle management
+ * 5. Factory Pattern: Order creation with type-specific validation
+ * 6. Chain of Responsibility: Order validation and risk management
+ * 7. Template Method Pattern: Common order processing workflow
+ * 8. Singleton Pattern: Central market data and matching engine
+ * 9. Decorator Pattern: Enhanced orders with stop-loss and take-profit
+ * 10. Mediator Pattern: Order book matching between buyers and sellers
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Encapsulation: Private portfolio calculations, order matching logic
+ * 2. Inheritance: Different order types with specialized behavior
+ * 3. Polymorphism: Various order types, same execution interface
+ * 4. Composition: Trading system composed of portfolios, orders, stocks
+ * 5. Association: Complex relationships between traders, stocks, orders
+ * 
+ * FINANCIAL FEATURES:
+ * - Real-time order book with bid/ask spreads
+ * - Multiple order types with sophisticated execution
+ * - Portfolio management with real-time P&L calculation
+ * - Risk management with position limits and margin
+ * - Market data streaming with price history
+ * - Advanced analytics and performance metrics
+ * - Automated trading strategies and algorithms
+ * 
+ * TRADING ALGORITHMS:
+ * - Order matching engine with price-time priority
+ * - Market making algorithms for liquidity
+ * - Risk assessment with value-at-risk calculations
+ * - Portfolio optimization with modern portfolio theory
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Event-driven market data processing
+ * - High-frequency trading support
+ * - Real-time risk monitoring
+ * - Regulatory compliance and audit trails
+ */
 
-const OrderType = { MARKET: 'MARKET', LIMIT: 'LIMIT', STOP: 'STOP', STOP_LIMIT: 'STOP_LIMIT' };
-const OrderSide = { BUY: 'BUY', SELL: 'SELL' };
-const OrderStatus = { PENDING: 'PENDING', FILLED: 'FILLED', PARTIALLY_FILLED: 'PARTIALLY_FILLED', CANCELLED: 'CANCELLED', REJECTED: 'REJECTED' };
-const MarketStatus = { OPEN: 'OPEN', CLOSED: 'CLOSED', PRE_MARKET: 'PRE_MARKET', AFTER_HOURS: 'AFTER_HOURS' };
+// Order type enumeration - Strategy Pattern for different execution strategies
+const OrderType = { 
+    MARKET: 'MARKET',           // Execute immediately at current market price
+    LIMIT: 'LIMIT',             // Execute only at specified price or better
+    STOP: 'STOP',               // Convert to market order when stop price hit
+    STOP_LIMIT: 'STOP_LIMIT'    // Convert to limit order when stop price hit
+};
 
-function generateUUID() { return 'xxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
+// Order side enumeration - Command Pattern for buy/sell operations
+const OrderSide = { 
+    BUY: 'BUY',     // Purchase securities
+    SELL: 'SELL'    // Sell securities
+};
 
+// Order status enumeration - State Pattern for order lifecycle
+const OrderStatus = { 
+    PENDING: 'PENDING',                     // Order submitted but not executed
+    FILLED: 'FILLED',                       // Order completely executed
+    PARTIALLY_FILLED: 'PARTIALLY_FILLED',   // Order partially executed
+    CANCELLED: 'CANCELLED',                 // Order cancelled by trader
+    REJECTED: 'REJECTED'                    // Order rejected by system
+};
+
+// Market status enumeration - State Pattern for trading session management
+const MarketStatus = { 
+    OPEN: 'OPEN',                 // Regular trading hours
+    CLOSED: 'CLOSED',             // Market closed
+    PRE_MARKET: 'PRE_MARKET',     // Pre-market trading session
+    AFTER_HOURS: 'AFTER_HOURS'    // After-hours trading session
+};
+
+// Utility function for generating unique trade and order identifiers
+function generateUUID() { 
+    return 'xxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, c => { 
+        const r = Math.random() * 16 | 0; 
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); 
+    }); 
+}
+
+/**
+ * Stock Class - Represents tradeable securities with market data
+ * 
+ * DESIGN PATTERNS:
+ * - Observer Pattern: Price updates notify subscribers
+ * - Value Object Pattern: Immutable price history records
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: Stock data and price calculation methods
+ * - State Management: Real-time price and volume tracking
+ */
 class Stock {
     constructor(symbol, name, currentPrice) {
-        this.symbol = symbol;
-        this.name = name;
-        this.currentPrice = currentPrice;
-        this.dayHigh = currentPrice;
-        this.dayLow = currentPrice;
-        this.openPrice = currentPrice;
-        this.volume = 0;
-        this.marketCap = 0;
-        this.priceHistory = [];
-        this.lastUpdated = new Date();
+        this.symbol = symbol;           // Stock ticker symbol
+        this.name = name;               // Company name
+        this.currentPrice = currentPrice; // Current market price
+        this.dayHigh = currentPrice;    // Highest price today
+        this.dayLow = currentPrice;     // Lowest price today
+        this.openPrice = currentPrice;  // Opening price today
+        this.volume = 0;                // Total shares traded today
+        this.marketCap = 0;             // Market capitalization
+        this.priceHistory = [];         // Historical price data
+        this.lastUpdated = new Date();  // Last price update timestamp
     }
     
+    /**
+     * Observer Pattern: Price update notification
+     * Updates all dependent calculations and notifies observers
+     */
     updatePrice(newPrice) {
         this.currentPrice = newPrice;
         this.dayHigh = Math.max(this.dayHigh, newPrice);

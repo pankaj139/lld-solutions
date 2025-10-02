@@ -1,20 +1,75 @@
+/**
+ * URL Shortener Service - JavaScript Implementation
+ * ================================================
+ * 
+ * Scalable URL shortening service demonstrating key Design Patterns:
+ * 
+ * DESIGN PATTERNS USED:
+ * 1. Factory Pattern: URL creation with different encoding strategies
+ * 2. Strategy Pattern: Multiple URL encoding algorithms (Base62, custom)
+ * 3. Repository Pattern: URL storage and retrieval abstraction
+ * 4. Observer Pattern: Analytics tracking and click notifications
+ * 5. Command Pattern: URL operations (create, update, delete)
+ * 6. Decorator Pattern: Enhanced URLs with custom aliases and analytics
+ * 7. Facade Pattern: Simplified API interface hiding complexity
+ * 8. Singleton Pattern: Central URL mapping service
+ * 9. Template Method Pattern: Common URL processing workflow
+ * 10. Chain of Responsibility: URL validation with multiple checks
+ * 
+ * OOP CONCEPTS DEMONSTRATED:
+ * 1. Encapsulation: Private URL mapping, analytics data
+ * 2. Composition: Service composed of users, URLs, analytics
+ * 3. Abstraction: Clean URL shortening interface
+ * 4. Polymorphism: Different encoding strategies, same interface
+ * 5. Association: URLs associated with users and analytics
+ * 
+ * SERVICE FEATURES:
+ * - Multiple URL encoding algorithms for scalability
+ * - Custom alias support with availability checking
+ * - Comprehensive analytics with click tracking
+ * - User account management with usage limits
+ * - URL expiration and lifecycle management
+ * - QR code generation for shortened URLs
+ * - Bulk URL processing and management
+ * - API rate limiting and abuse prevention
+ * 
+ * SCALABILITY FEATURES:
+ * - Distributed URL generation for high throughput
+ * - Caching layer for popular URLs
+ * - Analytics aggregation with real-time updates
+ * - Horizontal scaling with consistent hashing
+ * 
+ * ALGORITHMS IMPLEMENTED:
+ * - Base62 encoding for compact URL generation
+ * - Collision detection and resolution
+ * - Bloom filters for duplicate URL detection
+ * - Load balancing for distributed systems
+ * 
+ * ARCHITECTURAL PRINCIPLES:
+ * - Microservice-ready modular design
+ * - Event-driven analytics processing
+ * - High-availability with failover support
+ * - Security-first design with input validation
+ */
+
 // URL Shortener in JavaScript
 
-// Enums
+// URL status enumeration - State Pattern for URL lifecycle management
 const UrlStatus = {
-    ACTIVE: 'ACTIVE',
-    EXPIRED: 'EXPIRED',
-    DELETED: 'DELETED'
+    ACTIVE: 'ACTIVE',     // URL is active and redirecting traffic
+    EXPIRED: 'EXPIRED',   // URL has expired and no longer redirects
+    DELETED: 'DELETED'    // URL has been deleted by user or system
 };
 
+// Payment status enumeration - State Pattern for premium feature billing
 const PaymentStatus = {
-    PENDING: 'PENDING',
-    COMPLETED: 'COMPLETED',
-    FAILED: 'FAILED',
-    REFUNDED: 'REFUNDED'
+    PENDING: 'PENDING',     // Payment initiated but not processed
+    COMPLETED: 'COMPLETED', // Payment successfully processed
+    FAILED: 'FAILED',       // Payment failed due to various reasons
+    REFUNDED: 'REFUNDED'    // Payment refunded to customer
 };
 
-// Simple UUID generator
+// Utility function for generating unique identifiers
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
@@ -23,22 +78,44 @@ function generateUUID() {
     });
 }
 
+/**
+ * User Class - Represents registered users of the URL shortener service
+ * 
+ * DESIGN PATTERNS:
+ * - Entity Pattern: Core business entity with identity
+ * - Repository Pattern: User data persistence abstraction
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: User data and URL management
+ * - Association: User associated with multiple URLs
+ */
 class User {
     constructor(userId, email) {
-        this.userId = userId;
-        this.email = email;
-        this.createdAt = new Date();
-        this.urlCount = 0;
-        this.customAliases = new Map(); // alias -> longUrl
+        this.userId = userId;           // Unique user identifier
+        this.email = email;             // User contact email
+        this.createdAt = new Date();    // Account creation timestamp
+        this.urlCount = 0;              // Total URLs created by user
+        this.customAliases = new Map(); // Custom aliases mapping (alias -> longUrl)
     }
 }
 
+/**
+ * Url Class - Core entity representing shortened URLs
+ * 
+ * DESIGN PATTERNS:
+ * - State Pattern: URL status lifecycle management
+ * - Strategy Pattern: Different encoding and validation strategies
+ * 
+ * OOP CONCEPTS:
+ * - Encapsulation: URL data and analytics tracking
+ * - Composition: URL contains analytics and metadata
+ */
 class Url {
     constructor(urlId, longUrl, shortUrl, user = null) {
-        this.urlId = urlId;
-        this.longUrl = longUrl;
-        this.shortUrl = shortUrl;
-        this.user = user;
+        this.urlId = urlId;         // Unique URL identifier
+        this.longUrl = longUrl;     // Original long URL
+        this.shortUrl = shortUrl;   // Generated short URL
+        this.user = user;           // Associated user (if registered)
         this.createdAt = new Date();
         this.expiryDate = null;
         this.status = UrlStatus.ACTIVE;
