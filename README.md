@@ -25,12 +25,12 @@ Each problem includes:
 |---------|---------|------------|------------|--------------|
 | [Parking Lot System](./python/parking-lot/) | ✅ | ✅ | Medium | Strategy, State, Factory |
 | [Library Management](./python/library-management/) | ✅ | 🔄 | Medium | Template Method, Strategy |
+| [ATM System](./python/atm-system/) | ✅ | 🔄 | Medium | State, Command, Strategy |
+| [Chat Application](./python/chat-application/) | ✅ | 🔄 | Medium | Observer, Mediator, Factory |
 | Hotel Booking System | 🔄 | 🔄 | Hard | Observer, Command, State |
-| Chat Application | 🔄 | 🔄 | Medium | Observer, Mediator |
 | Food Delivery System | 🔄 | 🔄 | Hard | Strategy, Observer, Factory |
 | Ride Sharing System | 🔄 | 🔄 | Hard | Strategy, State, Observer |
 | Movie Ticket Booking | 🔄 | 🔄 | Medium | Command, State, Factory |
-| ATM System | 🔄 | 🔄 | Medium | State, Command, Chain of Responsibility |
 | Elevator System | 🔄 | 🔄 | Hard | State, Strategy, Observer |
 | URL Shortener | 🔄 | 🔄 | Medium | Factory, Strategy |
 
@@ -148,9 +148,9 @@ We welcome contributions! Please:
 ## 📊 Progress Tracker
 
 - **Documentation**: ✅ Complete (4/4 files)
-- **Python Solutions**: 🔄 In Progress (2/50 problems) 
+- **Python Solutions**: 🔄 In Progress (4/50 problems) 
 - **JavaScript Solutions**: 🔄 In Progress (1/50 problems)
-- **Total Implementation**: 6% complete
+- **Total Implementation**: 9% complete
 
 ## 📞 Support
 
