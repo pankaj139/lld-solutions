@@ -1,5 +1,9 @@
 # URL Shortener
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/url-shortener/main.py](python/url-shortener/main.py)
+- **JavaScript Implementation**: [javascript/url-shortener/main.js](javascript/url-shortener/main.js)
+
 ## Problem Statement
 
 Design a URL shortening service like bit.ly or tinyurl that can:

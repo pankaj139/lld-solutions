@@ -1,5 +1,9 @@
 # Chess Game
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/chess-game/main.py](python/chess-game/main.py)
+- **JavaScript Implementation**: [javascript/chess-game/main.js](javascript/chess-game/main.js)
+
 ## Problem Statement
 
 Design a complete chess game system that can:

@@ -1,5 +1,9 @@
 # Social Media Platform
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/social-media/main.py](python/social-media/main.py)
+- **JavaScript Implementation**: [javascript/social-media/main.js](javascript/social-media/main.js)
+
 ## Problem Statement
 
 Design a social media platform that can:

@@ -1,5 +1,9 @@
 # Memory Card Game
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/memory-card-game/main.py](python/memory-card-game/main.py)
+- **JavaScript Implementation**: [javascript/memory-card-game/main.js](javascript/memory-card-game/main.js)
+
 ## Problem Statement
 
 Design a memory card matching game that can:

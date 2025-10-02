@@ -1,5 +1,9 @@
 # Snake Game
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/snake-game/main.py](python/snake-game/main.py)
+- **JavaScript Implementation**: [javascript/snake-game/main.js](javascript/snake-game/main.js)
+
 ## Problem Statement
 
 Design a real-time snake game that can:

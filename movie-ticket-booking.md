@@ -1,5 +1,9 @@
 # Movie Ticket Booking System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/movie-ticket-booking/main.py](python/movie-ticket-booking/main.py)
+- **JavaScript Implementation**: [javascript/movie-ticket-booking/main.js](javascript/movie-ticket-booking/main.js)
+
 ## Problem Statement
 
 Design a movie ticket booking platform that can:

@@ -1,5 +1,9 @@
 # Chat Application
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/chat-application/main.py](python/chat-application/main.py)
+- **JavaScript Implementation**: [javascript/chat-application/main.js](javascript/chat-application/main.js)
+
 ## Problem Statement
 
 Design a chat application system that can:

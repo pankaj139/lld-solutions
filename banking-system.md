@@ -1,5 +1,9 @@
 # Banking System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/banking-system/main.py](python/banking-system/main.py)
+- **JavaScript Implementation**: [javascript/banking-system/main.js](javascript/banking-system/main.js)
+
 ## Problem Statement
 
 Design a comprehensive banking system that can:

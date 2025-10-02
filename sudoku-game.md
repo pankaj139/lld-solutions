@@ -1,5 +1,9 @@
 # Sudoku Game
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/sudoku-game/main.py](python/sudoku-game/main.py)
+- **JavaScript Implementation**: [javascript/sudoku-game/main.js](javascript/sudoku-game/main.js)
+
 ## Problem Statement
 
 Design a sudoku puzzle game that can:

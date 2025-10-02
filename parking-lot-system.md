@@ -1,5 +1,9 @@
 # Parking Lot System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/parking-lot/main.py](python/parking-lot/main.py)
+- **JavaScript Implementation**: [javascript/parking-lot/main.js](javascript/parking-lot/main.js)
+
 ## Problem Statement
 
 Design a parking lot system that can:

@@ -1,5 +1,9 @@
 # Tic-Tac-Toe Game
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/tic-tac-toe/main.py](python/tic-tac-toe/main.py)
+- **JavaScript Implementation**: [javascript/tic-tac-toe/main.js](javascript/tic-tac-toe/main.js)
+
 ## Problem Statement
 
 Design a tic-tac-toe game system that can:

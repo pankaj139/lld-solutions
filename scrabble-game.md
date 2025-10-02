@@ -1,5 +1,9 @@
 # Scrabble Game
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/scrabble-game/main.py](python/scrabble-game/main.py)
+- **JavaScript Implementation**: [javascript/scrabble-game/main.js](javascript/scrabble-game/main.js)
+
 ## Problem Statement
 
 Design a Scrabble word game that can:

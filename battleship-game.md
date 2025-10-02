@@ -1,5 +1,9 @@
 # Battleship Game
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/battleship-game/main.py](python/battleship-game/main.py)
+- **JavaScript Implementation**: [javascript/battleship-game/main.js](javascript/battleship-game/main.js)
+
 ## Problem Statement
 
 Design a Battleship naval strategy game that can:

@@ -1,5 +1,9 @@
 # Elevator System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/elevator-system/main.py](python/elevator-system/main.py)
+- **JavaScript Implementation**: [javascript/elevator-system/main.js](javascript/elevator-system/main.js)
+
 ## Problem Statement
 
 Design an intelligent elevator control system that can:

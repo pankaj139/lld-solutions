@@ -1,5 +1,9 @@
 # Library Management System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/library-management/main.py](python/library-management/main.py)
+- **JavaScript Implementation**: [javascript/library-management/main.js](javascript/library-management/main.js)
+
 ## Problem Statement
 
 Design a library management system that can:

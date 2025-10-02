@@ -1,5 +1,9 @@
 # Stock Trading System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/stock-trading/main.py](python/stock-trading/main.py)
+- **JavaScript Implementation**: [javascript/stock-trading/main.js](javascript/stock-trading/main.js)
+
 ## Problem Statement
 
 Design a stock trading platform that can:

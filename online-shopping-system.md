@@ -1,5 +1,9 @@
 # Online Shopping System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/online-shopping/main.py](python/online-shopping/main.py)
+- **JavaScript Implementation**: [javascript/online-shopping/main.js](javascript/online-shopping/main.js)
+
 A comprehensive e-commerce platform demonstrating advanced object-oriented design patterns and real-world business logic.
 
 ## 🏗️ System Architecture

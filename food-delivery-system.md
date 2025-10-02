@@ -1,5 +1,9 @@
 # Food Delivery System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/food-delivery/main.py](python/food-delivery/main.py)
+- **JavaScript Implementation**: [javascript/food-delivery/main.js](javascript/food-delivery/main.js)
+
 ## Problem Statement
 
 Design a comprehensive food delivery platform that can:

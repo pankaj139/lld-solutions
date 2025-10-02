@@ -1,5 +1,9 @@
 # ATM System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/atm-system/main.py](python/atm-system/main.py)
+- **JavaScript Implementation**: [javascript/atm-system/main.js](javascript/atm-system/main.js)
+
 ## Problem Statement
 
 Design an ATM (Automated Teller Machine) system that can:

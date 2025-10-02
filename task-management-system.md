@@ -1,5 +1,9 @@
 # Task Management System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/task-management/main.py](python/task-management/main.py)
+- **JavaScript Implementation**: [javascript/task-management/main.js](javascript/task-management/main.js)
+
 ## Problem Statement
 
 Design a project management and task tracking system that can:

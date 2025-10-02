@@ -1,5 +1,9 @@
 # Hotel Booking System
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/hotel-booking/main.py](python/hotel-booking/main.py)
+- **JavaScript Implementation**: [javascript/hotel-booking/main.js](javascript/hotel-booking/main.js)
+
 ## Problem Statement
 
 Design a hotel booking system that can:

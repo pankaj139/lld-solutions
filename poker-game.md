@@ -1,5 +1,9 @@
 # Poker Game
 
+## 🔗 Implementation Links
+- **Python Implementation**: [python/poker-game/main.py](python/poker-game/main.py)
+- **JavaScript Implementation**: [javascript/poker-game/main.js](javascript/poker-game/main.js)
+
 ## Problem Statement
 
 Design a Texas Hold'em poker game that can:
