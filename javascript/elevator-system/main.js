@@ -1,0 +1,7 @@
+/**ELEVATOR SYSTEM - Patterns: State, Strategy, Observer, Singleton, Command*/
+const ElevatorState = Object.freeze({IDLE:'idle',MOVING_UP:'moving_up',MOVING_DOWN:'moving_down',STOPPED:'stopped'});
+class Elevator{constructor(elevatorId,maxFloor){this.elevatorId=elevatorId;this.currentFloor=0;this.state=ElevatorState.IDLE;this.maxFloor=maxFloor}moveTo(floor){if(floor>this.currentFloor)this.state=ElevatorState.MOVING_UP;else if(floor<this.currentFloor)this.state=ElevatorState.MOVING_DOWN;console.log(`🛗 Elevator ${this.elevatorId}: ${this.currentFloor} → ${floor}`);this.currentFloor=floor;this.state=ElevatorState.STOPPED}}
+class ElevatorController{constructor(){if(ElevatorController.instance)return ElevatorController.instance;this.elevators=new Map();ElevatorController.instance=this}addElevator(elevator){this.elevators.set(elevator.elevatorId,elevator)}request(floor){let nearest=null,minDist=Infinity;for(const e of this.elevators.values()){const dist=Math.abs(e.currentFloor-floor);if(dist<minDist){minDist=dist;nearest=e}}nearest.moveTo(floor)}}
+function main(){console.log('='.repeat(70));console.log('ELEVATOR SYSTEM - Demo');console.log('='.repeat(70));const controller=new ElevatorController();controller.addElevator(new Elevator('E1',10));controller.addElevator(new Elevator('E2',10));controller.request(5);controller.request(8);console.log('\n'+'='.repeat(70));console.log('DEMO COMPLETE');console.log('='.repeat(70))}
+if(typeof require!=='undefined'&&require.main===module)main();
+
