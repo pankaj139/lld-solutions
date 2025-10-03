@@ -12,6 +12,45 @@ This implementation demonstrates:
 from enum import Enum
 import random
 import time
+"""
+SNAKE GAME SYSTEM - Low Level Design Implementation in Python
+
+DESIGN PATTERNS USED:
+1. STATE PATTERN: Game state management with clear transitions
+   - Game states: MENU -> PLAYING -> PAUSED -> GAME_OVER
+   - Snake direction states with movement validation
+   - Each state has specific input handling and rendering logic
+   - Prevents invalid state transitions and operations
+
+2. COMMAND PATTERN: Input handling and game actions
+   - Movement commands: up, down, left, right with validation
+   - Game control commands: pause, resume, restart
+   - Undo support for testing and debugging
+   - Input buffering for smooth gameplay
+
+3. OBSERVER PATTERN: Game event notifications
+   - Score updates, collision events, food consumption
+   - UI updates decoupled from game logic
+   - Sound effects and visual feedback systems
+   - Achievement and high score notifications
+
+4. STRATEGY PATTERN: Different difficulty levels and AI modes
+   - Speed strategies: slow, medium, fast, progressive difficulty
+   - AI snake strategies for computer players
+   - Scoring strategies: standard, bonus multipliers, time-based
+   - Food generation strategies: random, pattern-based, strategic placement
+
+5. TEMPLATE METHOD PATTERN: Game loop structure
+   - Standard game cycle: input -> update -> render -> check conditions
+   - Customizable update logic for different game modes
+   - Consistent frame rate and timing management
+   - Extensible framework for game variations
+
+OOP CONCEPTS: Encapsulation (Game state), Abstraction (Game logic), Polymorphism (Different game modes)
+SOLID PRINCIPLES: SRP for game components, OCP for new game modes, LSP for input handlers
+BUSINESS FEATURES: High score tracking, multiple difficulty levels, smooth gameplay
+"""
+
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Optional
 

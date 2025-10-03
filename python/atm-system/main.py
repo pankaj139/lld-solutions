@@ -1,12 +1,65 @@
+"""
+ATM SYSTEM - Low Level Design Implementation in Python
+
+DESIGN PATTERNS USED:
+1. STATE PATTERN: ATM operates in different states (IDLE, CARD_INSERTED, PIN_ENTERED, etc.)
+   - Encapsulates state-specific behavior and transitions
+   - Makes state transitions explicit and manageable
+   - Each state has specific allowed operations
+
+2. FACADE PATTERN: ATM class provides simplified interface to complex subsystems
+   - Hides complexity of cash dispensing, banking services, card validation
+   - Single point of interaction for clients
+   - Coordinates between multiple subsystems
+
+3. TEMPLATE METHOD PATTERN: Transaction processing follows a template
+   - Define skeleton of transaction algorithm in base method
+   - Subclasses override specific steps (validate, process, log)
+   - Ensures consistent transaction flow
+
+4. STRATEGY PATTERN: Different cash dispensing strategies
+   - Greedy algorithm for optimal denomination distribution
+   - Pluggable algorithms for different dispensing policies
+   - Easy to add new dispensing strategies
+
+OOP CONCEPTS DEMONSTRATED:
+- ENCAPSULATION: Internal state hidden behind methods (ATM state, account balance)
+- ABSTRACTION: Abstract base classes for common interfaces (Transaction, etc.)
+- INHERITANCE: Specialized transaction types inherit from base Transaction
+- POLYMORPHISM: Different transaction types processed uniformly
+
+SOLID PRINCIPLES:
+- SRP: Each class has single responsibility (ATM operations, cash dispensing, banking)
+- OCP: Easy to add new transaction types without modifying existing code
+- LSP: All transaction types can be used interchangeably
+- ISP: Focused interfaces for specific operations
+- DIP: ATM depends on abstractions (BankingService) not concrete implementations
+
+BUSINESS FEATURES:
+- Multi-step transaction workflow with state management
+- Cash dispensing with denomination optimization
+- Account validation and daily limits
+- Transaction logging and audit trail
+- Error handling and recovery mechanisms
+
+ARCHITECTURAL NOTES:
+- Clear separation between ATM hardware interface and business logic
+- Event-driven state transitions
+- Pluggable services for banking operations
+- Comprehensive error handling and validation
+"""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from datetime import datetime
 import uuid
 
+# DOMAIN MODEL: Account types supported by the banking system
+# Used for business rule validation and fee calculation
 class AccountType(Enum):
-    CHECKING = 1
-    SAVINGS = 2
-    CREDIT = 3
+    CHECKING = 1    # Standard checking account with overdraft
+    SAVINGS = 2     # Savings account with interest
+    CREDIT = 3      # Credit card account with credit limit
 
 class TransactionType(Enum):
     WITHDRAWAL = 1
@@ -14,13 +67,16 @@ class TransactionType(Enum):
     BALANCE_INQUIRY = 3
     TRANSFER = 4
 
+# STATE PATTERN: Explicit states for ATM state machine
+# Each state defines valid transitions and operations
+# Prevents invalid operations in wrong states
 class ATMState(Enum):
-    IDLE = 1
-    CARD_INSERTED = 2
-    PIN_ENTERED = 3
-    OPTION_SELECTED = 4
-    TRANSACTION_COMPLETED = 5
-    OUT_OF_SERVICE = 6
+    IDLE = 1                    # Waiting for card insertion
+    CARD_INSERTED = 2          # Card validated, waiting for PIN
+    PIN_ENTERED = 3            # PIN verified, show menu options
+    OPTION_SELECTED = 4        # Transaction type selected
+    TRANSACTION_COMPLETED = 5   # Transaction finished, return card
+    OUT_OF_SERVICE = 6         # ATM maintenance mode
 
 class TransactionStatus(Enum):
     SUCCESS = 1
@@ -30,15 +86,18 @@ class TransactionStatus(Enum):
     INSUFFICIENT_FUNDS = 5
     INCORRECT_PIN = 6
 
+# VALUE OBJECT: Immutable card representation with validation
+# ENCAPSULATION: Hides card validation logic behind clean interface
 class Card:
     def __init__(self, card_number, customer_name, expiry_date, pin):
         self.card_number = card_number
         self.customer_name = customer_name
         self.expiry_date = expiry_date
         self.pin = pin
-        self.is_blocked = False
+        self.is_blocked = False  # Security feature for fraud prevention
 
     def is_valid(self):
+        """BUSINESS RULE: Card must not be blocked and not expired"""
         return not self.is_blocked and datetime.now() < self.expiry_date
 
 class Account:

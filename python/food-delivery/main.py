@@ -1,3 +1,42 @@
+"""
+FOOD DELIVERY SYSTEM - Low Level Design Implementation in Python
+
+DESIGN PATTERNS USED:
+1. STRATEGY PATTERN: Multiple delivery and pricing strategies
+   - Delivery assignment algorithms: nearest driver, fastest route, load balancing
+   - Dynamic pricing: surge pricing, distance-based, time-based
+   - Payment strategies: card, digital wallet, cash on delivery
+   - Restaurant recommendation algorithms based on user preferences
+
+2. OBSERVER PATTERN: Real-time order tracking and notifications
+   - Order status updates to customers, restaurants, and delivery partners
+   - Location tracking for real-time delivery updates
+   - Inventory updates when items go out of stock
+   - Multiple notification channels: app, SMS, email, push notifications
+
+3. STATE PATTERN: Order lifecycle with explicit state management
+   - Order states: PLACED -> CONFIRMED -> PREPARING -> READY -> PICKED_UP -> DELIVERED
+   - Each state has specific allowed operations and business rules
+   - State-based notifications and actions
+   - Delivery partner state management (available, busy, offline)
+
+4. COMMAND PATTERN: Order operations and delivery actions
+   - Place order, modify order, cancel order as command objects
+   - Delivery commands: accept order, pick up, deliver
+   - Undo support for order modifications
+   - Batch operations for restaurant inventory updates
+
+5. FACADE PATTERN: FoodDeliveryService provides unified interface
+   - Simplifies complex operations across restaurants, customers, and delivery
+   - Hides complexity of matching, routing, and payment processing
+   - Single API for mobile app and web platform integration
+   - Coordinates between multiple subsystems
+
+OOP CONCEPTS: Inheritance (User types), Encapsulation (Order details), Polymorphism (Payment methods)
+SOLID PRINCIPLES: SRP, OCP for new restaurants/payment methods, LSP for user types
+BUSINESS FEATURES: Multi-restaurant platform, real-time tracking, delivery optimization
+"""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from datetime import datetime, timedelta

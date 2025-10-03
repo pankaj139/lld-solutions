@@ -1,12 +1,65 @@
 """
-Tic-Tac-Toe Game Implementation
-==============================
+TIC-TAC-TOE GAME SYSTEM - Low Level Design Implementation in Python
 
-This implementation demonstrates:
-- Strategy Pattern: Different AI difficulty strategies
-- State Pattern: Game state management
-- Template Method: Common game flow structure
-- Observer Pattern: Game event notifications
+DESIGN PATTERNS USED:
+1. STRATEGY PATTERN: AI difficulty levels with different move strategies
+   - Easy: Random valid moves for unpredictable gameplay
+   - Medium: Basic heuristics with some strategic thinking
+   - Hard: Minimax algorithm with optimal play
+   - Pluggable AI strategies without changing game core
+   - Easy to add new AI personalities and difficulty levels
+
+2. STATE PATTERN: Game state management with clear transitions
+   - GameStatus enum defines all possible game outcomes
+   - State transitions: ACTIVE -> X_WINS/O_WINS/DRAW
+   - Each state determines valid operations and game continuation
+   - Clear win condition checking and game termination
+
+3. TEMPLATE METHOD PATTERN: Common game flow structure
+   - Base game loop template with customizable steps
+   - Standard flow: validate move -> make move -> check win -> switch player
+   - Subclasses can override specific steps (AI vs human players)
+   - Consistent game flow regardless of player types
+
+4. OBSERVER PATTERN: Game event notifications
+   - Move events, win events, game state changes
+   - Decoupled UI updates from game logic
+   - Multiple observers: console display, GUI, game statistics
+   - Easy to add new notification types (sound, animations)
+
+5. COMMAND PATTERN: Move operations as command objects
+   - Move validation and execution encapsulated
+   - Support for undo/redo functionality
+   - Move history tracking for game replay
+   - Consistent move handling across player types
+
+OOP CONCEPTS DEMONSTRATED:
+- ENCAPSULATION: Game state and rules hidden behind clean interface
+- ABSTRACTION: Complex AI algorithms abstracted into simple strategy interface
+- POLYMORPHISM: Human and AI players treated uniformly
+- INHERITANCE: Different AI strategies inherit from base AI class
+
+SOLID PRINCIPLES:
+- SRP: Each class handles single responsibility (Board, Game, AI, Player)
+- OCP: Easy to add new AI strategies without modifying existing code
+- LSP: All player types (human/AI) can be used interchangeably
+- ISP: Focused interfaces for game operations and AI strategies
+- DIP: Game depends on player abstractions, not concrete implementations
+
+BUSINESS FEATURES:
+- Multiple AI difficulty levels for different skill challenges
+- Human vs Human, Human vs AI, AI vs AI gameplay modes
+- Game statistics tracking (wins, losses, draws)
+- Move validation with clear error messages
+- Interactive console interface with board visualization
+- Game replay and move history functionality
+
+ARCHITECTURAL NOTES:
+- Clean separation between game logic and AI strategies
+- Extensible design for different board sizes (NxN grids)
+- Modular AI system for easy strategy addition
+- Event-driven architecture for UI updates
+- Stateless game operations for thread safety
 """
 
 from enum import Enum

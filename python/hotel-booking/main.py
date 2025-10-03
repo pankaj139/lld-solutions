@@ -1,3 +1,72 @@
+"""
+HOTEL BOOKING SYSTEM - Low Level Design Implementation in Python
+
+DESIGN PATTERNS USED:
+1. STATE PATTERN: Booking lifecycle with explicit state transitions
+   - BookingStatus defines all possible booking states
+   - State transitions: PENDING -> CONFIRMED -> CHECKED_IN -> CHECKED_OUT
+   - Each state has specific allowed operations and business rules
+   - Prevents invalid state transitions and operations
+
+2. BUILDER PATTERN: Complex booking creation with step-by-step construction
+   - BookingBuilder allows flexible booking creation
+   - Optional components: room selection, guest info, payment details
+   - Validates booking completeness before creation
+   - Supports different booking flows (online, phone, walk-in)
+
+3. STRATEGY PATTERN: Different pricing and discount strategies
+   - Seasonal pricing, corporate rates, loyalty discounts
+   - Pluggable pricing algorithms for different customer types
+   - Easy to add new pricing models and promotional offers
+   - Dynamic price calculation based on multiple factors
+
+4. DECORATOR PATTERN: Room amenities and service add-ons
+   - Base room functionality enhanced with amenities
+   - Stackable services: breakfast, wifi, parking, spa
+   - Flexible service combination without class explosion
+   - Runtime service addition and pricing calculation
+
+5. FACADE PATTERN: HotelBookingSystem provides unified interface
+   - Hides complexity of room management, booking processing, payment
+   - Single entry point for all booking operations
+   - Coordinates between multiple subsystems
+   - Simplifies client interaction with complex booking logic
+
+6. OBSERVER PATTERN: Booking event notifications
+   - Notification system for booking confirmations, cancellations
+   - Email, SMS, and push notification strategies
+   - Decoupled notification logic from core booking system
+   - Easy to add new notification channels
+
+OOP CONCEPTS DEMONSTRATED:
+- ENCAPSULATION: Booking state and business rules hidden behind methods
+- INHERITANCE: Specialized room types and guest categories
+- POLYMORPHISM: Different payment methods and notification channels
+- ABSTRACTION: Complex booking workflow abstracted into simple API calls
+
+SOLID PRINCIPLES:
+- SRP: Each class handles single responsibility (Room, Booking, Payment, Guest)
+- OCP: Easy to add new room types, payment methods without code changes
+- LSP: All room types and payment methods interchangeable
+- ISP: Focused interfaces for booking, payment, and notification operations
+- DIP: High-level booking logic depends on abstractions not implementations
+
+BUSINESS FEATURES:
+- Multi-room type support with dynamic pricing
+- Guest profile management with booking history
+- Comprehensive booking lifecycle management
+- Payment processing with multiple payment methods
+- Room availability management and conflict resolution
+- Reporting and analytics for occupancy and revenue
+
+ARCHITECTURAL NOTES:
+- Event-driven architecture for booking state changes
+- Flexible pricing engine with multiple strategy support
+- Scalable notification system with multiple channels
+- Comprehensive validation and error handling
+- Integration-ready design for external payment gateways
+"""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from datetime import datetime, timedelta

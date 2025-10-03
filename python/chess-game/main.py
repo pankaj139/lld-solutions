@@ -1,13 +1,67 @@
 """
-Chess Game Implementation
-==========================
+CHESS GAME SYSTEM - Low Level Design Implementation in Python
 
-This implementation demonstrates:
-- Strategy Pattern: Different piece movement strategies
-- State Pattern: Game state management (Active, Check, Checkmate, Stalemate)
-- Command Pattern: Move operations
-- Factory Pattern: Piece creation
-- Template Method: Common move validation structure
+DESIGN PATTERNS USED:
+1. STRATEGY PATTERN: Each piece type has unique movement strategy
+   - Piece.get_possible_moves() defines strategy interface
+   - King, Queen, Rook, Bishop, Knight, Pawn implement specific strategies
+   - Move generation algorithms encapsulated in respective piece classes
+   - Easy to modify piece behavior or add new piece types
+
+2. STATE PATTERN: Game state management with explicit states
+   - GameStatus enum defines all possible game states
+   - State transitions: ACTIVE -> CHECK -> CHECKMATE/STALEMATE
+   - Each state has specific valid operations and behaviors
+   - Clear state validation and transition rules
+
+3. COMMAND PATTERN: Move operations as command objects
+   - Move class encapsulates all move information
+   - Supports undo/redo functionality for game replay
+   - Move validation separated from move execution
+   - History tracking for game analysis
+
+4. FACTORY PATTERN: Centralized piece creation and management
+   - PieceFactory creates pieces based on type and color
+   - Type-safe piece instantiation
+   - Easy to extend with new piece variants
+
+5. TEMPLATE METHOD PATTERN: Common move validation structure
+   - Base validation steps: bounds checking, piece presence, capture rules
+   - Specific move generation delegated to piece implementations
+   - Consistent validation flow across all piece types
+
+6. COMPOSITE PATTERN: Board composition of squares and pieces
+   - Board contains 8x8 grid of squares
+   - Each square can contain a piece or be empty
+   - Hierarchical structure for position management
+
+OOP CONCEPTS DEMONSTRATED:
+- INHERITANCE: Piece hierarchy with specialized move implementations
+- POLYMORPHISM: All pieces treated uniformly through Piece interface
+- ENCAPSULATION: Game rules and state hidden behind clean API
+- ABSTRACTION: Complex chess rules abstracted into simple method calls
+
+SOLID PRINCIPLES:
+- SRP: Each class has single responsibility (Board, Piece types, Game logic)
+- OCP: Easy to add new piece types without modifying existing code
+- LSP: All piece types can be used interchangeably through Piece interface
+- ISP: Focused interfaces for piece operations and game management
+- DIP: Game depends on Piece abstraction, not concrete piece implementations
+
+BUSINESS FEATURES:
+- Complete chess rule implementation including special moves
+- Game state tracking (check, checkmate, stalemate detection)
+- Move validation and legal move generation
+- Turn-based gameplay with proper state management
+- Support for castling, en passant, pawn promotion
+- Game history and move replay capabilities
+
+ARCHITECTURAL NOTES:
+- Clear separation between game logic and piece behavior
+- Immutable position objects for thread safety
+- Comprehensive move validation with rule enforcement
+- Efficient board representation and piece lookup
+- Extensible design for chess variants and AI integration
 """
 
 from enum import Enum

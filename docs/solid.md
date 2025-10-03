@@ -7,11 +7,13 @@ The SOLID principles are five design principles that help create more maintainab
 **Definition:** A class should have only one reason to change, meaning it should have only one job or responsibility.
 
 **Why it matters:**
+
 - Easier to understand and maintain
 - Reduces coupling between functionalities
 - Makes testing simpler
 
 **Example - Violation:**
+
 ```python
 class User:
     def __init__(self, name, email):
@@ -32,6 +34,7 @@ class User:
 ```
 
 **Example - Following SRP:**
+
 ```python
 class User:
     def __init__(self, name, email):
@@ -59,11 +62,13 @@ class EmailValidator:
 **Definition:** Software entities should be open for extension but closed for modification.
 
 **Why it matters:**
+
 - Prevents breaking existing code when adding new features
 - Promotes code reusability
 - Reduces the risk of introducing bugs
 
 **Example - Violation:**
+
 ```python
 class Rectangle:
     def __init__(self, width, height):
@@ -81,6 +86,7 @@ class AreaCalculator:
 ```
 
 **Example - Following OCP:**
+
 ```python
 from abc import ABC, abstractmethod
 
@@ -114,11 +120,13 @@ class AreaCalculator:
 **Definition:** Objects of a superclass should be replaceable with objects of a subclass without breaking the application.
 
 **Why it matters:**
+
 - Ensures proper inheritance hierarchy
 - Maintains behavioral compatibility
 - Prevents unexpected behavior in polymorphic code
 
 **Example - Violation:**
+
 ```python
 class Bird:
     def fly(self):
@@ -130,6 +138,7 @@ class Penguin(Bird):
 ```
 
 **Example - Following LSP:**
+
 ```python
 from abc import ABC, abstractmethod
 
@@ -164,11 +173,13 @@ class Penguin(SwimmingBird):
 **Definition:** Clients should not be forced to depend on interfaces they do not use.
 
 **Why it matters:**
+
 - Prevents unnecessary dependencies
 - Makes interfaces more focused and cohesive
 - Reduces the impact of changes
 
 **Example - Violation:**
+
 ```python
 from abc import ABC, abstractmethod
 
@@ -198,6 +209,7 @@ class RobotWorker(Worker):
 ```
 
 **Example - Following ISP:**
+
 ```python
 from abc import ABC, abstractmethod
 
@@ -228,11 +240,13 @@ class RobotWorker(Workable):
 **Definition:** High-level modules should not depend on low-level modules. Both should depend on abstractions.
 
 **Why it matters:**
+
 - Reduces coupling between modules
 - Makes code more flexible and testable
 - Easier to swap implementations
 
 **Example - Violation:**
+
 ```python
 class MySQLDatabase:
     def save(self, data):
@@ -248,6 +262,7 @@ class UserService:
 ```
 
 **Example - Following DIP:**
+
 ```python
 from abc import ABC, abstractmethod
 

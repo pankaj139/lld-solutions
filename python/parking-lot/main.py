@@ -1,3 +1,54 @@
+"""
+PARKING LOT SYSTEM - Low Level Design Implementation in Python
+
+DESIGN PATTERNS USED:
+1. STRATEGY PATTERN: Different parking strategies for different vehicle types
+   - Each vehicle type has different space requirements
+   - Flexible parking spot allocation algorithms
+   - Easy to add new vehicle types or parking policies
+
+2. FACTORY PATTERN: Vehicle creation through factory methods
+   - Centralized vehicle instantiation logic
+   - Type-safe vehicle creation
+   - Easy to extend with new vehicle types
+
+3. COMPOSITE PATTERN: Parking lot composed of multiple levels and spots
+   - Hierarchical structure: ParkingLot -> Levels -> Spots
+   - Uniform interface for parking operations
+   - Scalable architecture for large parking facilities
+
+4. FACADE PATTERN: ParkingLot provides simplified interface
+   - Hides complexity of level management and spot allocation
+   - Single entry point for parking operations
+   - Coordinates between multiple subsystems
+
+OOP CONCEPTS DEMONSTRATED:
+- INHERITANCE: Vehicle hierarchy with specialized implementations
+- POLYMORPHISM: All vehicles treated uniformly through base Vehicle interface
+- ENCAPSULATION: Internal spot allocation logic hidden behind public methods
+- ABSTRACTION: Abstract Vehicle class defines contract for all vehicle types
+
+SOLID PRINCIPLES:
+- SRP: Each class has single responsibility (Vehicle, ParkingSpot, Level management)
+- OCP: Easy to add new vehicle types without modifying existing code
+- LSP: All vehicle types can be used interchangeably
+- ISP: Focused interfaces for parking operations
+- DIP: High-level modules depend on Vehicle abstraction, not concrete types
+
+BUSINESS FEATURES:
+- Multi-level parking facility management
+- Vehicle type-based spot allocation
+- Real-time spot availability tracking
+- Payment processing and fee calculation
+- Ticket generation and validation
+
+ARCHITECTURAL NOTES:
+- Clear separation between vehicle types and parking logic
+- Scalable design for multiple levels and thousands of spots
+- Efficient spot allocation algorithms
+- Comprehensive tracking and reporting
+"""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from datetime import datetime
@@ -18,31 +69,41 @@ class PaymentStatus(Enum):
     COMPLETED = 2
     FAILED = 3
 
+# ABSTRACT BASE CLASS: Defines contract for all vehicle types
+# POLYMORPHISM: All vehicles can be treated uniformly
 class Vehicle(ABC):
     def __init__(self, license_plate, vehicle_type):
         self.license_plate = license_plate
         self.vehicle_type = vehicle_type
 
+# INHERITANCE: Concrete vehicle implementations
+# STRATEGY PATTERN: Each vehicle type encapsulates its parking requirements
 class Motorcycle(Vehicle):
+    """Small vehicle - can fit in any spot type"""
     def __init__(self, license_plate):
         super().__init__(license_plate, VehicleType.MOTORCYCLE)
 
 class Car(Vehicle):
+    """Standard vehicle - needs car or truck spots"""
     def __init__(self, license_plate):
         super().__init__(license_plate, VehicleType.CAR)
 
 class Truck(Vehicle):
+    """Large vehicle - needs truck spots only"""
     def __init__(self, license_plate):
         super().__init__(license_plate, VehicleType.TRUCK)
 
+# ENCAPSULATION: Parking spot state and behavior encapsulated
+# STRATEGY PATTERN: Vehicle fitting logic based on spot and vehicle types
 class ParkingSpot:
     def __init__(self, spot_id, spot_type):
         self.spot_id = spot_id
         self.spot_type = spot_type
         self.is_occupied = False
-        self.vehicle = None
+        self.vehicle = None  # Currently parked vehicle
 
     def park_vehicle(self, vehicle):
+        """BUSINESS LOGIC: Park vehicle with validation"""
         if self.is_occupied:
             raise Exception("Parking spot is already occupied")
         

@@ -1,3 +1,47 @@
+"""
+MOVIE TICKET BOOKING SYSTEM - Low Level Design Implementation in Python
+
+DESIGN PATTERNS USED:
+1. STATE PATTERN: Booking lifecycle with explicit state transitions
+   - Booking states: PENDING -> CONFIRMED -> PAID -> CANCELLED
+   - Seat states: AVAILABLE -> RESERVED -> BOOKED -> LOCKED
+   - Each state has specific timeout rules and allowed operations
+   - Prevents double booking and seat conflicts
+
+2. STRATEGY PATTERN: Pricing and payment strategies
+   - Dynamic pricing: peak hours, weekend rates, holiday surcharges
+   - Discount strategies: student, senior, group, loyalty member
+   - Payment strategies: credit card, digital wallet, points redemption
+   - Seat selection strategies: best available, user preference, accessibility
+
+3. FACADE PATTERN: BookingService provides unified cinema operations
+   - Simplifies complex booking workflow across multiple cinemas
+   - Hides complexity of seat management, payment processing, notifications
+   - Single interface for mobile app and web platform
+   - Coordinates showtimes, inventory, and customer management
+
+4. OBSERVER PATTERN: Real-time seat availability and notifications
+   - Seat status updates across multiple booking sessions
+   - Booking confirmation and reminder notifications
+   - Showtime changes and cancellation alerts
+   - Multiple notification channels: email, SMS, app notifications
+
+5. TEMPLATE METHOD PATTERN: Booking workflow standardization
+   - Standard flow: select movie -> choose showtime -> pick seats -> pay -> confirm
+   - Customizable steps for different booking scenarios (group, VIP, premium)
+   - Consistent validation and error handling
+   - Extensible framework for special booking types
+
+6. FACTORY PATTERN: Ticket and booking creation
+   - Different ticket types: standard, premium, VIP, child, senior
+   - Booking creation with proper validation and initialization
+   - Centralized creation logic with business rule enforcement
+
+OOP CONCEPTS: Inheritance (Ticket types), Encapsulation (Booking details), Polymorphism (Payment methods)
+SOLID PRINCIPLES: SRP for booking components, OCP for new payment/pricing methods, LSP for ticket types
+BUSINESS FEATURES: Multi-cinema platform, real-time seat selection, dynamic pricing, loyalty programs
+"""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from datetime import datetime, timedelta

@@ -5,12 +5,14 @@ A comprehensive repository containing solutions to **23 Low-Level Design intervi
 ## 🎯 Complete Coverage of LLD Problem Categories
 
 ### 📚 **Documentation Framework**
+
 - **[Object-Oriented Programming](./docs/oop.md)** - Core principles with practical examples
 - **[SOLID Principles](./docs/solid.md)** - All five principles with violation examples and fixes
 - **[Design Patterns](./docs/design-patterns.md)** - 35+ patterns with implementations
 - **[LLD Framework](./docs/lld-framework.md)** - Step-by-step systematic approach
 
 ### 🏗️ **System Design Problems** (10 Problems)
+
 | Problem | Python | JavaScript | Key Patterns |
 |---------|--------|------------|--------------|
 | [Parking Lot System](./parking-lot-system.md) | ✅ | ✅ | Strategy, State, Factory |
@@ -25,6 +27,7 @@ A comprehensive repository containing solutions to **23 Low-Level Design intervi
 | [URL Shortener](./url-shortener.md) | ✅ | ✅ | Strategy, Caching, Analytics |
 
 ### 💼 **Business System Problems** (5 Problems)
+
 | Problem | Python | JavaScript | Key Features |
 |---------|--------|------------|--------------|
 | [Online Shopping](./online-shopping-system.md) | ✅ | ✅ | E-commerce, Multi-vendor, Payments |
@@ -34,6 +37,7 @@ A comprehensive repository containing solutions to **23 Low-Level Design intervi
 | [Stock Trading](./stock-trading-system.md) | ✅ | ✅ | Trading Platform, Risk Management |
 
 ### 🎮 **Game Design Problems** (8 Problems)
+
 | Problem | Python | JavaScript | Key Features |
 |---------|--------|------------|--------------|
 | [Chess Game](./chess-game.md) | ✅ | ✅ | Complete Chess Rules, AI |
@@ -48,11 +52,13 @@ A comprehensive repository containing solutions to **23 Low-Level Design intervi
 ## 🚀 **Technical Excellence Features**
 
 ### **35+ Design Patterns Implemented**
+
 - **Creational**: Factory, Singleton, Builder
 - **Structural**: Decorator, Composite, Adapter
 - **Behavioral**: Strategy, Observer, State, Command, Template Method, Chain of Responsibility
 
 ### **Real-World Features**
+
 - **Concurrency Handling**: Thread-safe operations, race condition prevention
 - **Real-time Systems**: Live notifications, instant messaging, location tracking
 - **Security & Compliance**: Authentication, fraud detection, data validation
@@ -60,13 +66,14 @@ A comprehensive repository containing solutions to **23 Low-Level Design intervi
 - **Scalability Design**: Modular architecture, service separation
 
 ### **Cross-Language Support**
+
 - **Consistent APIs**: Same design patterns across Python and JavaScript
 - **Language-Specific Optimizations**: Leveraging each language's strengths
 - **Universal Concepts**: Transferable knowledge between languages
 
 ## 📁 **Repository Structure**
 
-```
+```bash
 lld-solutions/
 ├── docs/                           # Complete LLD documentation
 ├── [problem-name].md               # Problem statements (23 files)
@@ -83,6 +90,7 @@ lld-solutions/
 ## 🎓 **Perfect for Interview Preparation**
 
 ### **Each Solution Includes:**
+
 - **Problem Analysis**: Functional and non-functional requirements
 - **Design Decisions**: Trade-offs and architectural choices
 - **Working Code**: Fully runnable implementations with demos
@@ -91,6 +99,7 @@ lld-solutions/
 - **Complexity Analysis**: Time and space considerations
 
 ### **Interview Categories Covered:**
+
 - **System Design**: Core infrastructure and service problems
 - **Business Logic**: Complex domain modeling and workflows
 - **Game Development**: Interactive systems and AI algorithms
@@ -131,8 +140,9 @@ Comprehensive guides to master LLD concepts:
 ## 🎯 Problem Solutions
 
 Each problem includes:
+
 - ✅ **Python implementation** (`python/<problem>/main.py`)
-- ✅ **JavaScript implementation** (`javascript/<problem>/main.js`) 
+- ✅ **JavaScript implementation** (`javascript/<problem>/main.js`)
 - ✅ **Detailed README** with problem analysis and design decisions
 - ✅ **Working demo code** you can run immediately
 
@@ -172,6 +182,7 @@ Each problem includes:
 ## 🚀 Quick Start
 
 ### Running Python Solutions
+
 ```bash
 # Navigate to any Python solution
 cd python/parking-lot/
@@ -181,6 +192,7 @@ python main.py
 ```
 
 ### Running JavaScript Solutions  
+
 ```bash
 # Navigate to any JavaScript solution
 cd javascript/parking-lot/
@@ -199,14 +211,16 @@ node main.js
 
 ## 🎯 Interview Preparation Tips
 
-### For Each Problem:
+### For Each Problem
+
 1. **Understand Requirements** - Clarify functional and non-functional needs
 2. **Design Classes** - Identify entities, relationships, and responsibilities  
 3. **Apply Patterns** - Use appropriate design patterns
 4. **Handle Edge Cases** - Consider error scenarios and constraints
 5. **Discuss Trade-offs** - Explain design decisions and alternatives
 
-### Common Interview Questions:
+### Common Interview Questions
+
 - How would you scale this to handle 1M users?
 - What design patterns did you use and why?
 - How would you handle concurrency issues?
@@ -216,12 +230,14 @@ node main.js
 ## 🔧 Development Setup
 
 ### Prerequisites
+
 - **Python 3.7+** for Python solutions
 - **Node.js 14+** for JavaScript solutions
 - **Git** for version control
 
 ### Project Structure
-```
+
+```bash
 lld-solutions/
 ├── docs/                    # Documentation
 │   ├── oop.md
@@ -256,7 +272,8 @@ We welcome contributions! Please:
 5. **Test your code** - Ensure all examples work correctly
 6. **Submit a pull request**
 
-### Adding New Problems:
+### Adding New Problems
+
 1. Create directories: `python/<problem-name>/` and `javascript/<problem-name>/`
 2. Add `main.py`, `main.js`, and `README.md` files
 3. Update this main README with the new problem
@@ -265,7 +282,7 @@ We welcome contributions! Please:
 ## 📊 Progress Tracker
 
 - **Documentation**: ✅ Complete (4/4 files)
-- **Python Solutions**: ✅ Complete (10/10 System Design problems) 
+- **Python Solutions**: ✅ Complete (10/10 System Design problems)
 - **JavaScript Solutions**: ✅ Complete (10/10 System Design problems)
 - **System Design Problems**: ✅ All 10 problems implemented in both languages
 - **Cross-language Implementation**: ✅ 100% complete for System Design category

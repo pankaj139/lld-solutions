@@ -1,24 +1,88 @@
 #!/usr/bin/env python3
 """
-Online Shopping System - Comprehensive E-commerce Platform
+ONLINE SHOPPING SYSTEM - Low Level Design Implementation in Python
 
-This system demonstrates:
-- Strategy Pattern: Multiple payment methods and pricing strategies
-- Observer Pattern: Order status notifications and inventory updates
-- Command Pattern: Shopping cart operations and order processing
-- State Pattern: Order lifecycle management
-- Factory Pattern: Product creation and user types
-- Decorator Pattern: Product features and discounts
-- Template Method Pattern: Order processing workflow
+DESIGN PATTERNS USED:
+1. STRATEGY PATTERN: Multiple payment methods and pricing strategies
+   - Credit card, PayPal, digital wallet payment strategies
+   - Dynamic pricing: seasonal, bulk discount, loyalty pricing
+   - Shipping cost calculation strategies (standard, express, overnight)
+   - Tax calculation strategies for different regions
 
-Key Features:
-- Multi-vendor marketplace with seller management
-- Shopping cart with persistent sessions
-- Inventory management with stock tracking
-- Order processing with multiple payment methods
-- Rating and review system
-- Discount and coupon management
-- Real-time notifications
+2. OBSERVER PATTERN: Real-time notifications and inventory updates
+   - Order status change notifications to customers and sellers
+   - Inventory level alerts for low stock situations
+   - Price change notifications for wishlisted items
+   - Multiple notification channels: email, SMS, push notifications
+
+3. COMMAND PATTERN: Shopping cart operations and order processing
+   - Add/remove items, apply coupons, checkout as command objects
+   - Undo/redo support for cart modifications
+   - Order processing workflow as sequence of commands
+   - Batch operations for bulk inventory updates
+
+4. STATE PATTERN: Order lifecycle management with explicit transitions
+   - Order states: PENDING -> CONFIRMED -> SHIPPED -> DELIVERED
+   - Each state has specific allowed operations and behaviors
+   - State-based business rules (cancellation, returns, refunds)
+   - Payment state management (pending, authorized, captured, failed)
+
+5. FACTORY PATTERN: Product creation and user type instantiation
+   - ProductFactory creates different product types with specific attributes
+   - UserFactory handles customer, seller, and admin creation
+   - Centralized creation logic with validation
+   - Easy extension for new product categories and user roles
+
+6. DECORATOR PATTERN: Product features and discount application
+   - Base product functionality enhanced with features (warranty, insurance)
+   - Discount decorators: percentage, fixed amount, buy-one-get-one
+   - Stackable promotions without class explosion
+   - Runtime feature addition and pricing calculation
+
+7. TEMPLATE METHOD PATTERN: Order processing workflow
+   - Standard order flow: validate -> reserve inventory -> process payment -> ship
+   - Customizable steps for different order types (digital vs physical)
+   - Consistent error handling and rollback mechanisms
+   - Extensible framework for special order processing
+
+8. BUILDER PATTERN: Complex order and product construction
+   - Step-by-step order building with validation at each step
+   - Product configuration with multiple variants and options
+   - Flexible construction process for different scenarios
+   - Validation of required fields before object creation
+
+OOP CONCEPTS DEMONSTRATED:
+- INHERITANCE: User hierarchy (Customer, Seller, Admin) with role-specific behavior
+- ENCAPSULATION: Order details and payment info hidden behind secure interfaces
+- ABSTRACTION: Complex e-commerce operations abstracted into simple APIs
+- POLYMORPHISM: Different product types and payment methods handled uniformly
+
+SOLID PRINCIPLES:
+- SRP: Each class handles single responsibility (Product, Order, Payment, Inventory)
+- OCP: Easy to add new payment methods and product types without code changes
+- LSP: All payment methods and product types interchangeable through interfaces
+- ISP: Focused interfaces for shopping, payment, inventory, and notification operations
+- DIP: High-level order processing depends on abstractions, not implementations
+
+BUSINESS FEATURES:
+- Multi-vendor marketplace with seller onboarding and management
+- Advanced product catalog with categories, attributes, and search
+- Shopping cart with session persistence and saved items
+- Comprehensive inventory management with real-time stock tracking
+- Multiple payment gateway integration with fraud detection
+- Order fulfillment with tracking and delivery management
+- Customer review and rating system with moderation
+- Coupon and discount management with usage tracking
+- Advanced analytics for sales, inventory, and customer behavior
+
+ARCHITECTURAL NOTES:
+- Microservice-ready design with clear service boundaries
+- Event-driven architecture for real-time updates
+- Scalable inventory management for high-volume operations
+- Security features: payment encryption, user authentication, data protection
+- Integration points for external services: payment gateways, shipping providers
+- Comprehensive audit trail for financial and inventory transactions
+- Performance optimization for catalog search and order processing
 """
 
 from abc import ABC, abstractmethod

@@ -1,3 +1,74 @@
+"""
+LIBRARY MANAGEMENT SYSTEM - Low Level Design Implementation in Python
+
+DESIGN PATTERNS USED:
+1. FACADE PATTERN: LibrarySystem provides unified interface for all operations
+   - Simplifies complex library operations (search, issue, return, reserve)
+   - Hides complexity of user management, book tracking, and fine calculation
+   - Single entry point for librarians and members
+   - Coordinates between multiple subsystems (catalog, circulation, accounts)
+
+2. TEMPLATE METHOD PATTERN: Common book operation workflow
+   - Base template for book transactions: validate -> process -> record -> notify
+   - Specific steps customized for different operations (issue, return, reserve)
+   - Consistent validation and audit trail across all operations
+   - Extensible framework for new transaction types
+
+3. STRATEGY PATTERN: Different fine calculation strategies
+   - Standard fine calculation for overdue books
+   - Graduated fines based on book type and user category
+   - Holiday and weekend adjustments
+   - Special rates for students, faculty, and premium members
+
+4. CHAIN OF RESPONSIBILITY PATTERN: User permission and validation chain
+   - Role-based access control with permission chains
+   - Member -> Librarian -> Admin hierarchy
+   - Request validation flows through appropriate handlers
+   - Easy to add new roles and permissions
+
+5. STATE PATTERN: Book lifecycle state management
+   - BookStatus enum with explicit state transitions
+   - Available -> Reserved -> Issued -> Returned workflow
+   - State-specific business rules and operations
+   - Invalid state transition prevention
+
+6. OBSERVER PATTERN: Notification system for library events
+   - Book return reminders and overdue notifications
+   - Reservation availability alerts
+   - New book acquisition notifications
+   - Multiple notification channels: email, SMS, in-app
+
+OOP CONCEPTS DEMONSTRATED:
+- INHERITANCE: User hierarchy (Member, Librarian, Admin) with role-specific behavior
+- ENCAPSULATION: Book and user data hidden behind controlled interfaces
+- ABSTRACTION: Complex library operations abstracted into simple method calls
+- POLYMORPHISM: Different user types handled uniformly through User interface
+
+SOLID PRINCIPLES:
+- SRP: Each class handles single responsibility (Book, User, Transaction, Catalog)
+- OCP: Easy to add new user types and book categories without code changes
+- LSP: All user types can be used interchangeably through User interface
+- ISP: Focused interfaces for catalog operations, user management, circulation
+- DIP: Library system depends on abstractions, not concrete implementations
+
+BUSINESS FEATURES:
+- Multi-user role management (Members, Librarians, Administrators)
+- Comprehensive book catalog with search and filtering
+- Book reservation system with priority queues
+- Automated fine calculation for overdue books
+- Book issue and return tracking with history
+- Inventory management with acquisition and disposal
+- Reporting and analytics for library operations
+
+ARCHITECTURAL NOTES:
+- Role-based access control with permission inheritance
+- Automated notification system for library events
+- Flexible fine calculation with configurable rules
+- Scalable catalog design for large book collections
+- Integration points for external systems (payment, notifications)
+- Comprehensive audit trail for all transactions
+"""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from datetime import datetime, timedelta

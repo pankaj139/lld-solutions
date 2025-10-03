@@ -1,3 +1,71 @@
+"""
+ELEVATOR SYSTEM - Low Level Design Implementation in Python
+
+DESIGN PATTERNS USED:
+1. SINGLETON PATTERN: Central elevator controller for coordination
+   - Single ElevatorController instance manages all elevators
+   - Ensures consistent elevator assignment and scheduling
+   - Prevents conflicts in multi-elevator coordination
+   - Global access point for elevator system management
+
+2. STATE PATTERN: Elevator state machine with explicit states
+   - ElevatorState enum defines all possible elevator states
+   - State transitions: IDLE -> MOVING_UP/DOWN -> DOOR_OPENING -> DOOR_CLOSING
+   - Each state has specific behaviors and valid transitions
+   - Safety constraints enforced through state validation
+
+3. STRATEGY PATTERN: Elevator scheduling algorithms
+   - Different algorithms: FCFS, SCAN, LOOK, Shortest Seek Time
+   - Pluggable scheduling strategies for different building requirements
+   - Performance optimization based on traffic patterns
+   - Easy to switch between algorithms based on time of day
+
+4. COMMAND PATTERN: Elevator requests as command objects
+   - Request encapsulates floor, direction, and metadata
+   - Queue-based request management with prioritization
+   - Support for request cancellation and modification
+   - Audit trail for elevator usage analysis
+
+5. OBSERVER PATTERN: Elevator status monitoring
+   - Real-time status updates for building management systems
+   - Multiple observers: display panels, maintenance systems, analytics
+   - Decoupled monitoring from core elevator logic
+   - Event-driven architecture for status changes
+
+6. FACADE PATTERN: Simplified interface for elevator operations
+   - ElevatorController hides complex scheduling and coordination
+   - Single interface for all elevator interactions
+   - Abstraction over multiple elevator management subsystems
+
+OOP CONCEPTS DEMONSTRATED:
+- ENCAPSULATION: Elevator internal state hidden behind controlled interface
+- ABSTRACTION: Complex scheduling algorithms abstracted into strategy interface
+- POLYMORPHISM: Different scheduling strategies used interchangeably
+- INHERITANCE: Specialized elevator types (freight, passenger, service)
+
+SOLID PRINCIPLES:
+- SRP: Each class handles single responsibility (Car, Controller, Scheduler)
+- OCP: Easy to add new scheduling algorithms without changing existing code
+- LSP: All scheduling strategies can be used interchangeably
+- ISP: Focused interfaces for elevator operations and monitoring
+- DIP: Controller depends on scheduling abstractions, not implementations
+
+BUSINESS FEATURES:
+- Multi-elevator coordination and load balancing
+- Intelligent request scheduling for optimal performance
+- Safety mechanisms: overload detection, emergency stops
+- Energy optimization through smart scheduling
+- Maintenance mode support with service requests
+- Real-time monitoring and performance analytics
+
+ARCHITECTURAL NOTES:
+- Thread-safe operations for concurrent request handling
+- Scalable design for buildings with many elevators
+- Configurable parameters for different building types
+- Comprehensive logging for maintenance and optimization
+- Integration points for IoT sensors and building automation
+"""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from datetime import datetime
