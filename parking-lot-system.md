@@ -1,6 +1,7 @@
 # Parking Lot System
 
 ## 🔗 Implementation Links
+
 - **Python Implementation**: [python/parking-lot/main.py](python/parking-lot/main.py)
 - **JavaScript Implementation**: [javascript/parking-lot/main.js](javascript/parking-lot/main.js)
 
@@ -18,6 +19,7 @@ Design a parking lot system that can:
 ## Requirements
 
 ### Functional Requirements
+
 - Support multiple vehicle types with different parking spot requirements
 - Track parking spot availability in real-time
 - Generate unique tickets for each parking session
@@ -26,6 +28,7 @@ Design a parking lot system that can:
 - Handle vehicle entry and exit operations
 
 ### Non-Functional Requirements
+
 - System should be extensible for new vehicle types
 - Fast lookup for available parking spots
 - Thread-safe operations for concurrent access
@@ -71,7 +74,7 @@ Design a parking lot system that can:
 
 ## Class Diagram
 
-```
+```text
 Vehicle (Abstract)
 ├── Motorcycle
 ├── Car

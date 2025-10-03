@@ -1,6 +1,7 @@
 # ATM System
 
 ## 🔗 Implementation Links
+
 - **Python Implementation**: [python/atm-system/main.py](python/atm-system/main.py)
 - **JavaScript Implementation**: [javascript/atm-system/main.js](javascript/atm-system/main.js)
 
@@ -18,6 +19,7 @@ Design an ATM (Automated Teller Machine) system that can:
 ## Requirements
 
 ### Functional Requirements
+
 - Insert and validate debit/credit cards
 - Authenticate users with PIN verification
 - Support multiple transaction types (withdrawal, deposit, balance inquiry)
@@ -28,6 +30,7 @@ Design an ATM (Automated Teller Machine) system that can:
 - Support multiple account types (checking, savings, credit)
 
 ### Non-Functional Requirements
+
 - System should be secure and handle authentication properly
 - Cash dispensing algorithm should be optimal
 - Support for concurrent transactions (though simplified in this implementation)
@@ -70,7 +73,7 @@ Design an ATM (Automated Teller Machine) system that can:
 
 ## State Diagram
 
-```
+```text
 IDLE
   ↓ (insert_card)
 CARD_INSERTED
@@ -86,7 +89,7 @@ IDLE
 
 ## Class Diagram
 
-```
+```text
 Card
 ├── card_number: str
 ├── customer_name: str
