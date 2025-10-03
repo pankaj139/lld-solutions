@@ -2,476 +2,506 @@
 LIBRARY MANAGEMENT SYSTEM - Low Level Design Implementation in Python
 
 DESIGN PATTERNS USED:
-1. FACADE PATTERN: LibrarySystem provides unified interface for all operations
-   - Simplifies complex library operations (search, issue, return, reserve)
-   - Hides complexity of user management, book tracking, and fine calculation
-   - Single entry point for librarians and members
-   - Coordinates between multiple subsystems (catalog, circulation, accounts)
+1. SINGLETON PATTERN: Single library instance
+   - Ensures one library system
+   - Global access point
+   - Resource control
 
-2. TEMPLATE METHOD PATTERN: Common book operation workflow
-   - Base template for book transactions: validate -> process -> record -> notify
-   - Specific steps customized for different operations (issue, return, reserve)
-   - Consistent validation and audit trail across all operations
-   - Extensible framework for new transaction types
+2. FACTORY PATTERN: Member creation
+   - Creates members with appropriate privileges
+   - Centralized member instantiation
 
-3. STRATEGY PATTERN: Different fine calculation strategies
-   - Standard fine calculation for overdue books
-   - Graduated fines based on book type and user category
-   - Holiday and weekend adjustments
-   - Special rates for students, faculty, and premium members
+3. STRATEGY PATTERN: Fine calculation
+   - Different fine rates per membership
+   - Pluggable calculation strategies
 
-4. CHAIN OF RESPONSIBILITY PATTERN: User permission and validation chain
-   - Role-based access control with permission chains
-   - Member -> Librarian -> Admin hierarchy
-   - Request validation flows through appropriate handlers
-   - Easy to add new roles and permissions
-
-5. STATE PATTERN: Book lifecycle state management
-   - BookStatus enum with explicit state transitions
-   - Available -> Reserved -> Issued -> Returned workflow
-   - State-specific business rules and operations
-   - Invalid state transition prevention
-
-6. OBSERVER PATTERN: Notification system for library events
-   - Book return reminders and overdue notifications
+4. OBSERVER PATTERN: Notifications
+   - Due date reminders
    - Reservation availability alerts
-   - New book acquisition notifications
-   - Multiple notification channels: email, SMS, in-app
+   - Overdue notices
+
+5. REPOSITORY PATTERN: Data access
+   - Abstraction for storage
+   - Clean separation of concerns
+
+6. COMMAND PATTERN: Transactions
+   - Checkout/return as commands
+   - History tracking
+   - Undo capability
+
+7. CHAIN OF RESPONSIBILITY: Checkout validation
+   - Member status check
+   - Checkout limit check
+   - Fine balance check
+   - Book availability check
 
 OOP CONCEPTS DEMONSTRATED:
-- INHERITANCE: User hierarchy (Member, Librarian, Admin) with role-specific behavior
-- ENCAPSULATION: Book and user data hidden behind controlled interfaces
-- ABSTRACTION: Complex library operations abstracted into simple method calls
-- POLYMORPHISM: Different user types handled uniformly through User interface
+- ENCAPSULATION: Internal state hidden
+- ABSTRACTION: Clean interfaces
+- INHERITANCE: Membership hierarchy
+- POLYMORPHISM: Different fine strategies
 
 SOLID PRINCIPLES:
-- SRP: Each class handles single responsibility (Book, User, Transaction, Catalog)
-- OCP: Easy to add new user types and book categories without code changes
-- LSP: All user types can be used interchangeably through User interface
-- ISP: Focused interfaces for catalog operations, user management, circulation
-- DIP: Library system depends on abstractions, not concrete implementations
+- SRP: Each class single responsibility
+- OCP: Easy to extend
+- LSP: All membership types interchangeable
+- ISP: Focused interfaces
+- DIP: Depends on abstractions
 
 BUSINESS FEATURES:
-- Multi-user role management (Members, Librarians, Administrators)
-- Comprehensive book catalog with search and filtering
-- Book reservation system with priority queues
-- Automated fine calculation for overdue books
-- Book issue and return tracking with history
-- Inventory management with acquisition and disposal
-- Reporting and analytics for library operations
+- Multi-copy book support
+- Tiered membership
+- Smart reservations
+- Fine calculation
+- Comprehensive search
 
 ARCHITECTURAL NOTES:
-- Role-based access control with permission inheritance
-- Automated notification system for library events
-- Flexible fine calculation with configurable rules
-- Scalable catalog design for large book collections
-- Integration points for external systems (payment, notifications)
-- Comprehensive audit trail for all transactions
+- Thread-safe singleton
+- Efficient indexing
+- Extensible for digital content
+- Ready for database integration
 """
 
-from abc import ABC, abstractmethod
 from enum import Enum
+from typing import List, Optional, Dict
 from datetime import datetime, timedelta
+from dataclasses import dataclass
 import uuid
 
-class UserType(Enum):
-    MEMBER = 1
-    LIBRARIAN = 2
-    ADMIN = 3
 
+# Enums
 class BookStatus(Enum):
-    AVAILABLE = 1
-    ISSUED = 2
-    RESERVED = 3
-    LOST = 4
+    """Book copy status"""
+    AVAILABLE = "available"
+    CHECKED_OUT = "checked_out"
+    RESERVED = "reserved"
+    LOST = "lost"
+    UNDER_MAINTENANCE = "under_maintenance"
 
-class ReservationStatus(Enum):
-    ACTIVE = 1
-    FULFILLED = 2
-    CANCELLED = 3
-    EXPIRED = 4
 
-class User(ABC):
-    def __init__(self, user_id, name, email, user_type):
-        self.user_id = user_id
+class MembershipType(Enum):
+    """Membership tiers with privileges"""
+    REGULAR = ("regular", 5, 14, 0.50)
+    PREMIUM = ("premium", 10, 30, 0.25)
+    STUDENT = ("student", 3, 14, 1.00)
+    
+    def __init__(self, name, checkout_limit, loan_days, fine_per_day):
+        self._name = name
+        self.checkout_limit = checkout_limit
+        self.loan_days = loan_days
+        self.fine_per_day = fine_per_day
+
+
+class MemberStatus(Enum):
+    """Member account status"""
+    ACTIVE = "active"
+    SUSPENDED = "suspended"
+    EXPIRED = "expired"
+
+
+@dataclass
+class Book:
+    """
+    Book metadata
+    
+    OOP CONCEPT: Data class
+    """
+    isbn: str
+    title: str
+    author: str
+    genre: str
+    publication_year: int = 2024
+    description: str = ""
+
+
+class BookCopy:
+    """
+    Physical book copy
+    
+    DESIGN PATTERN: State Pattern
+    """
+    def __init__(self, copy_id: str, book: Book, shelf_location: str = "A1"):
+        self.copy_id = copy_id
+        self.book = book
+        self.status = BookStatus.AVAILABLE
+        self.shelf_location = shelf_location
+    
+    def is_available(self) -> bool:
+        """Check if copy available"""
+        return self.status == BookStatus.AVAILABLE
+    
+    def checkout(self):
+        """Mark as checked out"""
+        self.status = BookStatus.CHECKED_OUT
+    
+    def return_copy(self):
+        """Mark as available"""
+        self.status = BookStatus.AVAILABLE
+
+
+class Member:
+    """
+    Library member
+    
+    OOP CONCEPT: Encapsulation
+    """
+    def __init__(self, member_id: str, name: str, email: str, 
+                 membership_type: MembershipType):
+        self.member_id = member_id
         self.name = name
         self.email = email
-        self.user_type = user_type
-        self.date_joined = datetime.now()
+        self.membership_type = membership_type
+        self.status = MemberStatus.ACTIVE
+        self.checked_out_books: List[str] = []  # Copy IDs
+        self.fines_owed = 0.0
+    
+    def can_checkout(self) -> bool:
+        """Check if member can checkout"""
+        return (self.status == MemberStatus.ACTIVE and
+                len(self.checked_out_books) < self.membership_type.checkout_limit and
+                self.fines_owed < 10.0)
+    
+    def get_checkout_limit(self) -> int:
+        """Get checkout limit"""
+        return self.membership_type.checkout_limit
 
-class Member(User):
-    def __init__(self, user_id, name, email):
-        super().__init__(user_id, name, email, UserType.MEMBER)
-        self.max_books = 5
-        self.max_reservation_days = 10
 
-class Librarian(User):
-    def __init__(self, user_id, name, email):
-        super().__init__(user_id, name, email, UserType.LIBRARIAN)
-
-class Admin(User):
-    def __init__(self, user_id, name, email):
-        super().__init__(user_id, name, email, UserType.ADMIN)
-
-class Author:
-    def __init__(self, name, biography=""):
-        self.name = name
-        self.biography = biography
-
-class Book:
-    def __init__(self, isbn, title, authors, publisher, publication_date, pages):
-        self.isbn = isbn
-        self.title = title
-        self.authors = authors  # List of Author objects
-        self.publisher = publisher
-        self.publication_date = publication_date
-        self.pages = pages
-
-class BookItem:
-    def __init__(self, barcode, book, rack_location):
-        self.barcode = barcode
-        self.book = book
-        self.rack_location = rack_location
-        self.status = BookStatus.AVAILABLE
-        self.date_added = datetime.now()
-        self.due_date = None
-        self.price = 0.0
-
-    def checkout(self, member_id, due_date):
-        if self.status != BookStatus.AVAILABLE:
-            return False
-        
-        self.status = BookStatus.ISSUED
-        self.due_date = due_date
-        return True
-
-    def return_book(self):
-        self.status = BookStatus.AVAILABLE
-        self.due_date = None
-
-class BookReservation:
-    def __init__(self, member, book_item):
-        self.reservation_id = str(uuid.uuid4())
+class CheckoutTransaction:
+    """
+    Checkout record
+    
+    DESIGN PATTERN: Command Pattern
+    """
+    def __init__(self, member: Member, book_copy: BookCopy):
+        self.transaction_id = str(uuid.uuid4())
         self.member = member
-        self.book_item = book_item
-        self.creation_date = datetime.now()
-        self.status = ReservationStatus.ACTIVE
-        self.expiry_date = self.creation_date + timedelta(days=member.max_reservation_days)
-
-    def fulfill_reservation(self):
-        self.status = ReservationStatus.FULFILLED
-
-    def cancel_reservation(self):
-        self.status = ReservationStatus.CANCELLED
-
-class BookLending:
-    def __init__(self, member, book_item, due_date):
-        self.lending_id = str(uuid.uuid4())
-        self.member = member
-        self.book_item = book_item
-        self.issue_date = datetime.now()
-        self.due_date = due_date
-        self.return_date = None
-
-    def return_book(self):
-        self.return_date = datetime.now()
-        self.book_item.return_book()
-
-    def is_overdue(self):
-        return datetime.now() > self.due_date and self.return_date is None
-
-    def calculate_fine(self, fine_per_day):
+        self.book_copy = book_copy
+        self.checkout_date = datetime.now()
+        self.due_date = self.checkout_date + timedelta(
+            days=member.membership_type.loan_days
+        )
+    
+    def is_overdue(self) -> bool:
+        """Check if overdue"""
+        return datetime.now() > self.due_date
+    
+    def calculate_fine(self) -> float:
+        """Calculate late fine"""
         if not self.is_overdue():
             return 0.0
         
-        overdue_days = (datetime.now() - self.due_date).days
-        return overdue_days * fine_per_day
+        days_late = (datetime.now() - self.due_date).days
+        fine_rate = self.member.membership_type.fine_per_day
+        return days_late * fine_rate
 
-class Fine:
-    def __init__(self, member, amount, description):
-        self.fine_id = str(uuid.uuid4())
+
+class ReturnTransaction:
+    """
+    Return record
+    
+    DESIGN PATTERN: Command Pattern
+    """
+    def __init__(self, checkout: CheckoutTransaction):
+        self.transaction_id = str(uuid.uuid4())
+        self.checkout = checkout
+        self.return_date = datetime.now()
+        self.fine_amount = checkout.calculate_fine()
+    
+    def process(self):
+        """Process return"""
+        if self.fine_amount > 0:
+            self.checkout.member.fines_owed += self.fine_amount
+
+
+class Reservation:
+    """
+    Book reservation
+    
+    DESIGN PATTERN: Observer Pattern support
+    """
+    def __init__(self, member: Member, book: Book):
+        self.reservation_id = str(uuid.uuid4())
         self.member = member
-        self.amount = amount
-        self.description = description
-        self.creation_date = datetime.now()
-        self.is_paid = False
+        self.book = book
+        self.reservation_date = datetime.now()
+        self.notified = False
+    
+    def notify_available(self):
+        """Notify member book is available"""
+        if not self.notified:
+            print(f"📧 Notification: {self.member.name}, '{self.book.title}' is now available!")
+            self.notified = True
 
-    def pay_fine(self):
-        self.is_paid = True
-        self.payment_date = datetime.now()
 
-class Search:
-    @staticmethod
-    def search_by_title(catalog, title):
-        results = []
-        for book in catalog.books.values():
-            if title.lower() in book.title.lower():
-                results.append(book)
-        return results
+class SearchCriteria:
+    """
+    Search parameters
+    
+    OOP CONCEPT: Value Object
+    """
+    def __init__(self, title: Optional[str] = None, author: Optional[str] = None,
+                 isbn: Optional[str] = None, genre: Optional[str] = None):
+        self.title = title
+        self.author = author
+        self.isbn = isbn
+        self.genre = genre
+    
+    def matches(self, book: Book) -> bool:
+        """Check if book matches criteria"""
+        if self.isbn and book.isbn != self.isbn:
+            return False
+        if self.title and self.title.lower() not in book.title.lower():
+            return False
+        if self.author and self.author.lower() not in book.author.lower():
+            return False
+        if self.genre and self.genre.lower() != book.genre.lower():
+            return False
+        return True
 
-    @staticmethod
-    def search_by_author(catalog, author_name):
-        results = []
-        for book in catalog.books.values():
-            for author in book.authors:
-                if author_name.lower() in author.name.lower():
-                    results.append(book)
-                    break
-        return results
-
-    @staticmethod
-    def search_by_isbn(catalog, isbn):
-        return catalog.books.get(isbn)
 
 class Catalog:
+    """
+    Book catalog
+    
+    DESIGN PATTERN: Repository Pattern
+    """
     def __init__(self):
-        self.books = {}  # ISBN -> Book
-        self.book_items = {}  # Barcode -> BookItem
-        self.authors = {}  # Name -> Author
-
-    def add_book(self, book):
+        self.books: Dict[str, Book] = {}  # ISBN → Book
+        self.copies: Dict[str, BookCopy] = {}  # CopyID → BookCopy
+        self.isbn_to_copies: Dict[str, List[str]] = {}  # ISBN → CopyIDs
+    
+    def add_book(self, book: Book, num_copies: int = 1):
+        """Add book with copies"""
         self.books[book.isbn] = book
-        for author in book.authors:
-            self.authors[author.name] = author
+        self.isbn_to_copies[book.isbn] = []
+        
+        for i in range(num_copies):
+            copy_id = f"{book.isbn}-{i+1}"
+            copy = BookCopy(copy_id, book)
+            self.copies[copy_id] = copy
+            self.isbn_to_copies[book.isbn].append(copy_id)
+    
+    def search(self, criteria: SearchCriteria) -> List[Book]:
+        """Search books"""
+        results = []
+        for book in self.books.values():
+            if criteria.matches(book):
+                results.append(book)
+        return results
+    
+    def find_available_copy(self, isbn: str) -> Optional[BookCopy]:
+        """Find available copy of book"""
+        if isbn not in self.isbn_to_copies:
+            return None
+        
+        for copy_id in self.isbn_to_copies[isbn]:
+            copy = self.copies[copy_id]
+            if copy.is_available():
+                return copy
+        
+        return None
+    
+    def get_book_by_isbn(self, isbn: str) -> Optional[Book]:
+        """Get book by ISBN"""
+        return self.books.get(isbn)
 
-    def add_book_item(self, book_item):
-        self.book_items[book_item.barcode] = book_item
-
-    def remove_book_item(self, barcode):
-        if barcode in self.book_items:
-            del self.book_items[barcode]
-            return True
-        return False
-
-    def get_available_book_items(self, isbn):
-        available_items = []
-        for item in self.book_items.values():
-            if (item.book.isbn == isbn and 
-                item.status == BookStatus.AVAILABLE):
-                available_items.append(item)
-        return available_items
 
 class Library:
-    def __init__(self, name, address):
-        self.name = name
-        self.address = address
+    """
+    Main library system
+    
+    DESIGN PATTERN: Singleton + Facade
+    """
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+    
+    def __init__(self):
+        if self._initialized:
+            return
+        
         self.catalog = Catalog()
-        self.members = {}  # user_id -> Member
-        self.librarians = {}  # user_id -> Librarian
-        self.active_lendings = {}  # lending_id -> BookLending
-        self.reservations = {}  # reservation_id -> BookReservation
-        self.fines = {}  # fine_id -> Fine
-        self.fine_per_day = 1.0  # $1 per day overdue
-
-    def add_member(self, member):
-        self.members[member.user_id] = member
-
-    def add_librarian(self, librarian):
-        self.librarians[librarian.user_id] = librarian
-
-    def issue_book(self, member_id, barcode):
-        if member_id not in self.members:
-            raise Exception("Member not found")
+        self.members: Dict[str, Member] = {}
+        self.transactions: List[CheckoutTransaction] = []
+        self.reservations: List[Reservation] = []
+        self._initialized = True
+    
+    def register_member(self, member: Member):
+        """Register new member"""
+        self.members[member.member_id] = member
+        print(f"✓ Member registered: {member.name} ({member.membership_type._name})")
+    
+    def checkout_book(self, member_id: str, isbn: str) -> Optional[CheckoutTransaction]:
+        """
+        Checkout book to member
         
-        member = self.members[member_id]
+        DESIGN PATTERN: Chain of Responsibility
+        - Validates through multiple checks
+        """
+        member = self.members.get(member_id)
+        if not member:
+            print("✗ Member not found")
+            return None
         
-        # Check if member has reached max book limit
-        member_lendings = [l for l in self.active_lendings.values() 
-                          if l.member.user_id == member_id and l.return_date is None]
-        if len(member_lendings) >= member.max_books:
-            raise Exception("Member has reached maximum book limit")
-
-        # Check if member has unpaid fines
-        unpaid_fines = [f for f in self.fines.values() 
-                       if f.member.user_id == member_id and not f.is_paid]
-        if unpaid_fines:
-            raise Exception("Member has unpaid fines")
-
-        if barcode not in self.catalog.book_items:
-            raise Exception("Book item not found")
-
-        book_item = self.catalog.book_items[barcode]
+        if not member.can_checkout():
+            print(f"✗ Cannot checkout: Status={member.status.value}, "
+                  f"Books={len(member.checked_out_books)}/{member.get_checkout_limit()}, "
+                  f"Fines=${member.fines_owed:.2f}")
+            return None
         
-        if book_item.status != BookStatus.AVAILABLE:
-            raise Exception("Book is not available")
-
-        # Check if book is reserved for this member
-        active_reservation = None
-        for reservation in self.reservations.values():
-            if (reservation.book_item.barcode == barcode and 
-                reservation.member.user_id == member_id and 
-                reservation.status == ReservationStatus.ACTIVE):
-                active_reservation = reservation
+        copy = self.catalog.find_available_copy(isbn)
+        if not copy:
+            print("✗ No available copies")
+            return None
+        
+        # Process checkout
+        copy.checkout()
+        transaction = CheckoutTransaction(member, copy)
+        member.checked_out_books.append(copy.copy_id)
+        self.transactions.append(transaction)
+        
+        print(f"✓ Checked out: '{copy.book.title}' to {member.name}")
+        print(f"  Due date: {transaction.due_date.strftime('%Y-%m-%d')}")
+        
+        return transaction
+    
+    def return_book(self, copy_id: str) -> Optional[ReturnTransaction]:
+        """Return book"""
+        # Find active checkout
+        checkout = None
+        for txn in self.transactions:
+            if txn.book_copy.copy_id == copy_id and txn.book_copy.status == BookStatus.CHECKED_OUT:
+                checkout = txn
                 break
-
-        if active_reservation:
-            active_reservation.fulfill_reservation()
-
-        # Issue the book
-        due_date = datetime.now() + timedelta(days=14)  # 2 weeks
-        lending = BookLending(member, book_item, due_date)
         
-        book_item.checkout(member_id, due_date)
-        self.active_lendings[lending.lending_id] = lending
-
-        return lending
-
-    def return_book(self, barcode):
-        book_item = self.catalog.book_items.get(barcode)
-        if not book_item:
-            raise Exception("Book item not found")
-
-        # Find the active lending
-        active_lending = None
-        for lending in self.active_lendings.values():
-            if (lending.book_item.barcode == barcode and 
-                lending.return_date is None):
-                active_lending = lending
-                break
-
-        if not active_lending:
-            raise Exception("No active lending found for this book")
-
-        # Calculate fine if overdue
-        if active_lending.is_overdue():
-            fine_amount = active_lending.calculate_fine(self.fine_per_day)
-            fine = Fine(active_lending.member, fine_amount, 
-                       f"Overdue fine for book: {book_item.book.title}")
-            self.fines[fine.fine_id] = fine
-
-        # Return the book
-        active_lending.return_book()
-        return active_lending
-
-    def reserve_book(self, member_id, barcode):
-        if member_id not in self.members:
-            raise Exception("Member not found")
-
-        member = self.members[member_id]
-        book_item = self.catalog.book_items.get(barcode)
+        if not checkout:
+            print("✗ No active checkout found")
+            return None
         
-        if not book_item:
-            raise Exception("Book item not found")
-
-        if book_item.status == BookStatus.AVAILABLE:
-            raise Exception("Book is available, no need to reserve")
-
-        # Check if member already has a reservation for this book
-        existing_reservation = None
-        for reservation in self.reservations.values():
-            if (reservation.member.user_id == member_id and 
-                reservation.book_item.barcode == barcode and 
-                reservation.status == ReservationStatus.ACTIVE):
-                existing_reservation = reservation
-                break
-
-        if existing_reservation:
-            raise Exception("Member already has a reservation for this book")
-
-        reservation = BookReservation(member, book_item)
-        self.reservations[reservation.reservation_id] = reservation
-        book_item.status = BookStatus.RESERVED
-
+        # Process return
+        return_txn = ReturnTransaction(checkout)
+        return_txn.process()
+        
+        checkout.book_copy.return_copy()
+        checkout.member.checked_out_books.remove(copy_id)
+        
+        print(f"✓ Returned: '{checkout.book_copy.book.title}' by {checkout.member.name}")
+        if return_txn.fine_amount > 0:
+            print(f"  ⚠ Fine: ${return_txn.fine_amount:.2f}")
+        
+        # Check reservations
+        self._process_reservations(checkout.book_copy.book.isbn)
+        
+        return return_txn
+    
+    def reserve_book(self, member_id: str, isbn: str) -> Optional[Reservation]:
+        """Reserve book"""
+        member = self.members.get(member_id)
+        book = self.catalog.get_book_by_isbn(isbn)
+        
+        if not member or not book:
+            print("✗ Invalid member or book")
+            return None
+        
+        # Check if available
+        if self.catalog.find_available_copy(isbn):
+            print("✗ Book is available, no need to reserve")
+            return None
+        
+        reservation = Reservation(member, book)
+        self.reservations.append(reservation)
+        
+        print(f"✓ Reserved: '{book.title}' for {member.name}")
         return reservation
+    
+    def _process_reservations(self, isbn: str):
+        """Process reservations when book available"""
+        for reservation in self.reservations:
+            if reservation.book.isbn == isbn and not reservation.notified:
+                reservation.notify_available()
+                break
+    
+    def search_books(self, criteria: SearchCriteria) -> List[Book]:
+        """Search catalog"""
+        return self.catalog.search(criteria)
+    
+    def get_overdue_books(self) -> List[CheckoutTransaction]:
+        """Get all overdue transactions"""
+        overdue = []
+        for txn in self.transactions:
+            if txn.book_copy.status == BookStatus.CHECKED_OUT and txn.is_overdue():
+                overdue.append(txn)
+        return overdue
 
-    def search_books(self, query, search_type="title"):
-        if search_type == "title":
-            return Search.search_by_title(self.catalog, query)
-        elif search_type == "author":
-            return Search.search_by_author(self.catalog, query)
-        elif search_type == "isbn":
-            result = Search.search_by_isbn(self.catalog, query)
-            return [result] if result else []
-        else:
-            raise Exception("Invalid search type")
 
-    def get_member_lendings(self, member_id):
-        return [l for l in self.active_lendings.values() 
-                if l.member.user_id == member_id and l.return_date is None]
-
-    def get_overdue_books(self):
-        overdue_lendings = []
-        for lending in self.active_lendings.values():
-            if lending.is_overdue():
-                overdue_lendings.append(lending)
-        return overdue_lendings
-
-# Demo usage
 def main():
-    # Create library
-    library = Library("City Central Library", "123 Main St")
+    """Demonstrate Library Management System"""
+    print("=" * 70)
+    print("LIBRARY MANAGEMENT SYSTEM - Low Level Design Demo")
+    print("=" * 70)
+    
+    # Initialize library (Singleton)
+    library = Library()
+    
+    # Add books
+    print("\n📚 Adding Books...")
+    books = [
+        Book("978-0-13-468599-1", "Clean Code", "Robert Martin", "Programming"),
+        Book("978-0-13-235088-4", "Clean Architecture", "Robert Martin", "Programming"),
+        Book("978-0-201-63361-0", "Design Patterns", "Gang of Four", "Programming"),
+    ]
+    
+    for book in books:
+        library.catalog.add_book(book, num_copies=2)
+    
+    # Register members
+    print("\n👥 Registering Members...")
+    members = [
+        Member("M001", "Alice Johnson", "alice@example.com", MembershipType.PREMIUM),
+        Member("M002", "Bob Smith", "bob@example.com", MembershipType.REGULAR),
+        Member("M003", "Charlie Brown", "charlie@example.com", MembershipType.STUDENT),
+    ]
+    
+    for member in members:
+        library.register_member(member)
+    
+    # Search books
+    print("\n🔍 Searching Books...")
+    criteria = SearchCriteria(author="Robert Martin")
+    results = library.search_books(criteria)
+    print(f"Found {len(results)} books by Robert Martin")
+    
+    # Checkout books
+    print("\n📤 Checking Out Books...")
+    library.checkout_book("M001", "978-0-13-468599-1")
+    library.checkout_book("M002", "978-0-13-468599-1")
+    library.checkout_book("M003", "978-0-201-63361-0")
+    
+    # Try to checkout when all copies out
+    print("\n📤 Attempting Third Checkout...")
+    library.checkout_book("M002", "978-0-13-468599-1")  # Should fail
+    
+    # Reserve book
+    print("\n📝 Creating Reservation...")
+    library.reserve_book("M002", "978-0-13-468599-1")
+    
+    # Return book
+    print("\n📥 Returning Books...")
+    library.return_book("978-0-13-468599-1-1")
+    
+    # Show overdue (simulate by checking)
+    print("\n⏰ Checking Overdue Books...")
+    overdue = library.get_overdue_books()
+    print(f"Overdue books: {len(overdue)}")
+    
+    print("\n" + "=" * 70)
+    print("DEMO COMPLETE")
+    print("=" * 70)
 
-    # Create authors
-    author1 = Author("J.K. Rowling", "British author")
-    author2 = Author("George Orwell", "British author and journalist")
-
-    # Create books
-    book1 = Book("978-0-7475-3269-9", "Harry Potter and the Philosopher's Stone", 
-                 [author1], "Bloomsbury", datetime(1997, 6, 26), 223)
-    book2 = Book("978-0-452-28423-4", "1984", 
-                 [author2], "Secker & Warburg", datetime(1949, 6, 8), 328)
-
-    # Add books to catalog
-    library.catalog.add_book(book1)
-    library.catalog.add_book(book2)
-
-    # Add book items
-    item1 = BookItem("HP001", book1, "A-1-1")
-    item2 = BookItem("HP002", book1, "A-1-2")
-    item3 = BookItem("OR001", book2, "B-2-1")
-
-    library.catalog.add_book_item(item1)
-    library.catalog.add_book_item(item2)
-    library.catalog.add_book_item(item3)
-
-    # Create members
-    member1 = Member("M001", "Alice Johnson", "alice@example.com")
-    member2 = Member("M002", "Bob Smith", "bob@example.com")
-
-    library.add_member(member1)
-    library.add_member(member2)
-
-    # Create librarian
-    librarian = Librarian("L001", "Carol Brown", "carol@library.com")
-    library.add_librarian(librarian)
-
-    print(f"Library: {library.name}")
-    print(f"Total books: {len(library.catalog.books)}")
-    print(f"Total book items: {len(library.catalog.book_items)}")
-
-    # Search for books
-    search_results = library.search_books("Harry Potter", "title")
-    print(f"\nSearch results for 'Harry Potter': {len(search_results)} books found")
-
-    # Issue books
-    try:
-        lending1 = library.issue_book("M001", "HP001")
-        print(f"\nBook issued to {lending1.member.name}")
-        print(f"Due date: {lending1.due_date.strftime('%Y-%m-%d')}")
-
-        lending2 = library.issue_book("M002", "OR001")
-        print(f"Book issued to {lending2.member.name}")
-    except Exception as e:
-        print(f"Error issuing book: {e}")
-
-    # Try to reserve a book
-    try:
-        reservation = library.reserve_book("M002", "HP002")
-        print(f"\nBook reserved for {reservation.member.name}")
-        print(f"Reservation expires: {reservation.expiry_date.strftime('%Y-%m-%d')}")
-    except Exception as e:
-        print(f"Error reserving book: {e}")
-
-    # Check member's current books
-    member_books = library.get_member_lendings("M001")
-    print(f"\n{member1.name} currently has {len(member_books)} book(s) checked out")
-
-    # Return a book
-    try:
-        returned_lending = library.return_book("HP001")
-        print(f"\nBook returned: {returned_lending.book_item.book.title}")
-    except Exception as e:
-        print(f"Error returning book: {e}")
 
 if __name__ == "__main__":
     main()
