@@ -1,6 +1,26 @@
 # LLD Solutions - Complete Interview Preparation Repository
 
-A comprehensive repository containing solutions to **29 Low-Level Design interview questions** in Python and JavaScript. Features detailed documentation on OOP, SOLID principles, design patterns, and a systematic LLD framework for FAANG-level interviews.
+This repository contains **33 comprehensive Low Level Design (LLD) problems** with complete implementations in both **Python** and **JavaScript**. Each problem includes detailed system design, architectural patterns, and production-ready code that demonstrates essential concepts for software engineering interviews.
+
+## ⚡ Quick Start - Custom Commands
+
+This repository includes **custom Cursor slash commands** to automate creating new LLD problems!
+
+```bash
+# Create a new LLD problem with complete documentation and implementations
+/create-lld streaming-service system-design hard
+
+# Analyze an existing problem for improvements
+/analyze-lld atm-system
+
+# Add new features to existing systems
+/extend-lld parking-lot-system add mobile app integration
+
+# Generate comprehensive test cases
+/test-lld chat-application
+```
+
+**📖 Full command documentation**: [COMMANDS.md](./COMMANDS.md)
 
 ## 🎯 Complete Coverage of LLD Problem Categories
 
@@ -11,7 +31,7 @@ A comprehensive repository containing solutions to **29 Low-Level Design intervi
 - **[Design Patterns](./docs/design-patterns.md)** - 35+ patterns with implementations
 - **[LLD Framework](./docs/lld-framework.md)** - Step-by-step systematic approach
 
-### 🏗️ **System Design Problems** (13 Problems)
+### 🏗️ **System Design Problems** (15 Problems)
 
 | Problem | Python | JavaScript | Key Patterns |
 |---------|--------|------------|-------------|
@@ -28,6 +48,8 @@ A comprehensive repository containing solutions to **29 Low-Level Design intervi
 | [Notification System](./notification-system.md) | ✅ | ✅ | Observer, Strategy, Multi-Channel |
 | [Vending Machine System](./vending-machine-system.md) | ✅ | ✅ | State, Strategy, Command, Observer |
 | [In-Memory File System](./in-memory-file-system.md) | ✅ | ✅ | Composite, Visitor, Command, Strategy |
+| [Distributed Cache System](./distributed-cache-system.md) | ✅ | ✅ | Consistent Hashing, Replication, Fault Tolerance |
+| [CDN System](./cdn-system.md) | ✅ | ✅ | Geographic Routing, Multi-tier Caching, Content Optimization |
 
 ### 💼 **Business System Problems** (5 Problems)
 
@@ -53,12 +75,14 @@ A comprehensive repository containing solutions to **29 Low-Level Design intervi
 | [Memory Card Game](./memory-card-game.md) | ✅ | ✅ | Pattern Matching, Timing |
 | [Snake and Ladder Game](./snake-and-ladder-game.md) | ✅ | ✅ | Board Game Logic, AI Players |
 
-### 🗄️ **Data Structure Design Problems** (2 Problems)
+### 🗄️ **Data Structure Design Problems** (4 Problems)
 
 | Problem | Python | JavaScript | Key Features |
 |---------|--------|------------|--------------|
 | [LRU Cache System](./lru-cache-system.md) | ✅ | ✅ | O(1) Operations, HashMap + LinkedList |
 | [Rate Limiter System](./rate-limiter-system.md) | ✅ | ✅ | Multiple Algorithms, Token Bucket, Sliding Window |
+| [Message Queue System](./message-queue-system.md) | ✅ | ✅ | Pub-Sub, Consumer Groups, Persistence, Dead Letter Queue |
+| [Load Balancer System](./load-balancer-system.md) | ✅ | ✅ | Multiple Algorithms, Health Monitoring, Circuit Breaker, SSL Termination |
 
 ## 🚀 **Technical Excellence Features**
 
@@ -87,15 +111,17 @@ A comprehensive repository containing solutions to **29 Low-Level Design intervi
 ```bash
 lld-solutions/
 ├── docs/                           # Complete LLD documentation
-├── [problem-name].md               # Problem statements (28 files)
+├── [problem-name].md               # Problem statements (32 files)
 ├── python/                         # Python implementations
-│   ├── [system-design]/           # 13 system design problems
+│   ├── [system-design]/           # 14 system design problems
 │   ├── [business-systems]/        # 5 business system problems
-│   └── [game-design]/             # 8 game design problems
+│   ├── [game-design]/             # 9 game design problems
+│   └── [data-structures]/         # 4 data structure problems
 └── javascript/                     # JavaScript implementations
-    ├── [system-design]/           # 13 system design problems
+    ├── [system-design]/           # 14 system design problems
     ├── [business-systems]/        # 5 business system problems
-    └── [game-design]/             # 8 game design problems
+    ├── [game-design]/             # 9 game design problems
+    └── [data-structures]/         # 4 data structure problems
 ```
 
 ## 🎓 **Perfect for Interview Preparation**
@@ -119,7 +145,7 @@ lld-solutions/
 
 ## 🌟 **Why This Repository**
 
-1. **Comprehensive Coverage**: 28 problems across all major LLD categories
+1. **Comprehensive Coverage**: 32 problems across all major LLD categories
 2. **Production Quality**: Clean, well-documented, and tested code
 3. **Pattern Mastery**: 35+ design patterns with real implementations
 4. **Cross-Language**: Python and JavaScript for maximum flexibility
@@ -128,12 +154,12 @@ lld-solutions/
 
 ## 📊 **Statistics**
 
-- **Total Problems**: 29 comprehensive LLD problems
-- **Python Implementations**: 29/29 (100% complete)
-- **JavaScript Implementations**: 29/29 (100% complete)
+- **Total Problems**: 33 comprehensive LLD problems
+- **Python Implementations**: 33/33 (100% complete)
+- **JavaScript Implementations**: 33/33 (100% complete)
 - **Design Patterns**: 35+ patterns demonstrated
-- **Documentation Pages**: 30 comprehensive guides
-- **Lines of Code**: 63,000+ across all implementations
+- **Documentation Pages**: 34 comprehensive guides
+- **Lines of Code**: 75,000+ across all implementations
 
 ---
 
