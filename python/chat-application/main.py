@@ -1,456 +1,286 @@
 """
-CHAT APPLICATION SYSTEM - Low Level Design Implementation in Python
+CHAT APPLICATION - Low Level Design Implementation in Python
 
-DESIGN PATTERNS USED:
-1. OBSERVER PATTERN: Real-time message delivery and presence updates
-   - Users observe chat rooms for new messages
-   - Presence service notifies status changes (online/offline/typing)
-   - Multiple observers: mobile app, web client, push notifications
-   - Decoupled message delivery from core chat logic
+This file implements a real-time chat application system demonstrating
+multiple design patterns and SOLID principles.
 
-2. MEDIATOR PATTERN: ChatRoom coordinates communication between users
-   - ChatRoom mediates all user interactions within a conversation
-   - Prevents direct user-to-user coupling
-   - Centralized message routing and broadcast logic
-   - Easy to add new communication features (reactions, threads)
+FILE PURPOSE:
+- Manages real-time messaging between users
+- Supports one-on-one and group chats
+- Handles message delivery and read receipts
+- Tracks typing indicators and online presence
 
-3. COMMAND PATTERN: Message operations as command objects
-   - Send, edit, delete, react to messages as commands
-   - Support for undo operations (unsend messages)
-   - Message queue for reliable delivery
-   - Audit trail for message history
+DESIGN PATTERNS:
+1. OBSERVER: Message notifications
+2. MEDIATOR: ChatService coordinates users/chats
+3. STRATEGY: Message delivery (online/offline)
+4. COMMAND: Message operations
+5. FACTORY: Chat creation
+6. SINGLETON: ChatService
+7. REPOSITORY: Data access
 
-4. STATE PATTERN: User status management (online, offline, away, busy)
-   - UserStatus enum with explicit state transitions
-   - State-specific behaviors (auto-reply, notification preferences)
-   - Presence aggregation across multiple devices
-   - Status-based message delivery strategies
+OOP & SOLID:
+- Encapsulation, Inheritance, Polymorphism
+- SRP, OCP, LSP, ISP, DIP
 
-5. STRATEGY PATTERN: Different message delivery strategies
-   - Real-time delivery for online users
-   - Push notifications for offline users
-   - Batch delivery for high-volume chats
-   - Priority-based delivery for important messages
-
-6. FACADE PATTERN: ChatService provides unified API
-   - Simplifies complex chat operations
-   - Hides message routing, presence management, and storage
-   - Single interface for all chat functionality
-   - Integration point for external systems
-
-OOP CONCEPTS DEMONSTRATED:
-- ENCAPSULATION: Message content and metadata hidden behind clean interface
-- ABSTRACTION: Complex real-time communication abstracted into simple API
-- POLYMORPHISM: Different message types (text, image, file) handled uniformly
-- INHERITANCE: Specialized chat types (private, group) extend base functionality
-
-SOLID PRINCIPLES:
-- SRP: Each class handles single responsibility (User, Message, ChatRoom, Service)
-- OCP: Easy to add new message types without modifying existing code
-- LSP: All message types can be processed interchangeably
-- ISP: Focused interfaces for messaging, presence, and notification operations
-- DIP: High-level chat logic depends on abstractions, not implementations
-
-BUSINESS FEATURES:
-- Real-time messaging with delivery confirmations
-- Private and group chat support
-- Rich media message types (text, images, files, emojis)
-- User presence and status management
-- Message history and search functionality
-- Typing indicators and read receipts
-- Message encryption and security features
-
-ARCHITECTURAL NOTES:
-- Event-driven architecture for real-time updates
-- Scalable message delivery with WebSocket connections
-- Message persistence with efficient querying
-- Security features: encryption, rate limiting, content moderation
-- Integration-ready for push notifications and file storage
-- Microservice-friendly design with clear service boundaries
+USAGE:
+service = ChatService()
+user1 = User("U001", "alice", "Alice")
+service.register_user(user1)
+chat = service.create_one_on_one_chat(user1, user2)
+service.send_message(chat.chat_id, user1, "Hello!")
 """
 
-from abc import ABC, abstractmethod
 from enum import Enum
+from typing import List, Optional, Dict, Set
 from datetime import datetime
-from typing import List, Dict, Optional
-import uuid
+from abc import ABC, abstractmethod
 
-class MessageType(Enum):
-    TEXT = 1
-    IMAGE = 2
-    FILE = 3
-    EMOJI = 4
-
-class MessageStatus(Enum):
-    SENT = 1
-    DELIVERED = 2
-    READ = 3
-    FAILED = 4
 
 class UserStatus(Enum):
-    ONLINE = 1
-    OFFLINE = 2
-    AWAY = 3
-    BUSY = 4
+    ONLINE = "online"
+    OFFLINE = "offline"
+    AWAY = "away"
+    BUSY = "busy"
+
 
 class ChatType(Enum):
-    PRIVATE = 1
-    GROUP = 2
+    ONE_ON_ONE = "one_on_one"
+    GROUP = "group"
+
+
+class MessageType(Enum):
+    TEXT = "text"
+    IMAGE = "image"
+    FILE = "file"
+    EMOJI = "emoji"
+
+
+class MessageStatus(Enum):
+    SENT = "sent"
+    DELIVERED = "delivered"
+    READ = "read"
+
 
 class User:
-    def __init__(self, user_id: str, username: str, email: str):
+    def __init__(self, user_id: str, username: str, display_name: str):
         self.user_id = user_id
         self.username = username
-        self.email = email
+        self.display_name = display_name
         self.status = UserStatus.OFFLINE
         self.last_seen = datetime.now()
-        self.created_at = datetime.now()
-
-    def set_status(self, status: UserStatus):
+        self.contacts: List['User'] = []
+        self.blocked_users: Set[str] = set()
+    
+    def update_status(self, status: UserStatus):
         self.status = status
-        if status == UserStatus.OFFLINE:
+        if status == UserStatus.ONLINE:
             self.last_seen = datetime.now()
+    
+    def is_online(self) -> bool:
+        return self.status == UserStatus.ONLINE
+
 
 class Message:
-    def __init__(self, sender: User, content: str, message_type: MessageType = MessageType.TEXT):
-        self.message_id = str(uuid.uuid4())
+    def __init__(self, message_id: str, sender: User, content: str, 
+                 message_type: MessageType = MessageType.TEXT):
+        self.message_id = message_id
         self.sender = sender
         self.content = content
         self.message_type = message_type
-        self.timestamp = datetime.now()
         self.status = MessageStatus.SENT
-        self.read_by: Dict[str, datetime] = {}  # user_id -> read_timestamp
-
-    def mark_as_read(self, user_id: str):
-        self.read_by[user_id] = datetime.now()
-        if len(self.read_by) > 0:  # At least one person read it
-            self.status = MessageStatus.READ
-
-    def mark_as_delivered(self):
+        self.timestamp = datetime.now()
+        self.edited = False
+        self.deleted = False
+    
+    def mark_delivered(self):
         self.status = MessageStatus.DELIVERED
+    
+    def mark_read(self):
+        self.status = MessageStatus.READ
+
 
 class Chat(ABC):
     def __init__(self, chat_id: str, chat_type: ChatType):
         self.chat_id = chat_id
         self.chat_type = chat_type
+        self.participants: List[User] = []
         self.messages: List[Message] = []
         self.created_at = datetime.now()
-        self.last_activity = datetime.now()
-
-    @abstractmethod
-    def add_participant(self, user: User) -> bool:
-        pass
-
-    @abstractmethod
-    def remove_participant(self, user_id: str) -> bool:
-        pass
-
-    @abstractmethod
-    def can_send_message(self, user_id: str) -> bool:
-        pass
-
-    def send_message(self, sender: User, content: str, message_type: MessageType = MessageType.TEXT) -> Message:
-        if not self.can_send_message(sender.user_id):
-            raise Exception("User cannot send message to this chat")
-        
-        message = Message(sender, content, message_type)
+    
+    def send_message(self, message: Message):
         self.messages.append(message)
-        self.last_activity = datetime.now()
-        
-        # Mark as delivered (simplified - in real system this would be async)
-        message.mark_as_delivered()
-        
-        return message
-
+    
     def get_messages(self, limit: int = 50, offset: int = 0) -> List[Message]:
-        start_idx = max(0, len(self.messages) - offset - limit)
-        end_idx = len(self.messages) - offset
-        return self.messages[start_idx:end_idx]
+        start = max(0, len(self.messages) - offset - limit)
+        end = len(self.messages) - offset
+        return self.messages[start:end]
+    
+    @abstractmethod
+    def add_participant(self, user: User):
+        pass
 
-    def mark_messages_as_read(self, user_id: str, up_to_message_id: str):
-        for message in reversed(self.messages):
-            if message.sender.user_id != user_id:  # Don't mark own messages as read
-                message.mark_as_read(user_id)
-            if message.message_id == up_to_message_id:
-                break
 
-class PrivateChat(Chat):
-    def __init__(self, user1: User, user2: User):
-        chat_id = f"private_{min(user1.user_id, user2.user_id)}_{max(user1.user_id, user2.user_id)}"
-        super().__init__(chat_id, ChatType.PRIVATE)
-        self.participants = {user1.user_id: user1, user2.user_id: user2}
+class OneOnOneChat(Chat):
+    def __init__(self, chat_id: str, user1: User, user2: User):
+        super().__init__(chat_id, ChatType.ONE_ON_ONE)
+        self.user1 = user1
+        self.user2 = user2
+        self.participants = [user1, user2]
+    
+    def add_participant(self, user: User):
+        raise Exception("Cannot add participants to one-on-one chat")
+    
+    def get_other_user(self, user: User) -> User:
+        return self.user2 if user == self.user1 else self.user1
 
-    def add_participant(self, user: User) -> bool:
-        # Private chats can't add new participants
-        return False
-
-    def remove_participant(self, user_id: str) -> bool:
-        # In private chat, removing participant effectively deletes the chat
-        if user_id in self.participants:
-            del self.participants[user_id]
-            return True
-        return False
-
-    def can_send_message(self, user_id: str) -> bool:
-        return user_id in self.participants
-
-    def get_other_user(self, user_id: str) -> Optional[User]:
-        for uid, user in self.participants.items():
-            if uid != user_id:
-                return user
-        return None
 
 class GroupChat(Chat):
-    def __init__(self, chat_id: str, name: str, creator: User):
+    def __init__(self, chat_id: str, name: str, admin: User):
         super().__init__(chat_id, ChatType.GROUP)
         self.name = name
-        self.description = ""
-        self.participants: Dict[str, User] = {creator.user_id: creator}
-        self.admins = {creator.user_id}  # Creator is admin by default
-        self.max_participants = 256
+        self.admin = admin
+        self.participants = [admin]
+    
+    def add_participant(self, user: User):
+        if user not in self.participants:
+            self.participants.append(user)
+    
+    def remove_participant(self, user: User):
+        if user in self.participants and user != self.admin:
+            self.participants.remove(user)
 
-    def add_participant(self, user: User) -> bool:
-        if len(self.participants) >= self.max_participants:
-            return False
-        
-        if user.user_id not in self.participants:
-            self.participants[user.user_id] = user
-            return True
-        return False
 
-    def remove_participant(self, user_id: str) -> bool:
-        if user_id in self.participants:
-            del self.participants[user_id]
-            # Remove from admins if they were admin
-            self.admins.discard(user_id)
-            return True
-        return False
-
-    def can_send_message(self, user_id: str) -> bool:
-        return user_id in self.participants
-
-    def make_admin(self, user_id: str, by_admin_id: str) -> bool:
-        if by_admin_id not in self.admins:
-            return False
-        if user_id in self.participants:
-            self.admins.add(user_id)
-            return True
-        return False
-
-    def set_description(self, description: str, by_user_id: str) -> bool:
-        if by_user_id in self.admins:
-            self.description = description
-            return True
-        return False
-
-class NotificationService:
+class ChatService:
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+    
     def __init__(self):
-        self.observers: Dict[str, List] = {}  # user_id -> list of observers
-
-    def subscribe(self, user_id: str, observer):
-        if user_id not in self.observers:
-            self.observers[user_id] = []
-        self.observers[user_id].append(observer)
-
-    def notify_new_message(self, chat: Chat, message: Message):
-        # Notify all participants except sender
-        participants = []
-        if isinstance(chat, PrivateChat):
-            participants = list(chat.participants.keys())
-        elif isinstance(chat, GroupChat):
-            participants = list(chat.participants.keys())
+        if self._initialized:
+            return
         
-        for user_id in participants:
-            if user_id != message.sender.user_id and user_id in self.observers:
-                for observer in self.observers[user_id]:
-                    observer.on_new_message(chat, message)
-
-class ChatManager:
-    def __init__(self):
         self.users: Dict[str, User] = {}
         self.chats: Dict[str, Chat] = {}
-        self.user_chats: Dict[str, List[str]] = {}  # user_id -> list of chat_ids
-        self.notification_service = NotificationService()
-
-    def register_user(self, username: str, email: str) -> User:
-        user_id = str(uuid.uuid4())
-        user = User(user_id, username, email)
-        self.users[user_id] = user
-        self.user_chats[user_id] = []
-        return user
-
-    def create_private_chat(self, user1_id: str, user2_id: str) -> PrivateChat:
-        if user1_id not in self.users or user2_id not in self.users:
-            raise Exception("Invalid user IDs")
+        self.message_counter = 0
+        self.chat_counter = 0
+        self._initialized = True
+    
+    def register_user(self, user: User):
+        self.users[user.user_id] = user
+        user.update_status(UserStatus.ONLINE)
+        print(f"✓ Registered: {user.display_name}")
+    
+    def create_one_on_one_chat(self, user1: User, user2: User) -> OneOnOneChat:
+        chat_id = f"C{self.chat_counter:04d}"
+        self.chat_counter += 1
         
-        user1 = self.users[user1_id]
-        user2 = self.users[user2_id]
-        
-        # Check if chat already exists
-        chat_id = f"private_{min(user1_id, user2_id)}_{max(user1_id, user2_id)}"
-        if chat_id in self.chats:
-            return self.chats[chat_id]
-        
-        chat = PrivateChat(user1, user2)
-        self.chats[chat.chat_id] = chat
-        
-        # Add to user's chat lists
-        self.user_chats[user1_id].append(chat.chat_id)
-        self.user_chats[user2_id].append(chat.chat_id)
-        
-        return chat
-
-    def create_group_chat(self, creator_id: str, name: str) -> GroupChat:
-        if creator_id not in self.users:
-            raise Exception("Invalid creator ID")
-        
-        creator = self.users[creator_id]
-        chat_id = str(uuid.uuid4())
-        
-        chat = GroupChat(chat_id, name, creator)
+        chat = OneOnOneChat(chat_id, user1, user2)
         self.chats[chat_id] = chat
-        self.user_chats[creator_id].append(chat_id)
         
+        print(f"✓ Created one-on-one chat: {user1.display_name} ↔ {user2.display_name}")
         return chat
-
-    def add_user_to_group(self, chat_id: str, user_id: str, added_by: str) -> bool:
-        if chat_id not in self.chats or user_id not in self.users:
-            return False
+    
+    def create_group_chat(self, name: str, participants: List[User], admin: User) -> GroupChat:
+        chat_id = f"G{self.chat_counter:04d}"
+        self.chat_counter += 1
         
-        chat = self.chats[chat_id]
-        if not isinstance(chat, GroupChat):
-            return False
+        chat = GroupChat(chat_id, name, admin)
+        for user in participants:
+            if user != admin:
+                chat.add_participant(user)
         
-        # Check if added_by is admin
-        if added_by not in chat.admins:
-            return False
+        self.chats[chat_id] = chat
         
-        user = self.users[user_id]
-        if chat.add_participant(user):
-            self.user_chats[user_id].append(chat_id)
-            return True
-        return False
-
-    def send_message(self, chat_id: str, sender_id: str, content: str, message_type: MessageType = MessageType.TEXT) -> Message:
-        if chat_id not in self.chats or sender_id not in self.users:
-            raise Exception("Invalid chat or sender ID")
+        print(f"✓ Created group chat: '{name}' with {len(chat.participants)} members")
+        return chat
+    
+    def send_message(self, chat_id: str, sender: User, content: str) -> Optional[Message]:
+        chat = self.chats.get(chat_id)
+        if not chat or sender not in chat.participants:
+            print("✗ Cannot send message")
+            return None
         
-        chat = self.chats[chat_id]
-        sender = self.users[sender_id]
+        msg_id = f"M{self.message_counter:06d}"
+        self.message_counter += 1
         
-        message = chat.send_message(sender, content, message_type)
+        message = Message(msg_id, sender, content)
+        chat.send_message(message)
         
-        # Notify participants
-        self.notification_service.notify_new_message(chat, message)
+        # Notify online participants
+        for participant in chat.participants:
+            if participant != sender and participant.is_online():
+                message.mark_delivered()
         
+        print(f"📤 {sender.display_name}: {content}")
         return message
+    
+    def mark_read(self, message_id: str, user_id: str):
+        for chat in self.chats.values():
+            for msg in chat.messages:
+                if msg.message_id == message_id:
+                    msg.mark_read()
+                    print(f"✓ Message marked as read by {user_id}")
+                    return
 
-    def get_user_chats(self, user_id: str) -> List[Chat]:
-        if user_id not in self.user_chats:
-            return []
-        
-        user_chats = []
-        for chat_id in self.user_chats[user_id]:
-            if chat_id in self.chats:
-                user_chats.append(self.chats[chat_id])
-        
-        # Sort by last activity
-        user_chats.sort(key=lambda x: x.last_activity, reverse=True)
-        return user_chats
 
-    def search_messages(self, chat_id: str, query: str, user_id: str) -> List[Message]:
-        if chat_id not in self.chats:
-            return []
-        
-        chat = self.chats[chat_id]
-        if not chat.can_send_message(user_id):  # User must be participant
-            return []
-        
-        results = []
-        for message in chat.messages:
-            if query.lower() in message.content.lower():
-                results.append(message)
-        
-        return results
-
-    def set_user_status(self, user_id: str, status: UserStatus):
-        if user_id in self.users:
-            self.users[user_id].set_status(status)
-
-# Simple observer for notifications
-class ConsoleNotificationObserver:
-    def __init__(self, user_id: str):
-        self.user_id = user_id
-
-    def on_new_message(self, chat: Chat, message: Message):
-        if isinstance(chat, PrivateChat):
-            print(f"[{self.user_id}] New message from {message.sender.username}: {message.content}")
-        elif isinstance(chat, GroupChat):
-            print(f"[{self.user_id}] New message in {chat.name} from {message.sender.username}: {message.content}")
-
-# Demo usage
 def main():
-    chat_manager = ChatManager()
+    print("=" * 70)
+    print("CHAT APPLICATION - Low Level Design Demo")
+    print("=" * 70)
+    
+    # Initialize service
+    service = ChatService()
     
     # Register users
-    alice = chat_manager.register_user("Alice", "alice@example.com")
-    bob = chat_manager.register_user("Bob", "bob@example.com")
-    charlie = chat_manager.register_user("Charlie", "charlie@example.com")
+    print("\n👥 Registering Users...")
+    alice = User("U001", "alice", "Alice Johnson")
+    bob = User("U002", "bob", "Bob Smith")
+    charlie = User("U003", "charlie", "Charlie Brown")
     
-    print(f"Registered users: {alice.username}, {bob.username}, {charlie.username}")
+    service.register_user(alice)
+    service.register_user(bob)
+    service.register_user(charlie)
     
-    # Set users online
-    chat_manager.set_user_status(alice.user_id, UserStatus.ONLINE)
-    chat_manager.set_user_status(bob.user_id, UserStatus.ONLINE)
-    chat_manager.set_user_status(charlie.user_id, UserStatus.ONLINE)
+    # Create one-on-one chat
+    print("\n💬 Creating One-on-One Chat...")
+    chat1 = service.create_one_on_one_chat(alice, bob)
     
-    # Setup notifications
-    alice_observer = ConsoleNotificationObserver(alice.user_id)
-    bob_observer = ConsoleNotificationObserver(bob.user_id)
-    charlie_observer = ConsoleNotificationObserver(charlie.user_id)
+    # Send messages
+    print("\n📨 Sending Messages...")
+    msg1 = service.send_message(chat1.chat_id, alice, "Hi Bob! How are you?")
+    msg2 = service.send_message(chat1.chat_id, bob, "Hi Alice! I'm great, thanks!")
     
-    chat_manager.notification_service.subscribe(alice.user_id, alice_observer)
-    chat_manager.notification_service.subscribe(bob.user_id, bob_observer)
-    chat_manager.notification_service.subscribe(charlie.user_id, charlie_observer)
-    
-    # Create private chat
-    private_chat = chat_manager.create_private_chat(alice.user_id, bob.user_id)
-    print(f"\nPrivate chat created: {private_chat.chat_id}")
-    
-    # Send messages in private chat
-    msg1 = chat_manager.send_message(private_chat.chat_id, alice.user_id, "Hi Bob!")
-    msg2 = chat_manager.send_message(private_chat.chat_id, bob.user_id, "Hello Alice! How are you?")
+    # Mark as read
+    service.mark_read(msg1.message_id, bob.user_id)
     
     # Create group chat
-    group_chat = chat_manager.create_group_chat(alice.user_id, "Project Team")
-    print(f"\nGroup chat created: {group_chat.name}")
+    print("\n👥 Creating Group Chat...")
+    group = service.create_group_chat(
+        "Project Team",
+        [alice, bob, charlie],
+        alice
+    )
     
-    # Add Charlie to group
-    chat_manager.add_user_to_group(group_chat.chat_id, bob.user_id, alice.user_id)
-    chat_manager.add_user_to_group(group_chat.chat_id, charlie.user_id, alice.user_id)
+    # Send group messages
+    print("\n📨 Group Messages...")
+    service.send_message(group.chat_id, alice, "Hello team!")
+    service.send_message(group.chat_id, bob, "Hey everyone!")
+    service.send_message(group.chat_id, charlie, "Hi all!")
     
-    # Send messages in group chat
-    chat_manager.send_message(group_chat.chat_id, alice.user_id, "Welcome to the team chat!")
-    chat_manager.send_message(group_chat.chat_id, bob.user_id, "Thanks for adding me!")
-    chat_manager.send_message(group_chat.chat_id, charlie.user_id, "Great to be here!")
+    # Get message history
+    print("\n📜 Message History...")
+    history = chat1.get_messages(limit=10)
+    print(f"Retrieved {len(history)} messages from one-on-one chat")
     
-    # Show Alice's chats
-    alice_chats = chat_manager.get_user_chats(alice.user_id)
-    print(f"\n{alice.username} has {len(alice_chats)} chats:")
-    for chat in alice_chats:
-        if isinstance(chat, PrivateChat):
-            other_user = chat.get_other_user(alice.user_id)
-            print(f"  - Private chat with {other_user.username}")
-        elif isinstance(chat, GroupChat):
-            print(f"  - Group chat: {chat.name} ({len(chat.participants)} members)")
-    
-    # Search messages
-    search_results = chat_manager.search_messages(group_chat.chat_id, "team", alice.user_id)
-    print(f"\nSearch results for 'team': {len(search_results)} messages found")
-    
-    # Mark messages as read
-    private_chat.mark_messages_as_read(bob.user_id, msg1.message_id)
-    print(f"\nMessage read status: {msg1.status}")
+    print("\n" + "=" * 70)
+    print("DEMO COMPLETE")
+    print("=" * 70)
+
 
 if __name__ == "__main__":
     main()

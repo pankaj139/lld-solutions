@@ -1,228 +1,354 @@
 # Chat Application
 
 ## 🔗 Implementation Links
+
 - **Python Implementation**: [python/chat-application/main.py](python/chat-application/main.py)
 - **JavaScript Implementation**: [javascript/chat-application/main.js](javascript/chat-application/main.js)
 
 ## Problem Statement
 
-Design a chat application system that can:
+Design a real-time chat application system that can:
 
-1. **Support multiple users** with online/offline status
-2. **Handle private chats** between two users
-3. **Support group chats** with multiple participants and admins
-4. **Send different message types** (text, image, file, emoji)
-5. **Track message status** (sent, delivered, read)
-6. **Provide real-time notifications** for new messages
-7. **Search functionality** within chat conversations
-8. **Message history** and pagination support
+1. **Manage users** with online/offline status tracking
+2. **Support one-on-one chats** between two users
+3. **Support group chats** with multiple participants
+4. **Handle message delivery** with sent/delivered/read receipts
+5. **Store message history** with pagination
+6. **Support message types** including text, images, files, and emojis
+7. **Implement typing indicators** for active conversations
+8. **Provide search functionality** for messages and users
+9. **Support notifications** for new messages
 
 ## Requirements
 
 ### Functional Requirements
-- User registration and authentication
-- Create private chats between two users
-- Create group chats with multiple participants
-- Send and receive messages with different types
-- Track message delivery and read status
-- Real-time notifications for new messages
-- Search messages within conversations
-- User status management (online, offline, away, busy)
-- Admin controls in group chats
-- Message pagination for chat history
+
+- Register users with username, display name, and avatar
+- Create one-on-one chat between two users
+- Create group chat with multiple participants (2-256 members)
+- Send messages to chat (text, image, file, emoji)
+- Deliver messages to all online participants
+- Mark messages as delivered and read
+- Show typing indicator when user is typing
+- Search messages by content, sender, or date
+- Retrieve message history with pagination
+- Support message editing and deletion
+- Add/remove participants from group chats
+- Mute/unmute conversations
+- Block/unblock users
 
 ### Non-Functional Requirements
-- System should handle concurrent messaging
-- Fast message delivery and retrieval
-- Scalable to support thousands of users
-- Support for message attachments
-- Efficient search across message history
-- Real-time updates without frequent polling
+
+- Message delivery should be near real-time (< 100ms)
+- Support 10,000+ concurrent users
+- Message history retrieval should be O(log n) with indexing
+- Handle 1 million+ messages efficiently
+- System should be scalable horizontally
+- Data should be encrypted in transit
+- Support offline message queuing
 
 ## Design Decisions
 
 ### Key Classes
 
 1. **User Management**
-   - `User`: Represents system users with status and profile info
-   - `UserStatus`: Enum for online/offline/away/busy states
+   - `User`: User profile with status
+   - `UserStatus`: Enum (Online, Offline, Away, Busy)
+   - `Contact`: User's contact list
 
-2. **Message System**
-   - `Message`: Individual message with content, type, and metadata
-   - `MessageType`: Support for text, image, file, emoji
-   - `MessageStatus`: Track sent/delivered/read states
+2. **Chat Management**
+   - `Chat`: Base chat class
+   - `OneOnOneChat`: Direct chat between two users
+   - `GroupChat`: Multi-participant chat with admin
+   - `ChatType`: Enum (OneOnOne, Group)
 
-3. **Chat Management**
-   - `Chat`: Abstract base class for all chat types
-   - `PrivateChat`: Two-user conversations
-   - `GroupChat`: Multi-user conversations with admin controls
+3. **Message System**
+   - `Message`: Message with content and metadata
+   - `MessageType`: Enum (Text, Image, File, Emoji)
+   - `MessageStatus`: Enum (Sent, Delivered, Read)
+   - `MessageReceipt`: Delivery/read confirmation
 
-4. **System Components**
-   - `ChatManager`: Main coordinator for all chat operations
-   - `NotificationService`: Observer pattern for real-time notifications
+4. **Activity Tracking**
+   - `TypingIndicator`: Shows who is typing
+   - `LastSeen`: User's last activity timestamp
+   - `OnlinePresence`: Real-time status
+
+5. **System Management**
+   - `ChatService`: Main service managing all operations
+   - `MessageQueue`: Offline message handling
+   - `NotificationService`: Push notifications
 
 ### Design Patterns Used
 
-1. **Abstract Factory**: Chat creation (private vs group)
-2. **Observer Pattern**: Real-time notification system
-3. **Template Method**: Base chat functionality with specific implementations
-4. **Strategy Pattern**: Different message type handling
-5. **Factory Method**: Message and user creation
+1. **Observer Pattern**: Message notifications to participants
+2. **Mediator Pattern**: ChatService coordinates between users and chats
+3. **Strategy Pattern**: Different message delivery strategies (online/offline)
+4. **Command Pattern**: Message send/edit/delete as commands
+5. **Factory Pattern**: Create chats (one-on-one vs group)
+6. **Singleton Pattern**: ChatService instance
+7. **Repository Pattern**: Message and user data access
 
 ### Key Features
 
-- **Real-time Messaging**: Observer pattern for instant notifications
-- **Message Status Tracking**: Comprehensive delivery and read receipts
-- **Flexible Chat Types**: Both private and group conversations
-- **Search Functionality**: Message content search within chats
-- **Admin Controls**: Group management with admin privileges
-- **User Status**: Online presence and last seen tracking
+- **Real-Time Messaging**: Instant message delivery
+- **Read Receipts**: Track message delivery and read status
+- **Typing Indicators**: See when someone is typing
+- **Group Management**: Add/remove participants, assign admins
+- **Message History**: Paginated history retrieval
+
+## State Diagram
+
+```text
+USER STATES:
+
+OFFLINE
+  ↓ (login)
+ONLINE
+  ├─→ (set_away) → AWAY
+  ├─→ (set_busy) → BUSY
+  ├─→ (logout) → OFFLINE
+  └─→ (disconnect) → OFFLINE
+
+MESSAGE STATES:
+
+COMPOSING
+  ↓ (send)
+SENT
+  ↓ (receive by server)
+DELIVERED (to all online participants)
+  ↓ (open by participant)
+READ (by one or more participants)
+
+CHAT STATES:
+
+CREATED
+  ↓ (add_messages)
+ACTIVE (has messages)
+  ├─→ (mute) → MUTED
+  ├─→ (archive) → ARCHIVED
+  └─→ (delete) → DELETED
+```
 
 ## Class Diagram
 
-```
+```text
+UserStatus (Enum)
+├── ONLINE
+├── OFFLINE
+├── AWAY
+└── BUSY
+
+ChatType (Enum)
+├── ONE_ON_ONE
+└── GROUP
+
+MessageType (Enum)
+├── TEXT
+├── IMAGE
+├── FILE
+└── EMOJI
+
+MessageStatus (Enum)
+├── SENT
+├── DELIVERED
+└── READ
+
 User
 ├── user_id: str
 ├── username: str
-├── email: str
+├── display_name: str
 ├── status: UserStatus
-└── last_seen: datetime
+├── last_seen: datetime
+├── contacts: List[User]
+├── blocked_users: Set[str]
+├── update_status(status) → None
+└── is_online() → bool
 
 Message
 ├── message_id: str
 ├── sender: User
 ├── content: str
 ├── message_type: MessageType
-├── timestamp: datetime
 ├── status: MessageStatus
-└── read_by: Dict[str, datetime]
+├── timestamp: datetime
+├── edited: bool
+├── deleted: bool
+├── mark_delivered() → None
+└── mark_read() → None
+
+MessageReceipt
+├── message_id: str
+├── user: User
+├── status: MessageStatus
+└── timestamp: datetime
 
 Chat (Abstract)
 ├── chat_id: str
 ├── chat_type: ChatType
+├── participants: List[User]
 ├── messages: List[Message]
-├── send_message()
-└── mark_messages_as_read()
+├── created_at: datetime
+├── send_message(message) → None
+├── get_messages(limit, offset) → List[Message]
+└── add_participant(user) → None
 
-PrivateChat extends Chat
-├── participants: Dict[str, User]
-└── get_other_user()
+OneOnOneChat extends Chat
+├── user1: User
+├── user2: User
+└── get_other_user(user) → User
 
 GroupChat extends Chat
 ├── name: str
-├── participants: Dict[str, User]
-├── admins: Set[str]
-├── make_admin()
-└── set_description()
+├── admin: User
+├── remove_participant(user) → None
+└── change_admin(new_admin) → None
 
-ChatManager
+TypingIndicator
+├── chat_id: str
+├── user: User
+├── started_at: datetime
+└── is_expired() → bool
+
+MessageQueue
+├── queued_messages: Dict[str, List[Message]]
+├── enqueue(user_id, message) → None
+└── dequeue(user_id) → List[Message]
+
+ChatService (Singleton)
 ├── users: Dict[str, User]
 ├── chats: Dict[str, Chat]
-├── user_chats: Dict[str, List[str]]
-├── create_private_chat()
-├── create_group_chat()
-├── send_message()
-└── search_messages()
+├── message_queue: MessageQueue
+├── typing_indicators: Dict[str, List[TypingIndicator]]
+├── register_user(user) → None
+├── create_one_on_one_chat(user1, user2) → OneOnOneChat
+├── create_group_chat(name, participants, admin) → GroupChat
+├── send_message(chat_id, sender, content) → Message
+├── mark_delivered(message_id, user_id) → None
+├── mark_read(message_id, user_id) → None
+├── set_typing(chat_id, user_id) → None
+├── search_messages(query) → List[Message]
+└── get_user_chats(user_id) → List[Chat]
 ```
 
 ## Usage Example
 
 ```python
-# Create chat manager and register users
-chat_manager = ChatManager()
-alice = chat_manager.register_user("Alice", "alice@example.com")
-bob = chat_manager.register_user("Bob", "bob@example.com")
+# Initialize chat service
+chat_service = ChatService()
 
-# Create private chat and send messages
-private_chat = chat_manager.create_private_chat(alice.user_id, bob.user_id)
-message = chat_manager.send_message(private_chat.chat_id, alice.user_id, "Hello!")
+# Register users
+alice = User("U001", "alice", "Alice Johnson")
+bob = User("U002", "bob", "Bob Smith")
+charlie = User("U003", "charlie", "Charlie Brown")
 
-# Create group chat and add participants
-group_chat = chat_manager.create_group_chat(alice.user_id, "Project Team")
-chat_manager.add_user_to_group(group_chat.chat_id, bob.user_id, alice.user_id)
+chat_service.register_user(alice)
+chat_service.register_user(bob)
+chat_service.register_user(charlie)
 
-# Search messages
-results = chat_manager.search_messages(group_chat.chat_id, "project", alice.user_id)
+# Create one-on-one chat
+chat1 = chat_service.create_one_on_one_chat(alice, bob)
+
+# Send message
+message = chat_service.send_message(
+    chat_id=chat1.chat_id,
+    sender=alice,
+    content="Hi Bob! How are you?"
+)
+
+# Mark as delivered and read
+chat_service.mark_delivered(message.message_id, bob.user_id)
+chat_service.mark_read(message.message_id, bob.user_id)
+
+# Create group chat
+group = chat_service.create_group_chat(
+    name="Project Team",
+    participants=[alice, bob, charlie],
+    admin=alice
+)
+
+# Send group message
+chat_service.send_message(
+    chat_id=group.chat_id,
+    sender=alice,
+    content="Hello team! Let's discuss the project."
+)
+
+# Show typing indicator
+chat_service.set_typing(group.chat_id, bob.user_id)
+
+# Get message history
+messages = group.get_messages(limit=50, offset=0)
 ```
-
-## Real-time Features
-
-### Notification System
-```python
-class NotificationObserver:
-    def on_new_message(self, chat: Chat, message: Message):
-        # Handle new message notification
-        pass
-
-# Subscribe to notifications
-chat_manager.notification_service.subscribe(user_id, observer)
-```
-
-### Message Status Updates
-- **Sent**: Message created and stored
-- **Delivered**: Message reached recipient's device
-- **Read**: Recipient viewed the message
 
 ## Business Rules
 
-1. **Private Chats**
-   - Only two participants allowed
-   - Cannot add new participants
-   - Both users can send messages
+1. **User Rules**
+   - Username must be unique
+   - Users can block other users (no messages received)
+   - User status updates broadcast to contacts
+   - Last seen updated on activity
+   - Offline users receive queued messages on login
 
-2. **Group Chats**
-   - Creator becomes admin automatically
-   - Admins can add/remove participants
-   - Admins can promote other users to admin
-   - Maximum 256 participants per group
+2. **Chat Creation Rules**
+   - One-on-one chat: Exactly 2 participants
+   - Group chat: 2-256 participants
+   - User cannot create duplicate one-on-one chats
+   - Group requires at least one admin
+   - Admin can add/remove participants
 
-3. **Message Handling**
-   - Messages are immutable once sent
-   - Read receipts only for non-sender participants
-   - Search only available to chat participants
+3. **Message Rules**
+   - Messages cannot be empty (text) or null (media)
+   - Sent messages cannot be unsent (only deleted)
+   - Deleted messages show "Message deleted"
+   - Edited messages marked with "Edited" indicator
+   - Messages delivered to all online participants immediately
+   - Offline participants receive on next login
 
-4. **User Status**
-   - Automatic offline status when disconnected
-   - Last seen timestamp updated on status change
-   - Status visible to chat participants
+4. **Read Receipts**
+   - Message marked delivered when received by device
+   - Message marked read when chat opened
+   - In groups, multiple users can read at different times
+   - Read receipt cannot be reverted to delivered
+
+5. **Typing Indicators**
+   - Expire after 3 seconds of no activity
+   - Only show in active chat
+   - Multiple users can be typing simultaneously
+   - Not stored persistently
 
 ## Extension Points
 
-1. **Message Reactions**: Add emoji reactions to messages
-2. **File Sharing**: Enhanced file upload and sharing
-3. **Voice/Video Calls**: Integration with calling features
-4. **Message Encryption**: End-to-end encryption support
-5. **Push Notifications**: Mobile push notification integration
-6. **Message Threading**: Reply threads for group conversations
-7. **Bot Integration**: Support for chatbots and automated responses
-8. **Message Formatting**: Rich text, mentions, and formatting
+1. **Media Sharing**: Voice messages, video calls
+2. **Reactions**: Emoji reactions to messages
+3. **Threads**: Reply to specific messages
+4. **Stories**: Temporary shared content
+5. **End-to-End Encryption**: Secure messaging
+6. **Message Forwarding**: Share messages across chats
+7. **Voice/Video Calls**: Real-time communication
+8. **Stickers**: Custom sticker packs
 
 ## Security Considerations
 
-1. **Authentication**: Secure user authentication and session management
-2. **Authorization**: Proper access control for chat participation
-3. **Data Privacy**: Message content protection and user privacy
-4. **Rate Limiting**: Prevent spam and abuse
-5. **Content Moderation**: Automatic and manual content filtering
-
-## Performance Optimizations
-
-1. **Message Pagination**: Load messages in chunks for better performance
-2. **Caching**: Cache frequently accessed chats and recent messages
-3. **Database Indexing**: Efficient queries for message search and retrieval
-4. **Connection Pooling**: Manage database connections efficiently
-5. **Real-time Optimization**: WebSocket connections for instant messaging
+- **Authentication**: Secure user login with tokens
+- **Authorization**: Users can only access their chats
+- **Encryption**: Messages encrypted in transit (TLS)
+- **Privacy**: Blocked users cannot see status/messages
+- **Rate Limiting**: Prevent message spam
+- **Data Privacy**: Deleted messages removed from storage
 
 ## Time Complexity
 
-- **Send Message**: O(1) for message creation, O(n) for notifications
-- **Search Messages**: O(m) where m is number of messages in chat
-- **Get User Chats**: O(n log n) for sorting by last activity
-- **Mark as Read**: O(k) where k is number of messages to mark
+- **Send Message**: O(p) where p is participants (broadcast)
+- **Get Messages**: O(log n + k) where n is total messages, k is page size
+- **Search Messages**: O(m log m) where m is matching messages
+- **Mark Read/Delivered**: O(1) - Direct message update
+- **Create Chat**: O(p) where p is participants
+- **User Lookup**: O(1) with hash map
 
 ## Space Complexity
 
-- O(n) for users where n is total number of users
-- O(m) for messages where m is total number of messages
-- O(c) for chats where c is total number of chats
-- Additional O(p) for participant mappings and indexes
+- O(u) where u is number of users
+- O(c) where c is number of chats
+- O(m) where m is total messages
+- O(q) where q is queued messages for offline users
+- O(t) where t is active typing indicators
