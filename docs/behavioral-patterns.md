@@ -12,8 +12,14 @@
 4. [Command Pattern](#command-pattern)
 5. [State Pattern](#state-pattern)
 6. [Template Method Pattern](#template-method-pattern)
-7. [Pattern Comparison](#pattern-comparison)
-8. [Interview Questions](#interview-questions)
+7. [Chain of Responsibility Pattern](#chain-of-responsibility-pattern)
+8. [Iterator Pattern](#iterator-pattern)
+9. [Mediator Pattern](#mediator-pattern)
+10. [Memento Pattern](#memento-pattern)
+11. [Visitor Pattern](#visitor-pattern)
+12. [Interpreter Pattern](#interpreter-pattern)
+13. [Pattern Comparison](#pattern-comparison)
+14. [Interview Questions](#interview-questions)
 
 ---
 
@@ -1605,6 +1611,642 @@ if __name__ == "__main__":
 - Make all steps abstract (some should be concrete)
 - Create too granular steps
 - Use when algorithms are completely different
+
+---
+
+## Chain of Responsibility Pattern
+
+**Intent**: Pass request along **chain of handlers** until one handles it, avoiding coupling sender to receiver.
+
+### Chain of Responsibility: JavaScript Implementation
+
+```javascript
+/**
+ * Chain of Responsibility Pattern - JavaScript Implementation
+ * Customer support ticket handling system
+ */
+
+// Handler interface
+class SupportHandler {
+    constructor() {
+        this.nextHandler = null;
+    }
+    
+    setNext(handler) {
+        this.nextHandler = handler;
+        return handler; // For chaining
+    }
+    
+    handle(ticket) {
+        if (this.canHandle(ticket)) {
+            this.processTicket(ticket);
+        } else if (this.nextHandler) {
+            console.log(`${this.constructor.name} → passing to next handler`);
+            this.nextHandler.handle(ticket);
+        } else {
+            console.log('❌ No handler available for this ticket');
+        }
+    }
+    
+    canHandle(ticket) {
+        throw new Error('Must implement canHandle()');
+    }
+    
+    processTicket(ticket) {
+        throw new Error('Must implement processTicket()');
+    }
+}
+
+// Concrete Handlers
+class Level1Support extends SupportHandler {
+    canHandle(ticket) {
+        return ticket.priority === 'low' && ticket.type === 'general';
+    }
+    
+    processTicket(ticket) {
+        console.log(`✅ Level 1 Support handling ticket #${ticket.id}`);
+        console.log(`   Issue: ${ticket.description}`);
+    }
+}
+
+class Level2Support extends SupportHandler {
+    canHandle(ticket) {
+        return ticket.priority === 'medium';
+    }
+    
+    processTicket(ticket) {
+        console.log(`✅ Level 2 Support handling ticket #${ticket.id}`);
+        console.log(`   Issue: ${ticket.description}`);
+    }
+}
+
+class Level3Support extends SupportHandler {
+    canHandle(ticket) {
+        return ticket.priority === 'high';
+    }
+    
+    processTicket(ticket) {
+        console.log(`✅ Level 3 Support (Expert) handling ticket #${ticket.id}`);
+        console.log(`   Issue: ${ticket.description}`);
+    }
+}
+
+// Usage
+const level1 = new Level1Support();
+const level2 = new Level2Support();
+const level3 = new Level3Support();
+
+// Build chain
+level1.setNext(level2).setNext(level3);
+
+// Test tickets
+console.log('=== Ticket 1 ===');
+level1.handle({ id: 1, priority: 'low', type: 'general', description: 'Password reset' });
+
+console.log('\n=== Ticket 2 ===');
+level1.handle({ id: 2, priority: 'medium', type: 'technical', description: 'Database connection issue' });
+
+console.log('\n=== Ticket 3 ===');
+level1.handle({ id: 3, priority: 'high', type: 'critical', description: 'System outage' });
+```
+
+### Chain of Responsibility: Python Implementation
+
+```python
+"""
+Chain of Responsibility Pattern - Python Implementation
+Expense approval system
+"""
+
+from abc import ABC, abstractmethod
+
+class Approver(ABC):
+    """Abstract approver handler."""
+    
+    def __init__(self):
+        self._next_approver = None
+    
+    def set_next(self, approver: 'Approver') -> 'Approver':
+        """Set next approver in chain."""
+        self._next_approver = approver
+        return approver
+    
+    def approve(self, expense: dict) -> None:
+        """Handle approval request."""
+        if self._can_approve(expense):
+            self._process_approval(expense)
+        elif self._next_approver:
+            print(f"{self.__class__.__name__} → Forwarding to next approver")
+            self._next_approver.approve(expense)
+        else:
+            print(f"❌ Expense ${expense['amount']} cannot be approved by anyone")
+    
+    @abstractmethod
+    def _can_approve(self, expense: dict) -> bool:
+        """Check if can approve."""
+        pass
+    
+    @abstractmethod
+    def _process_approval(self, expense: dict) -> None:
+        """Process approval."""
+        pass
+
+
+class TeamLead(Approver):
+    """Team lead approver (up to $1000)."""
+    
+    def _can_approve(self, expense: dict) -> bool:
+        return expense['amount'] <= 1000
+    
+    def _process_approval(self, expense: dict) -> None:
+        print(f"✅ Team Lead approved expense: ${expense['amount']}")
+        print(f"   Purpose: {expense['purpose']}")
+
+
+class Manager(Approver):
+    """Manager approver (up to $5000)."""
+    
+    def _can_approve(self, expense: dict) -> bool:
+        return expense['amount'] <= 5000
+    
+    def _process_approval(self, expense: dict) -> None:
+        print(f"✅ Manager approved expense: ${expense['amount']}")
+        print(f"   Purpose: {expense['purpose']}")
+
+
+class Director(Approver):
+    """Director approver (up to $10000)."""
+    
+    def _can_approve(self, expense: dict) -> bool:
+        return expense['amount'] <= 10000
+    
+    def _process_approval(self, expense: dict) -> None:
+        print(f"✅ Director approved expense: ${expense['amount']}")
+        print(f"   Purpose: {expense['purpose']}")
+
+
+# Usage
+def main():
+    # Create chain
+    team_lead = TeamLead()
+    manager = Manager()
+    director = Director()
+    
+    team_lead.set_next(manager).set_next(director)
+    
+    # Test expenses
+    expenses = [
+        {'amount': 500, 'purpose': 'Office supplies'},
+        {'amount': 3000, 'purpose': 'Team building'},
+        {'amount': 8000, 'purpose': 'New equipment'},
+        {'amount': 15000, 'purpose': 'Company retreat'}
+    ]
+    
+    for expense in expenses:
+        print(f"\n{'='*50}")
+        print(f"Expense: ${expense['amount']}")
+        team_lead.approve(expense)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## Iterator Pattern
+
+**Intent**: Provide way to access elements of collection **sequentially** without exposing underlying representation.
+
+### Iterator: JavaScript Implementation
+
+```javascript
+/**
+ * Iterator Pattern - JavaScript Implementation
+ * Custom collection with iterator
+ */
+
+// Iterator interface
+class Iterator {
+    hasNext() {
+        throw new Error('Must implement hasNext()');
+    }
+    
+    next() {
+        throw new Error('Must implement next()');
+    }
+}
+
+// Concrete Iterator
+class BookIterator extends Iterator {
+    constructor(books) {
+        super();
+        this.books = books;
+        this.index = 0;
+    }
+    
+    hasNext() {
+        return this.index < this.books.length;
+    }
+    
+    next() {
+        if (this.hasNext()) {
+            return this.books[this.index++];
+        }
+        return null;
+    }
+}
+
+// Collection
+class BookCollection {
+    constructor() {
+        this.books = [];
+    }
+    
+    addBook(book) {
+        this.books.push(book);
+    }
+    
+    createIterator() {
+        return new BookIterator(this.books);
+    }
+    
+    // Modern JavaScript: Make collection iterable
+    *[Symbol.iterator]() {
+        for (const book of this.books) {
+            yield book;
+        }
+    }
+}
+
+// Usage
+const collection = new BookCollection();
+collection.addBook({ title: '1984', author: 'George Orwell' });
+collection.addBook({ title: 'Brave New World', author: 'Aldous Huxley' });
+collection.addBook({ title: 'Fahrenheit 451', author: 'Ray Bradbury' });
+
+console.log('=== Using Custom Iterator ===');
+const iterator = collection.createIterator();
+while (iterator.hasNext()) {
+    const book = iterator.next();
+    console.log(`📖 ${book.title} by ${book.author}`);
+}
+
+console.log('\n=== Using Built-in Iterator ===');
+for (const book of collection) {
+    console.log(`📖 ${book.title} by ${book.author}`);
+}
+```
+
+---
+
+## Mediator Pattern
+
+**Intent**: Define object that **encapsulates how set of objects interact**, promoting loose coupling.
+
+### Mediator: JavaScript Implementation
+
+```javascript
+/**
+ * Mediator Pattern - JavaScript Implementation
+ * Chat room mediator
+ */
+
+// Mediator
+class ChatRoom {
+    constructor() {
+        this.users = new Map();
+    }
+    
+    register(user) {
+        this.users.set(user.name, user);
+        user.setChatRoom(this);
+        console.log(`${user.name} joined the chat`);
+    }
+    
+    send(message, from, to = null) {
+        if (to) {
+            // Private message
+            const recipient = this.users.get(to);
+            if (recipient) {
+                recipient.receive(message, from);
+            }
+        } else {
+            // Broadcast to all except sender
+            this.users.forEach(user => {
+                if (user.name !== from) {
+                    user.receive(message, from);
+                }
+            });
+        }
+    }
+}
+
+// Colleague
+class User {
+    constructor(name) {
+        this.name = name;
+        this.chatRoom = null;
+    }
+    
+    setChatRoom(chatRoom) {
+        this.chatRoom = chatRoom;
+    }
+    
+    send(message, to = null) {
+        console.log(`\n${this.name} sends: "${message}"`);
+        this.chatRoom.send(message, this.name, to);
+    }
+    
+    receive(message, from) {
+        console.log(`${this.name} received from ${from}: "${message}"`);
+    }
+}
+
+// Usage
+const chatRoom = new ChatRoom();
+
+const alice = new User('Alice');
+const bob = new User('Bob');
+const charlie = new User('Charlie');
+
+chatRoom.register(alice);
+chatRoom.register(bob);
+chatRoom.register(charlie);
+
+alice.send('Hello everyone!');
+bob.send('Hi Alice!', 'Alice');
+charlie.send('Hey there!');
+```
+
+---
+
+## Memento Pattern
+
+**Intent**: Capture and externalize object's internal state for **later restoration** without violating encapsulation.
+
+### Memento: JavaScript Implementation
+
+```javascript
+/**
+ * Memento Pattern - JavaScript Implementation
+ * Document editor with history
+ */
+
+// Memento
+class DocumentMemento {
+    constructor(content, cursorPosition) {
+        this._content = content;
+        this._cursorPosition = cursorPosition;
+        this._timestamp = new Date();
+    }
+    
+    getContent() {
+        return this._content;
+    }
+    
+    getCursorPosition() {
+        return this._cursorPosition;
+    }
+    
+    getTimestamp() {
+        return this._timestamp;
+    }
+}
+
+// Originator
+class Document {
+    constructor() {
+        this.content = '';
+        this.cursorPosition = 0;
+    }
+    
+    write(text) {
+        this.content += text;
+        this.cursorPosition = this.content.length;
+    }
+    
+    save() {
+        return new DocumentMemento(this.content, this.cursorPosition);
+    }
+    
+    restore(memento) {
+        this.content = memento.getContent();
+        this.cursorPosition = memento.getCursorPosition();
+    }
+    
+    show() {
+        console.log(`Content: "${this.content}"`);
+        console.log(`Cursor at: ${this.cursorPosition}`);
+    }
+}
+
+// Caretaker
+class History {
+    constructor() {
+        this.mementos = [];
+    }
+    
+    push(memento) {
+        this.mementos.push(memento);
+    }
+    
+    pop() {
+        return this.mementos.pop();
+    }
+}
+
+// Usage
+const doc = new Document();
+const history = new History();
+
+doc.write('Hello');
+history.push(doc.save());
+
+doc.write(' World');
+history.push(doc.save());
+
+doc.write('!');
+doc.show();
+
+console.log('\n--- Undo ---');
+doc.restore(history.pop());
+doc.show();
+
+console.log('\n--- Undo ---');
+doc.restore(history.pop());
+doc.show();
+```
+
+---
+
+## Visitor Pattern
+
+**Intent**: Represent **operation to be performed** on elements of object structure, letting you define new operation without changing classes.
+
+### Visitor: JavaScript Implementation
+
+```javascript
+/**
+ * Visitor Pattern - JavaScript Implementation
+ * Shape area calculator
+ */
+
+// Visitor interface
+class ShapeVisitor {
+    visitCircle(circle) {
+        throw new Error('Must implement visitCircle()');
+    }
+    
+    visitRectangle(rectangle) {
+        throw new Error('Must implement visitRectangle()');
+    }
+}
+
+// Concrete Visitor
+class AreaCalculator extends ShapeVisitor {
+    visitCircle(circle) {
+        const area = Math.PI * circle.radius ** 2;
+        console.log(`Circle area: ${area.toFixed(2)}`);
+        return area;
+    }
+    
+    visitRectangle(rectangle) {
+        const area = rectangle.width * rectangle.height;
+        console.log(`Rectangle area: ${area.toFixed(2)}`);
+        return area;
+    }
+}
+
+// Element interface
+class Shape {
+    accept(visitor) {
+        throw new Error('Must implement accept()');
+    }
+}
+
+// Concrete Elements
+class Circle extends Shape {
+    constructor(radius) {
+        super();
+        this.radius = radius;
+    }
+    
+    accept(visitor) {
+        return visitor.visitCircle(this);
+    }
+}
+
+class Rectangle extends Shape {
+    constructor(width, height) {
+        super();
+        this.width = width;
+        this.height = height;
+    }
+    
+    accept(visitor) {
+        return visitor.visitRectangle(this);
+    }
+}
+
+// Usage
+const shapes = [
+    new Circle(5),
+    new Rectangle(4, 6),
+    new Circle(3)
+];
+
+const areaCalc = new AreaCalculator();
+
+console.log('Calculating areas:');
+shapes.forEach(shape => shape.accept(areaCalc));
+```
+
+---
+
+## Interpreter Pattern
+
+**Intent**: Define **grammar representation** for language and interpreter to interpret sentences.
+
+### Interpreter: JavaScript Implementation
+
+```javascript
+/**
+ * Interpreter Pattern - JavaScript Implementation
+ * Simple mathematical expression evaluator
+ */
+
+// Abstract Expression
+class Expression {
+    interpret(context) {
+        throw new Error('Must implement interpret()');
+    }
+}
+
+// Terminal Expressions
+class NumberExpression extends Expression {
+    constructor(number) {
+        super();
+        this.number = number;
+    }
+    
+    interpret(context) {
+        return this.number;
+    }
+}
+
+class VariableExpression extends Expression {
+    constructor(name) {
+        super();
+        this.name = name;
+    }
+    
+    interpret(context) {
+        return context[this.name] || 0;
+    }
+}
+
+// Non-terminal Expressions
+class AddExpression extends Expression {
+    constructor(left, right) {
+        super();
+        this.left = left;
+        this.right = right;
+    }
+    
+    interpret(context) {
+        return this.left.interpret(context) + this.right.interpret(context);
+    }
+}
+
+class SubtractExpression extends Expression {
+    constructor(left, right) {
+        super();
+        this.left = left;
+        this.right = right;
+    }
+    
+    interpret(context) {
+        return this.left.interpret(context) - this.right.interpret(context);
+    }
+}
+
+// Usage
+const context = { x: 10, y: 5 };
+
+// Expression: (x + y) - 3
+const expression = new SubtractExpression(
+    new AddExpression(
+        new VariableExpression('x'),
+        new VariableExpression('y')
+    ),
+    new NumberExpression(3)
+);
+
+console.log(`Expression: (x + y) - 3`);
+console.log(`Context: x=${context.x}, y=${context.y}`);
+console.log(`Result: ${expression.interpret(context)}`);
+```
 
 ---
 
