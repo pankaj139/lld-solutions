@@ -1457,18 +1457,21 @@ Car *-- Engine
 ### Q2: What's the difference between association and dependency?
 
 **Answer**:
+
 - **Association**: Structural relationship, object holds reference (e.g., Customer has Orders)
 - **Dependency**: Usage relationship, temporary (e.g., method parameter, local variable)
 
 ### Q3: What's the difference between aggregation and composition?
 
 **Answer**:
+
 - **Aggregation**: Weak "has-a", parts can exist independently (e.g., Department has Employees)
 - **Composition**: Strong "has-a", parts die with whole (e.g., Car has Engine)
 
 ### Q4: What does multiplicity mean?
 
 **Answer**: Multiplicity specifies how many instances of one class can relate to instances of another class. Examples:
+
 - `1`: Exactly one
 - `0..1`: Zero or one
 - `*` or `0..*`: Zero or more
@@ -1477,6 +1480,7 @@ Car *-- Engine
 ### Q5: What are the visibility modifiers in UML?
 
 **Answer**:
+
 - `+` Public: Accessible everywhere
 - `-` Private: Accessible only within class
 - `#` Protected: Accessible in class and subclasses
@@ -1485,6 +1489,7 @@ Car *-- Engine
 ### Q6: When should you use an abstract class?
 
 **Answer**: Use abstract classes when:
+
 - You want to define common behavior for subclasses
 - Some methods should be implemented by subclasses
 - You want to prevent instantiation of the base class

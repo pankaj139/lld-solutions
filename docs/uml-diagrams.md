@@ -82,6 +82,7 @@ Structural diagrams show the **static structure** of the system - what exists an
 **Purpose**: Most important diagram showing classes, attributes, methods, and relationships.
 
 **When to Use**:
+
 - Designing object-oriented systems
 - Showing class hierarchy
 - Documenting system architecture
@@ -186,6 +187,7 @@ class Customer extends User {
 **Purpose**: Shows specific instances of classes at a particular moment in time.
 
 **When to Use**:
+
 - Understanding complex relationships
 - Showing example scenarios
 - Debugging design issues
@@ -213,6 +215,7 @@ graph TB
 **Purpose**: Shows how software components are organized and their dependencies.
 
 **When to Use**:
+
 - Designing system architecture
 - Showing module dependencies
 - Planning deployments
@@ -263,6 +266,7 @@ graph TB
 **Purpose**: Shows physical deployment of artifacts on hardware nodes.
 
 **When to Use**:
+
 - Infrastructure planning
 - System deployment
 - DevOps documentation
@@ -308,6 +312,7 @@ graph TB
 **Purpose**: Shows how packages are organized and their dependencies.
 
 **When to Use**:
+
 - Organizing large systems
 - Managing dependencies
 - Modular architecture
@@ -336,6 +341,7 @@ graph TD
 **Purpose**: Shows internal structure of a class and collaborations.
 
 **When to Use**:
+
 - Complex class internals
 - Design patterns implementation
 - Component interactions
@@ -345,6 +351,7 @@ graph TD
 **Purpose**: Extends UML with custom stereotypes and constraints.
 
 **When to Use**:
+
 - Domain-specific modeling
 - Custom notation needed
 - Specialized systems
@@ -360,6 +367,7 @@ Behavioral diagrams show the **dynamic behavior** of the system - what happens a
 **Purpose**: Shows system functionality from user perspective.
 
 **When to Use**:
+
 - Requirements gathering
 - Stakeholder communication
 - System scope definition
@@ -445,6 +453,7 @@ class CheckoutUseCase {
 **Purpose**: Shows interactions between objects over time.
 
 **When to Use**:
+
 - Designing interactions
 - Understanding message flow
 - Documenting protocols
@@ -532,6 +541,7 @@ class OrderController {
 **Purpose**: Shows workflow, business processes, and algorithms.
 
 **When to Use**:
+
 - Business process modeling
 - Workflow documentation
 - Algorithm visualization
@@ -624,6 +634,7 @@ class OrderWorkflow:
 **Purpose**: Shows states of an object and transitions between states.
 
 **When to Use**:
+
 - Complex object lifecycle
 - Protocol design
 - UI state management
@@ -735,6 +746,7 @@ console.log(`Final state: ${doc.getState()}`);
 **Purpose**: Shows interactions between objects with focus on relationships.
 
 **When to Use**:
+
 - Alternative to sequence diagrams
 - Emphasizing object relationships
 - Complex collaborations
@@ -744,6 +756,7 @@ console.log(`Final state: ${doc.getState()}`);
 **Purpose**: Shows behavior over time with time constraints.
 
 **When to Use**:
+
 - Real-time systems
 - Time-critical operations
 - Performance analysis
@@ -753,6 +766,7 @@ console.log(`Final state: ${doc.getState()}`);
 **Purpose**: Shows overview of interaction flow.
 
 **When to Use**:
+
 - High-level interaction flow
 - Combining multiple scenarios
 - System overview
@@ -1122,24 +1136,28 @@ class User {
 ### Q1: What are the two main categories of UML diagrams?
 
 **Answer**:
+
 1. **Structural Diagrams**: Show static structure (Class, Component, Deployment, Package, Object, Composite Structure, Profile)
 2. **Behavioral Diagrams**: Show dynamic behavior (Use Case, Sequence, Activity, State Machine, Communication, Timing, Interaction Overview)
 
 ### Q2: When would you use a sequence diagram vs a communication diagram?
 
 **Answer**:
+
 - **Sequence Diagram**: When time ordering is important, showing messages in chronological order
 - **Communication Diagram**: When object relationships are important, showing how objects collaborate
 
 ### Q3: What's the difference between class diagram and object diagram?
 
 **Answer**:
+
 - **Class Diagram**: Shows classes, attributes, methods, and relationships (general structure)
 - **Object Diagram**: Shows specific instances at a point in time (concrete snapshot)
 
 ### Q4: When should you use a state machine diagram?
 
 **Answer**: Use state machine diagrams when:
+
 - Object has well-defined states
 - Complex lifecycle
 - State-dependent behavior
@@ -1153,6 +1171,7 @@ class User {
 ### Q6: How do you decide which diagram to create first?
 
 **Answer**:
+
 1. **Use Case Diagram**: Start here for requirements
 2. **Class Diagram**: Then design structure
 3. **Sequence Diagram**: Then detail interactions
