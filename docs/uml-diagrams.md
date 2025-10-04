@@ -1225,4 +1225,3 @@ mindmap
 ---
 
 **Key Takeaway**: Each UML diagram serves a specific purpose. Master the most common ones (Class, Use Case, Sequence, Activity, State Machine) and use the right diagram for your specific need. Don't try to show everything in one diagram!
-

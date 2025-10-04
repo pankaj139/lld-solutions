@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **26 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **28 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -58,7 +58,7 @@ Master the fundamentals with **23,437+ lines** of comprehensive documentation:
 
 ---
 
-## 🏗️ **System Design Problems** (12 Systems)
+## 🏗️ **System Design Problems** (13 Systems)
 
 Production-ready infrastructure and service designs:
 
@@ -76,10 +76,11 @@ Production-ready infrastructure and service designs:
 | [Movie Ticket Booking](./movie-ticket-booking.md) | ✅ | ✅ | Medium | State, Observer, Strategy, Factory, Singleton, Command |
 | [Chat Application](./chat-application.md) | ✅ | ✅ | Medium | Observer, Mediator, Strategy, Command, Factory, Singleton, Repository (7 patterns) |
 | [Rate Limiter System](./rate-limiter-system.md) | ✅ | ✅ | Hard | Strategy, Factory, Observer, Template Method |
+| [Task Scheduler System](./task-scheduler-system.md) | ✅ | ✅ | Medium | Command, Strategy, Observer, State, Template Method (6 patterns) |
 
 ---
 
-## 💼 **Business System Problems** (5 Systems)
+## 💼 **Business System Problems** (6 Systems)
 
 Complex domain modeling and enterprise workflows:
 
@@ -88,6 +89,7 @@ Complex domain modeling and enterprise workflows:
 | [Online Shopping System](./online-shopping-system.md) | ✅ | ✅ | Hard | State, Strategy, Observer, Factory, Singleton, Command, Repository (7 patterns) |
 | [Food Delivery System](./food-delivery-system.md) | ✅ | ✅ | Hard | State, Strategy, Observer, Factory, Singleton, Command, Repository (7 patterns) |
 | [Ride Sharing System](./ride-sharing-system.md) | ✅ | ✅ | Hard | State, Strategy, Observer, Factory, Singleton, Command |
+| [Expense Sharing System](./expense-sharing-system.md) | ✅ | ✅ | Hard | Strategy, Factory, Observer, Command, Composite (5 patterns) |
 | [Banking System](./banking-system.md) | ✅ | ✅ | Medium | Command, State, Template Method, Strategy |
 | [Social Media Platform](./social-media-platform.md) | ✅ | ✅ | Hard | Observer, Strategy, Factory, Singleton, Composite, Repository |
 
@@ -172,15 +174,15 @@ Complete Gang of Four pattern coverage with implementations across all systems:
 
 ## 📊 **Repository Statistics**
 
-- **Total Systems**: 26 complete LLD problems
-- **Python Implementations**: 26/26 (100% ✅)
-- **JavaScript Implementations**: 26/26 (100% ✅)
+- **Total Systems**: 28 complete LLD problems
+- **Python Implementations**: 28/28 (100% ✅)
+- **JavaScript Implementations**: 28/28 (100% ✅)
 - **Documentation Guides**: 18 comprehensive guides (23,437+ lines)
 - **Design Patterns Documented**: 23 GoF patterns (complete coverage) ✅
-- **Design Pattern Implementations**: 100+ across all systems
-- **Average Patterns per System**: 6.2
-- **System Documentation Files**: 26 markdown files (avg 280+ lines)
-- **Total Lines of Code**: ~30,000+ across all implementations
+- **Design Pattern Implementations**: 111+ across all systems
+- **Average Patterns per System**: 6.1
+- **System Documentation Files**: 28 markdown files (avg 300+ lines)
+- **Total Lines of Code**: ~35,000+ across all implementations
 - **Quality Level**: Production-Ready ⭐⭐⭐⭐⭐
 
 ---
@@ -455,12 +457,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 This repository represents:
 
-- ✅ **26 Complete System Designs**
-- ✅ **52 Working Implementations** (Python + JavaScript)
+- ✅ **28 Complete System Designs**
+- ✅ **56 Working Implementations** (Python + JavaScript)
 - ✅ **18 Comprehensive Documentation Guides** (23,437+ lines)
 - ✅ **23 Gang of Four Design Patterns** (Complete Coverage)
-- ✅ **100+ Design Pattern Implementations**
-- ✅ **~30,000+ Lines of Quality Code**
+- ✅ **111+ Design Pattern Implementations**
+- ✅ **~35,000+ Lines of Quality Code**
 - ✅ **Production-Ready Quality** ⭐⭐⭐⭐⭐
 
 ---
