@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **28 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **29 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -80,7 +80,7 @@ Production-ready infrastructure and service designs:
 
 ---
 
-## 💼 **Business System Problems** (6 Systems)
+## 💼 **Business System Problems** (7 Systems)
 
 Complex domain modeling and enterprise workflows:
 
@@ -90,6 +90,7 @@ Complex domain modeling and enterprise workflows:
 | [Food Delivery System](./food-delivery-system.md) | ✅ | ✅ | Hard | State, Strategy, Observer, Factory, Singleton, Command, Repository (7 patterns) |
 | [Ride Sharing System](./ride-sharing-system.md) | ✅ | ✅ | Hard | State, Strategy, Observer, Factory, Singleton, Command |
 | [Expense Sharing System](./expense-sharing-system.md) | ✅ | ✅ | Hard | Strategy, Factory, Observer, Command, Composite (5 patterns) |
+| [Trello / Kanban Board](./trello-kanban-board.md) | ✅ | ✅ | Hard | Composite, Command, Observer, Memento, Chain of Responsibility, Decorator (6 patterns) |
 | [Banking System](./banking-system.md) | ✅ | ✅ | Medium | Command, State, Template Method, Strategy |
 | [Social Media Platform](./social-media-platform.md) | ✅ | ✅ | Hard | Observer, Strategy, Factory, Singleton, Composite, Repository |
 
