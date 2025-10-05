@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **32 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **33 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -127,13 +127,14 @@ Performance-critical implementations:
 
 ---
 
-## 🔧 **Utility Systems** (1 System)
+## 🔧 **Utility Systems** (2 Systems)
 
 Essential infrastructure components for production applications:
 
 | Problem | Python | JavaScript | Difficulty | Design Patterns |
 |---------|--------|------------|------------|-----------------|
 | [Configuration Manager](./configuration-manager-system.md) | ✅ | ✅ | Medium | Singleton, Strategy, Observer, Factory, Decorator, Chain of Responsibility, Template Method (7 patterns) |
+| [Connection Pool](./connection-pool-system.md) | ✅ | ✅ | Medium | Object Pool, Factory, Singleton, State, Strategy, Observer, Template Method (7 patterns) |
 
 ---
 
