@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **31 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **32 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -124,6 +124,16 @@ Performance-critical implementations:
 | [Autocomplete / Typeahead](./autocomplete-typeahead-system.md) | ✅ | ✅ | Medium | Trie Data Structure, O(p) Prefix Search, Fuzzy Matching, Caching |
 | [Bloom Filter](./bloom-filter-system.md) | ✅ | ✅ | Medium | Probabilistic Set, Space-Efficient (93% savings), O(k) Operations |
 | [Rate Limiter System](./rate-limiter-system.md) | ✅ | ✅ | Hard | Token Bucket, Sliding Window, Distributed Systems |
+
+---
+
+## 🔧 **Utility Systems** (1 System)
+
+Essential infrastructure components for production applications:
+
+| Problem | Python | JavaScript | Difficulty | Design Patterns |
+|---------|--------|------------|------------|-----------------|
+| [Configuration Manager](./configuration-manager-system.md) | ✅ | ✅ | Medium | Singleton, Strategy, Observer, Factory, Decorator, Chain of Responsibility, Template Method (7 patterns) |
 
 ---
 
