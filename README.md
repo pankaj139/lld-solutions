@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **30 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **31 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -80,7 +80,7 @@ Production-ready infrastructure and service designs:
 
 ---
 
-## 💼 **Business System Problems** (8 Systems)
+## 💼 **Business System Problems** (9 Systems)
 
 Complex domain modeling and enterprise workflows:
 
@@ -94,6 +94,7 @@ Complex domain modeling and enterprise workflows:
 | [Trello / Kanban Board](./trello-kanban-board.md) | ✅ | ✅ | Hard | Composite, Command, Observer, Memento, Chain of Responsibility, Decorator (6 patterns) |
 | [Banking System](./banking-system.md) | ✅ | ✅ | Medium | Command, State, Template Method, Strategy |
 | [Social Media Platform](./social-media-platform.md) | ✅ | ✅ | Hard | Observer, Strategy, Factory, Singleton, Composite, Repository |
+| [Restaurant Reservation](./restaurant-reservation-system.md) | ✅ | ✅ | Medium | State, Strategy, Observer, Factory, Singleton, Command (6 patterns) |
 
 ---
 
@@ -113,13 +114,15 @@ Interactive systems with AI algorithms and state management:
 
 ---
 
-## 🗄️ **Data Structure Design Problems** (2 Systems)
+## 🗄️ **Data Structure Design Problems** (4 Systems)
 
 Performance-critical implementations:
 
 | Problem | Python | JavaScript | Difficulty | Key Features |
 |---------|--------|------------|------------|--------------|
 | [LRU Cache System](./lru-cache-system.md) | ✅ | ✅ | Medium | O(1) Operations, HashMap + Doubly LinkedList |
+| [Autocomplete / Typeahead](./autocomplete-typeahead-system.md) | ✅ | ✅ | Medium | Trie Data Structure, O(p) Prefix Search, Fuzzy Matching, Caching |
+| [Bloom Filter](./bloom-filter-system.md) | ✅ | ✅ | Medium | Probabilistic Set, Space-Efficient (93% savings), O(k) Operations |
 | [Rate Limiter System](./rate-limiter-system.md) | ✅ | ✅ | Hard | Token Bucket, Sliding Window, Distributed Systems |
 
 ---
@@ -176,15 +179,15 @@ Complete Gang of Four pattern coverage with implementations across all systems:
 
 ## 📊 **Repository Statistics**
 
-- **Total Systems**: 28 complete LLD problems
-- **Python Implementations**: 28/28 (100% ✅)
-- **JavaScript Implementations**: 28/28 (100% ✅)
+- **Total Systems**: 31 complete LLD problems
+- **Python Implementations**: 31/31 (100% ✅)
+- **JavaScript Implementations**: 31/31 (100% ✅)
 - **Documentation Guides**: 18 comprehensive guides (23,437+ lines)
 - **Design Patterns Documented**: 23 GoF patterns (complete coverage) ✅
-- **Design Pattern Implementations**: 111+ across all systems
+- **Design Pattern Implementations**: 120+ across all systems
 - **Average Patterns per System**: 6.1
-- **System Documentation Files**: 28 markdown files (avg 300+ lines)
-- **Total Lines of Code**: ~35,000+ across all implementations
+- **System Documentation Files**: 31 markdown files (avg 300+ lines)
+- **Total Lines of Code**: ~42,000+ across all implementations
 - **Quality Level**: Production-Ready ⭐⭐⭐⭐⭐
 
 ---
@@ -216,18 +219,18 @@ lld-solutions/
 │   ├── comprehensive-lld-roadmap.md  # Learning path
 │   └── README.md                     # Documentation guide
 │
-├── [system-name].md                   # 26 system documentation files
+├── [system-name].md                   # 31 system documentation files
 │
 ├── python/                            # Python implementations
 │   ├── atm-system/main.py
 │   ├── parking-lot/main.py
-│   ├── [... 24 more systems]
+│   ├── [... 29 more systems]
 │   └── README.md
 │
 └── javascript/                        # JavaScript implementations
     ├── atm-system/main.js
     ├── parking-lot/main.js
-    ├── [... 24 more systems]
+    ├── [... 29 more systems]
     └── README.md
 ```
 
@@ -459,12 +462,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 This repository represents:
 
-- ✅ **28 Complete System Designs**
-- ✅ **56 Working Implementations** (Python + JavaScript)
+- ✅ **31 Complete System Designs**
+- ✅ **62 Working Implementations** (Python + JavaScript)
 - ✅ **18 Comprehensive Documentation Guides** (23,437+ lines)
 - ✅ **23 Gang of Four Design Patterns** (Complete Coverage)
-- ✅ **111+ Design Pattern Implementations**
-- ✅ **~35,000+ Lines of Quality Code**
+- ✅ **120+ Design Pattern Implementations**
+- ✅ **~42,000+ Lines of Quality Code**
 - ✅ **Production-Ready Quality** ⭐⭐⭐⭐⭐
 
 ---
