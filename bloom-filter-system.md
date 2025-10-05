@@ -105,10 +105,12 @@ Check "grape":
 ### Optimal Parameters
 
 Given:
+
 - `n` = expected number of elements
 - `p` = desired false positive probability
 
 Calculate:
+
 - `m` = optimal bit array size
 - `k` = optimal number of hash functions
 
@@ -722,12 +724,14 @@ def test_performance():
 ## Summary
 
 Bloom Filters are elegant probabilistic data structures offering:
+
 - **95%+ space savings** over traditional sets
 - **O(k) constant-time** operations
 - **Configurable accuracy** vs space trade-off
 - **Wide adoption** in industry (browsers, databases, networks)
 
 Perfect when:
+
 - Memory is limited
 - False positives are acceptable
 - Negative queries are common

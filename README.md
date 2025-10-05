@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **35 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **36 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -134,7 +134,7 @@ Media and entertainment applications:
 
 ---
 
-## 🗄️ **Data Structure Design Problems** (4 Systems)
+## 🗄️ **Data Structure Design Problems** (5 Systems)
 
 Performance-critical implementations:
 
@@ -143,6 +143,7 @@ Performance-critical implementations:
 | [LRU Cache System](./lru-cache-system.md) | ✅ | ✅ | Medium | O(1) Operations, HashMap + Doubly LinkedList |
 | [Autocomplete / Typeahead](./autocomplete-typeahead-system.md) | ✅ | ✅ | Medium | Trie Data Structure, O(p) Prefix Search, Fuzzy Matching, Caching |
 | [Bloom Filter](./bloom-filter-system.md) | ✅ | ✅ | Medium | Probabilistic Set, Space-Efficient (93% savings), O(k) Operations |
+| [Consistent Hashing](./consistent-hashing-system.md) | ✅ | ✅ | Medium | Distributed Systems, Virtual Nodes, O(log N) Lookup, Load Balancing |
 | [Rate Limiter System](./rate-limiter-system.md) | ✅ | ✅ | Hard | Token Bucket, Sliding Window, Distributed Systems |
 
 ---
