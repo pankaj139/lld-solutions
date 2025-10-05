@@ -1,6 +1,7 @@
 # Hotel Booking System
 
 ## 🔗 Implementation Links
+
 - **Python Implementation**: [python/hotel-booking/main.py](python/hotel-booking/main.py)
 - **JavaScript Implementation**: [javascript/hotel-booking/main.js](javascript/hotel-booking/main.js)
 
@@ -19,6 +20,7 @@ Design a hotel booking system that can:
 ## Requirements
 
 ### Functional Requirements
+
 - Register guests with personal information
 - Add and manage hotel rooms with different types and amenities
 - Search for available rooms based on date range, type, and price
@@ -30,6 +32,7 @@ Design a hotel booking system that can:
 - Prevent double-booking and handle date conflicts
 
 ### Non-Functional Requirements
+
 - System should handle concurrent bookings
 - Fast room search and availability checking
 - Secure payment processing
@@ -77,7 +80,7 @@ Design a hotel booking system that can:
 
 ## Class Diagram
 
-```
+```text
 Guest
 ├── guest_id: str
 ├── name: str
@@ -180,16 +183,19 @@ hotel.check_out_guest(booking.booking_id)
 ## Advanced Features
 
 ### Inventory Management
+
 - Track room maintenance schedules
 - Handle overbooking scenarios
 - Waitlist management for popular dates
 
 ### Revenue Optimization
+
 - Yield management algorithms
 - Revenue per available room (RevPAR) tracking
 - Booking trend analysis
 
 ### Guest Experience
+
 - Preference tracking (room type, floor, amenities)
 - Special request handling
 - Guest feedback and rating system

@@ -1,9 +1,10 @@
-**Description**: Analyze an existing LLD problem and suggest improvements
+# Description: Analyze an existing LLD problem and suggest improvements
 
 **Usage**: `/analyze-lld <system-name>`
 
 **AI Instructions**:
 When this command is invoked:
+
 1. Read the markdown documentation and both implementations
 2. Check for:
    - Missing design patterns opportunities
