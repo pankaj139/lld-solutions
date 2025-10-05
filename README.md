@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **34 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **35 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -121,6 +121,16 @@ Interactive systems with AI algorithms and state management:
 | [Scrabble Game](./scrabble-game.md) | ✅ | ✅ | Hard | Dictionary Trie, Word Validation, Complex Scoring |
 | [Battleship Game](./battleship-game.md) | ✅ | ✅ | Medium | Ship Placement, AI Targeting (Hunt/Target Mode) |
 | [Memory Card Game](./memory-card-game.md) | ✅ | ✅ | Easy | Pattern Matching, Multiple Difficulty Levels |
+
+---
+
+## 🎵 **Entertainment Systems** (1 System)
+
+Media and entertainment applications:
+
+| Problem | Python | JavaScript | Difficulty | Design Patterns |
+|---------|--------|------------|------------|-----------------|
+| [Music Player](./music-player-system.md) | ✅ | ✅ | Medium | State, Strategy, Observer, Singleton, Command, Composite, Iterator (7 patterns) |
 
 ---
 
