@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **39 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **40 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -80,7 +80,7 @@ Production-ready infrastructure and service designs:
 
 ---
 
-## 💼 **Business System Problems** (9 Systems)
+## 💼 **Business System Problems** (10 Systems)
 
 Complex domain modeling and enterprise workflows:
 
@@ -95,6 +95,7 @@ Complex domain modeling and enterprise workflows:
 | [Banking System](./banking-system.md) | ✅ | ✅ | Medium | Command, State, Template Method, Strategy |
 | [Social Media Platform](./social-media-platform.md) | ✅ | ✅ | Hard | Observer, Strategy, Factory, Singleton, Composite, Repository |
 | [Restaurant Reservation](./restaurant-reservation-system.md) | ✅ | ✅ | Medium | State, Strategy, Observer, Factory, Singleton, Command (6 patterns) |
+| [Auction System](./auction-system.md) | ✅ | ✅ | **Hard** | State, Strategy, Observer, Command, Factory, Chain of Responsibility, Proxy, Singleton, Template Method, Decorator (10 patterns) |
 
 ---
 
@@ -214,9 +215,9 @@ Complete Gang of Four pattern coverage with implementations across all systems:
 
 ## 📊 **Repository Statistics**
 
-- **Total Systems**: 31 complete LLD problems
-- **Python Implementations**: 31/31 (100% ✅)
-- **JavaScript Implementations**: 31/31 (100% ✅)
+- **Total Systems**: 40 complete LLD problems
+- **Python Implementations**: 40/40 (100% ✅)
+- **JavaScript Implementations**: 40/40 (100% ✅)
 - **Documentation Guides**: 18 comprehensive guides (23,437+ lines)
 - **Design Patterns Documented**: 23 GoF patterns (complete coverage) ✅
 - **Design Pattern Implementations**: 120+ across all systems
