@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **38 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **39 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -98,13 +98,14 @@ Complex domain modeling and enterprise workflows:
 
 ---
 
-## 🤝 **Collaborative Systems** (1 System)
+## 🤝 **Collaborative Systems** (2 Systems)
 
 Real-time multi-user applications:
 
 | Problem | Python | JavaScript | Difficulty | Design Patterns |
 |---------|--------|------------|------------|-----------------|
 | [Text Editor](./text-editor-system.md) | ✅ | ✅ | Medium | Command, Memento, Observer, Strategy, Composite, Template Method, Chain of Responsibility (7 patterns) |
+| [Meeting Scheduler](./meeting-scheduler-system.md) | ✅ | ✅ | **Hard** | Strategy, Observer, Factory, Builder, Chain of Responsibility, State, Composite, Memento, Singleton, Template Method (10 patterns) |
 
 ---
 
