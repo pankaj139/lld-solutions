@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **40 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **42 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -68,6 +68,8 @@ Production-ready infrastructure and service designs:
 | [Parking Lot System](./parking-lot-system.md) | ✅ | ✅ | Medium | Strategy, State, Factory, Observer |
 | [Library Management](./library-management-system.md) | ✅ | ✅ | Medium | Singleton, Factory, Strategy, Observer, Repository (7 patterns) |
 | [Hotel Booking](./hotel-booking-system.md) | ✅ | ✅ | Hard | State, Observer, Command, Concurrency |
+| [Flight Booking](./flight-booking-system.md) | ✅ | ✅ | **Hard** | Builder, Strategy, State, Factory, Observer, Command, Composite, Decorator, Singleton, Template Method (10 patterns) |
+| [Cab Booking System](./cab-booking-system.md) | ✅ | ✅ | **Hard** | State, Strategy, Observer, Factory, Command, Singleton, Decorator, Chain of Responsibility, Template Method, Proxy (10 patterns) |
 | [Elevator System](./elevator-system.md) | ✅ | ✅ | Hard | State, Strategy, Observer, Singleton, Command |
 | [Vending Machine](./vending-machine-system.md) | ✅ | ✅ | Medium | State, Strategy, Command, Observer |
 | [In-Memory File System](./in-memory-file-system.md) | ✅ | ✅ | Hard | Composite, Visitor, Command, Strategy |
@@ -99,7 +101,7 @@ Complex domain modeling and enterprise workflows:
 
 ---
 
-## 🤝 **Collaborative Systems** (2 Systems)
+## 🤝 **Collaborative Systems** (3 Systems)
 
 Real-time multi-user applications:
 
@@ -107,6 +109,7 @@ Real-time multi-user applications:
 |---------|--------|------------|------------|-----------------|
 | [Text Editor](./text-editor-system.md) | ✅ | ✅ | Medium | Command, Memento, Observer, Strategy, Composite, Template Method, Chain of Responsibility (7 patterns) |
 | [Meeting Scheduler](./meeting-scheduler-system.md) | ✅ | ✅ | **Hard** | Strategy, Observer, Factory, Builder, Chain of Responsibility, State, Composite, Memento, Singleton, Template Method (10 patterns) |
+| [Spreadsheet System](./spreadsheet-system.md) | ✅ | ✅ | **Hard** | Interpreter, Observer, Command, Composite, Strategy, Factory, Memento, Singleton, Visitor, Proxy (10 patterns) |
 
 ---
 
@@ -138,13 +141,14 @@ Media and entertainment applications:
 
 ---
 
-## 🗄️ **Data Structure Design Problems** (5 Systems)
+## 🗄️ **Data Structure Design Problems** (6 Systems)
 
 Performance-critical implementations:
 
 | Problem | Python | JavaScript | Difficulty | Key Features |
 |---------|--------|------------|------------|--------------|
 | [LRU Cache System](./lru-cache-system.md) | ✅ | ✅ | Medium | O(1) Operations, HashMap + Doubly LinkedList |
+| [LFU Cache System](./lfu-cache-system.md) | ✅ | ✅ | **Hard** | O(1) Operations, Frequency Tracking, LRU Tie-Breaking, HashMap + Multiple DLLs |
 | [Autocomplete / Typeahead](./autocomplete-typeahead-system.md) | ✅ | ✅ | Medium | Trie Data Structure, O(p) Prefix Search, Fuzzy Matching, Caching |
 | [Bloom Filter](./bloom-filter-system.md) | ✅ | ✅ | Medium | Probabilistic Set, Space-Efficient (93% savings), O(k) Operations |
 | [Consistent Hashing](./consistent-hashing-system.md) | ✅ | ✅ | Medium | Distributed Systems, Virtual Nodes, O(log N) Lookup, Load Balancing |
@@ -215,9 +219,9 @@ Complete Gang of Four pattern coverage with implementations across all systems:
 
 ## 📊 **Repository Statistics**
 
-- **Total Systems**: 40 complete LLD problems
-- **Python Implementations**: 40/40 (100% ✅)
-- **JavaScript Implementations**: 40/40 (100% ✅)
+- **Total Systems**: 44 complete LLD problems
+- **Python Implementations**: 44/44 (100% ✅)
+- **JavaScript Implementations**: 44/44 (100% ✅)
 - **Documentation Guides**: 18 comprehensive guides (23,437+ lines)
 - **Design Patterns Documented**: 23 GoF patterns (complete coverage) ✅
 - **Design Pattern Implementations**: 120+ across all systems
