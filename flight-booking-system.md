@@ -296,283 +296,278 @@ Alternative Flow:
 
 ## Class Diagram
 
-```text
-┌─────────────────────────────────┐
-│   User                          │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - name: str                     │
-│ - email: str                    │
-│ - phone: str                    │
-│ - loyalty_account: LoyaltyAcct  │
-├─────────────────────────────────┤
-│ + search_flights(criteria)      │
-│ + book_flight(flight)           │
-│ + get_bookings(): List          │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   LoyaltyAccount                │
-├─────────────────────────────────┤
-│ - account_number: str           │
-│ - miles: int                    │
-│ - tier: LoyaltyTier             │
-├─────────────────────────────────┤
-│ + earn_miles(distance, class)   │
-│ + redeem_miles(amount)          │
-│ + get_benefits(): List          │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Airport                       │
-├─────────────────────────────────┤
-│ - code: str (IATA: JFK)         │
-│ - name: str                     │
-│ - city: str                     │
-│ - country: str                  │
-│ - timezone: str                 │
-├─────────────────────────────────┤
-│ + get_location(): Location      │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Aircraft                      │
-├─────────────────────────────────┤
-│ - registration: str             │
-│ - model: str (Boeing 737)       │
-│ - airline: Airline              │
-│ - seat_config: SeatConfiguration│
-├─────────────────────────────────┤
-│ + get_capacity(): int           │
-│ + get_seat_map(): SeatMap       │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   SeatConfiguration             │
-├─────────────────────────────────┤
-│ - economy_seats: int            │
-│ - business_seats: int           │
-│ - first_class_seats: int        │
-│ - seat_layout: str (3-3-3)      │
-├─────────────────────────────────┤
-│ + get_total_seats(): int        │
-│ + get_seat_map(): SeatMap       │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Seat                          │
-├─────────────────────────────────┤
-│ - number: str (12A)             │
-│ - class: SeatClass              │
-│ - status: SeatStatus            │
-│ - features: List[str]           │
-│   (window, aisle, extra legroom)│
-├─────────────────────────────────┤
-│ + is_available(): bool          │
-│ + block(duration)               │
-│ + book(passenger)               │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Flight                        │
-├─────────────────────────────────┤
-│ - flight_number: str (AA100)    │
-│ - airline: Airline              │
-│ - aircraft: Aircraft            │
-│ - origin: Airport               │
-│ - destination: Airport          │
-│ - departure_time: datetime      │
-│ - arrival_time: datetime        │
-│ - duration: timedelta           │
-│ - status: FlightStatus          │
-│ - available_seats: Dict[Class]  │
-├─────────────────────────────────┤
-│ + get_available_seats(class)    │
-│ + book_seat(seat, passenger)    │
-│ + get_price(class): Decimal     │
-│ + is_available(): bool          │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   FlightSegment                 │
-│   (Composite Pattern - Leaf)    │
-├─────────────────────────────────┤
-│ - flight: Flight                │
-│ - segment_number: int           │
-├─────────────────────────────────┤
-│ + get_duration(): timedelta     │
-│ + get_origin(): Airport         │
-│ + get_destination(): Airport    │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   FlightItinerary               │
-│   (Composite Pattern)           │
-├─────────────────────────────────┤
-│ - segments: List[FlightSegment] │
-│ - layovers: List[Layover]       │
-│ - total_duration: timedelta     │
-├─────────────────────────────────┤
-│ + add_segment(segment)          │
-│ + get_total_duration()          │
-│ + validate_connections(): bool  │
-│ + get_layover_times(): List     │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   PricingStrategy               │
-│   <<interface>>                 │
-├─────────────────────────────────┤
-│ + calculate_price(flight, class)│
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┬────────┐
-    │          │          │        │
-┌───┴───────┐ ┌┴────────┐ ┌┴───────┐ ┌┴─────────┐
-│Dynamic    │ │Fixed    │ │Seasonal│ │Demand    │
-│Pricing    │ │Pricing  │ │Pricing │ │Based     │
-└───────────┘ └─────────┘ └────────┘ └──────────┘
-
-┌─────────────────────────────────┐
-│   FareClass                     │
-├─────────────────────────────────┤
-│ - name: str                     │
-│ - code: str (Y, J, F)           │
-│ - seat_class: SeatClass         │
-│ - refundable: bool              │
-│ - changeable: bool              │
-│ - change_fee: Decimal           │
-│ - cancellation_fee: Decimal     │
-│ - baggage_included: int         │
-├─────────────────────────────────┤
-│ + calculate_refund(price)       │
-│ + calculate_change_fee()        │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Booking                       │
-├─────────────────────────────────┤
-│ - pnr: str (6-char code)        │
-│ - user: User                    │
-│ - itinerary: FlightItinerary    │
-│ - passengers: List[Passenger]   │
-│ - seats: Dict[Segment, Seat]    │
-│ - fare_class: FareClass         │
-│ - base_price: Decimal           │
-│ - taxes: Decimal                │
-│ - total_price: Decimal          │
-│ - state: BookingState           │
-│ - payment: Payment              │
-│ - created_at: datetime          │
-├─────────────────────────────────┤
-│ + add_passenger(passenger)      │
-│ + select_seat(segment, seat)    │
-│ + add_baggage(count)            │
-│ + add_meal(passenger, meal)     │
-│ + calculate_total(): Decimal    │
-│ + confirm()                     │
-│ + cancel()                      │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   BookingState                  │
-│   <<interface>>                 │
-├─────────────────────────────────┤
-│ + confirm(booking)              │
-│ + cancel(booking)               │
-│ + check_in(booking)             │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┬────────┐
-    │          │          │        │
-┌───┴─────┐ ┌──┴────┐  ┌──┴────┐ ┌┴────────┐
-│Pending  │ │Confirmed│ │CheckedIn│ │Cancelled│
-└─────────┘ └─────────┘ └────────┘ └─────────┘
-
-┌─────────────────────────────────┐
-│   Passenger                     │
-├─────────────────────────────────┤
-│ - first_name: str               │
-│ - last_name: str                │
-│ - date_of_birth: date           │
-│ - passport_number: str          │
-│ - nationality: str              │
-│ - loyalty_number: str           │
-├─────────────────────────────────┤
-│ + get_full_name(): str          │
-│ + is_child(): bool              │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Payment                       │
-├─────────────────────────────────┤
-│ - transaction_id: str           │
-│ - amount: Decimal               │
-│ - method: PaymentMethod         │
-│ - status: PaymentStatus         │
-│ - timestamp: datetime           │
-├─────────────────────────────────┤
-│ + process()                     │
-│ + refund(amount)                │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   BookingDecorator              │
-│   <<abstract>>                  │
-├─────────────────────────────────┤
-│ - booking: Booking              │
-├─────────────────────────────────┤
-│ + get_price(): Decimal          │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┬────────┐
-    │          │          │        │
-┌───┴────────┐ ┌┴────────┐ ┌┴───────┐ ┌┴──────────┐
-│Baggage     │ │Meal     │ │SeatSel │ │Insurance  │
-│Decorator   │ │Decorator│ │Decorator│ │Decorator  │
-└────────────┘ └─────────┘ └────────┘ └───────────┘
-
-┌─────────────────────────────────┐
-│   InventoryManager              │
-│   (Singleton)                   │
-├─────────────────────────────────┤
-│ - inventory: Dict[Flight, Seats]│
-│ - blocked_seats: Dict           │
-├─────────────────────────────────┤
-│ + get_availability(flight)      │
-│ + block_seat(seat, duration)    │
-│ + release_seat(seat)            │
-│ + book_seat(seat, passenger)    │
-│ + update_inventory(flight)      │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   SearchEngine                  │
-├─────────────────────────────────┤
-│ - strategy: SearchStrategy      │
-│ - cache: SearchCache            │
-├─────────────────────────────────┤
-│ + search(criteria): List[Flight]│
-│ + filter(results, filters)      │
-│ + sort(results, criteria)       │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   BookingManager                │
-│   (Singleton)                   │
-├─────────────────────────────────┤
-│ - bookings: Dict[PNR, Booking]  │
-│ - inventory_manager             │
-│ - payment_processor             │
-├─────────────────────────────────┤
-│ + create_booking(itinerary)     │
-│ + confirm_booking(pnr)          │
-│ + cancel_booking(pnr)           │
-│ + get_booking(pnr): Booking     │
-└─────────────────────────────────┘
+```mermaid
+classDiagram
+    class User {
+        -str id
+        -str name
+        -str email
+        -str phone
+        -LoyaltyAccount loyalty_account
+        +search_flights(criteria) List
+        +book_flight(flight) Booking
+        +get_bookings() List
+    }
+    
+    class LoyaltyAccount {
+        -str account_number
+        -int miles
+        -LoyaltyTier tier
+        +earn_miles(distance, class) void
+        +redeem_miles(amount) void
+        +get_benefits() List
+    }
+    
+    class Airport {
+        -str code
+        -str name
+        -str city
+        -str country
+        -str timezone
+        +get_location() Location
+    }
+    
+    class Aircraft {
+        -str registration
+        -str model
+        -Airline airline
+        -SeatConfiguration seat_config
+        +get_capacity() int
+        +get_seat_map() SeatMap
+    }
+    
+    class SeatConfiguration {
+        -int economy_seats
+        -int business_seats
+        -int first_class_seats
+        -str seat_layout
+        +get_total_seats() int
+        +get_seat_map() SeatMap
+    }
+    
+    class Seat {
+        -str number
+        -SeatClass class
+        -SeatStatus status
+        -List~str~ features
+        +is_available() bool
+        +block(duration) void
+        +book(passenger) void
+    }
+    
+    class Flight {
+        -str flight_number
+        -Airline airline
+        -Aircraft aircraft
+        -Airport origin
+        -Airport destination
+        -datetime departure_time
+        -datetime arrival_time
+        -timedelta duration
+        -FlightStatus status
+        -Dict available_seats
+        +get_available_seats(class) int
+        +book_seat(seat, passenger) void
+        +get_price(class) Decimal
+        +is_available() bool
+    }
+    
+    class FlightSegment {
+        -Flight flight
+        -int segment_number
+        +get_duration() timedelta
+        +get_origin() Airport
+        +get_destination() Airport
+    }
+    
+    class FlightItinerary {
+        -List~FlightSegment~ segments
+        -List~Layover~ layovers
+        -timedelta total_duration
+        +add_segment(segment) void
+        +get_total_duration() timedelta
+        +validate_connections() bool
+        +get_layover_times() List
+    }
+    
+    class PricingStrategy {
+        <<interface>>
+        +calculate_price(flight, class) Decimal
+    }
+    
+    class DynamicPricing {
+        +calculate_price(flight, class) Decimal
+    }
+    
+    class FixedPricing {
+        +calculate_price(flight, class) Decimal
+    }
+    
+    class SeasonalPricing {
+        +calculate_price(flight, class) Decimal
+    }
+    
+    class DemandBased {
+        +calculate_price(flight, class) Decimal
+    }
+    
+    class FareClass {
+        -str name
+        -str code
+        -SeatClass seat_class
+        -bool refundable
+        -bool changeable
+        -Decimal change_fee
+        -Decimal cancellation_fee
+        -int baggage_included
+        +calculate_refund(price) Decimal
+        +calculate_change_fee() Decimal
+    }
+    
+    class Booking {
+        -str pnr
+        -User user
+        -FlightItinerary itinerary
+        -List~Passenger~ passengers
+        -Dict seats
+        -FareClass fare_class
+        -Decimal base_price
+        -Decimal taxes
+        -Decimal total_price
+        -BookingState state
+        -Payment payment
+        -datetime created_at
+        +add_passenger(passenger) void
+        +select_seat(segment, seat) void
+        +add_baggage(count) void
+        +add_meal(passenger, meal) void
+        +calculate_total() Decimal
+        +confirm() void
+        +cancel() void
+    }
+    
+    class BookingState {
+        <<interface>>
+        +confirm(booking) void
+        +cancel(booking) void
+        +check_in(booking) void
+    }
+    
+    class PendingState {
+        +confirm(booking) void
+    }
+    
+    class ConfirmedState {
+        +check_in(booking) void
+    }
+    
+    class CheckedInState {
+        +complete(booking) void
+    }
+    
+    class CancelledState {
+        +cancel(booking) void
+    }
+    
+    class Passenger {
+        -str first_name
+        -str last_name
+        -date date_of_birth
+        -str passport_number
+        -str nationality
+        -str loyalty_number
+        +get_full_name() str
+        +is_child() bool
+    }
+    
+    class Payment {
+        -str transaction_id
+        -Decimal amount
+        -PaymentMethod method
+        -PaymentStatus status
+        -datetime timestamp
+        +process() bool
+        +refund(amount) bool
+    }
+    
+    class BookingDecorator {
+        <<abstract>>
+        -Booking booking
+        +get_price() Decimal
+    }
+    
+    class BaggageDecorator {
+        +get_price() Decimal
+    }
+    
+    class MealDecorator {
+        +get_price() Decimal
+    }
+    
+    class SeatSelDecorator {
+        +get_price() Decimal
+    }
+    
+    class InsuranceDecorator {
+        +get_price() Decimal
+    }
+    
+    class InventoryManager {
+        <<singleton>>
+        -Dict inventory
+        -Dict blocked_seats
+        +get_availability(flight) int
+        +block_seat(seat, duration) void
+        +release_seat(seat) void
+        +book_seat(seat, passenger) void
+        +update_inventory(flight) void
+    }
+    
+    class SearchEngine {
+        -SearchStrategy strategy
+        -SearchCache cache
+        +search(criteria) List~Flight~
+        +filter(results, filters) List
+        +sort(results, criteria) List
+    }
+    
+    class BookingManager {
+        <<singleton>>
+        -Dict~PNR,Booking~ bookings
+        -InventoryManager inventory_manager
+        -PaymentProcessor payment_processor
+        +create_booking(itinerary) Booking
+        +confirm_booking(pnr) bool
+        +cancel_booking(pnr) bool
+        +get_booking(pnr) Booking
+    }
+    
+    User "1" --> "1" LoyaltyAccount : has
+    Flight "*" --> "2" Airport : origin/dest
+    Flight "1" --> "1" Aircraft : uses
+    Aircraft "1" --> "1" SeatConfiguration : has
+    FlightItinerary "1" --> "*" FlightSegment : contains
+    FlightSegment "*" --> "1" Flight : references
+    PricingStrategy <|-- DynamicPricing : implements
+    PricingStrategy <|-- FixedPricing : implements
+    PricingStrategy <|-- SeasonalPricing : implements
+    PricingStrategy <|-- DemandBased : implements
+    Booking "*" --> "1" User : for
+    Booking "1" --> "1" FlightItinerary : has
+    Booking "1" --> "*" Passenger : includes
+    Booking "1" --> "1" FareClass : uses
+    Booking "1" --> "1" BookingState : has
+    Booking "1" --> "1" Payment : processes
+    BookingState <|-- PendingState : implements
+    BookingState <|-- ConfirmedState : implements
+    BookingState <|-- CheckedInState : implements
+    BookingState <|-- CancelledState : implements
+    BookingDecorator <|-- BaggageDecorator : extends
+    BookingDecorator <|-- MealDecorator : extends
+    BookingDecorator <|-- SeatSelDecorator : extends
+    BookingDecorator <|-- InsuranceDecorator : extends
+    BookingManager ..> InventoryManager : uses
+    InventoryManager ..> Flight : manages
 ```
 
 ## Component Design

@@ -114,124 +114,142 @@ Collaboration Manager
 
 ## 3. Class Diagram
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│                      Spreadsheet                             │
-├─────────────────────────────────────────────────────────────┤
-│ - cells: Dict[CellAddress, Cell]                            │
-│ - dependency_manager: DependencyManager                      │
-│ - formula_engine: FormulaEngine                             │
-│ - history: CommandHistory                                    │
-│ - collaboration_manager: CollaborationManager               │
-├─────────────────────────────────────────────────────────────┤
-│ + get_cell(address: CellAddress): Cell                      │
-│ + set_cell_value(address: CellAddress, value: Any)         │
-│ + set_cell_formula(address: CellAddress, formula: str)     │
-│ + evaluate_cell(address: CellAddress): Any                  │
-│ + recalculate(): void                                        │
-│ + undo(): void                                               │
-│ + redo(): void                                               │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            │ contains
-                            ▼
-            ┌───────────────────────────────┐
-            │          Cell (ABC)            │
-            ├───────────────────────────────┤
-            │ # address: CellAddress         │
-            │ # value: Any                   │
-            │ # formatted_value: str         │
-            │ # observers: List[Observer]    │
-            ├───────────────────────────────┤
-            │ + get_value(): Any             │
-            │ + set_value(value: Any): void  │
-            │ + evaluate(): Any              │
-            │ + notify(): void               │
-            └───────────────────────────────┘
-                       △
-                       │
-        ┌──────────────┼──────────────┐
-        │              │              │
-┌───────────────┐ ┌────────────┐ ┌──────────────┐
-│  ValueCell    │ │FormulaCell │ │  EmptyCell   │
-├───────────────┤ ├────────────┤ ├──────────────┤
-│- raw_value    │ │- formula   │ │              │
-│              │ │- ast       │ │              │
-│              │ │- cached    │ │              │
-└───────────────┘ └────────────┘ └──────────────┘
-
-┌──────────────────────────────────────────────────┐
-│              FormulaEngine                        │
-├──────────────────────────────────────────────────┤
-│ - function_registry: FunctionRegistry            │
-│ - lexer: Lexer                                    │
-│ - parser: Parser                                  │
-│ - evaluator: Evaluator                           │
-├──────────────────────────────────────────────────┤
-│ + parse(formula: str): Expression                │
-│ + evaluate(expression: Expression): Any          │
-│ + register_function(name: str, func: Function)  │
-└──────────────────────────────────────────────────┘
-                            │
-                            │ uses
-                            ▼
-            ┌──────────────────────────────┐
-            │      Expression (ABC)         │
-            ├──────────────────────────────┤
-            │ + evaluate(context): Any      │
-            │ + get_dependencies(): Set     │
-            └──────────────────────────────┘
-                       △
-                       │
-        ┌──────────────┼───────────────┐
-        │              │               │
-┌───────────────┐ ┌──────────────┐ ┌──────────────┐
-│LiteralExpr    │ │CellRefExpr   │ │BinaryOpExpr  │
-├───────────────┤ ├──────────────┤ ├──────────────┤
-│- value        │ │- cell_addr   │ │- left        │
-│               │ │              │ │- right       │
-│               │ │              │ │- operator    │
-└───────────────┘ └──────────────┘ └──────────────┘
-
-┌──────────────────────────────────────────────────┐
-│          DependencyManager                        │
-├──────────────────────────────────────────────────┤
-│ - dependents: Dict[Cell, Set[Cell]]              │
-│ - dependencies: Dict[Cell, Set[Cell]]            │
-├──────────────────────────────────────────────────┤
-│ + add_dependency(from: Cell, to: Cell): void     │
-│ + remove_dependency(from: Cell, to: Cell): void  │
-│ + get_evaluation_order(cells: Set[Cell]): List  │
-│ + has_circular_dependency(cell: Cell): bool      │
-│ + notify_dependents(cell: Cell): void            │
-└──────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────┐
-│              Command (ABC)                        │
-├──────────────────────────────────────────────────┤
-│ + execute(): void                                 │
-│ + undo(): void                                    │
-└──────────────────────────────────────────────────┘
-                       △
-                       │
-        ┌──────────────┼──────────────┐
-        │              │              │
-┌─────────────────┐ ┌──────────────┐ ┌──────────────┐
-│SetValueCommand  │ │SetFormulaCmd │ │DeleteCellCmd │
-└─────────────────┘ └──────────────┘ └──────────────┘
-
-┌──────────────────────────────────────────────────┐
-│          CollaborationManager                     │
-├──────────────────────────────────────────────────┤
-│ - active_users: Dict[str, User]                  │
-│ - cell_locks: Dict[CellAddress, User]            │
-│ - change_listeners: List[ChangeListener]         │
-├──────────────────────────────────────────────────┤
-│ + lock_cell(address: CellAddress, user: User)    │
-│ + unlock_cell(address: CellAddress, user: User)  │
-│ + broadcast_change(change: Change): void         │
-│ + resolve_conflict(conflict: Conflict): void     │
-└──────────────────────────────────────────────────┘
+```mermaid
+classDiagram
+    class Spreadsheet {
+        -Dict~CellAddress,Cell~ cells
+        -DependencyManager dependency_manager
+        -FormulaEngine formula_engine
+        -CommandHistory history
+        -CollaborationManager collaboration_manager
+        +get_cell(address CellAddress) Cell
+        +set_cell_value(address CellAddress, value Any) void
+        +set_cell_formula(address CellAddress, formula str) void
+        +evaluate_cell(address CellAddress) Any
+        +recalculate() void
+        +undo() void
+        +redo() void
+    }
+    
+    class Cell {
+        <<abstract>>
+        #CellAddress address
+        #Any value
+        #str formatted_value
+        #List~Observer~ observers
+        +get_value() Any
+        +set_value(value Any) void
+        +evaluate() Any
+        +notify() void
+    }
+    
+    class ValueCell {
+        -Any raw_value
+        +evaluate() Any
+    }
+    
+    class FormulaCell {
+        -str formula
+        -AST ast
+        -Any cached
+        +evaluate() Any
+    }
+    
+    class EmptyCell {
+        +evaluate() Any
+    }
+    
+    class FormulaEngine {
+        -FunctionRegistry function_registry
+        -Lexer lexer
+        -Parser parser
+        -Evaluator evaluator
+        +parse(formula str) Expression
+        +evaluate(expression Expression) Any
+        +register_function(name str, func Function) void
+    }
+    
+    class Expression {
+        <<abstract>>
+        +evaluate(context) Any
+        +get_dependencies() Set
+    }
+    
+    class LiteralExpr {
+        -Any value
+        +evaluate(context) Any
+    }
+    
+    class CellRefExpr {
+        -CellAddress cell_addr
+        +evaluate(context) Any
+        +get_dependencies() Set
+    }
+    
+    class BinaryOpExpr {
+        -Expression left
+        -Expression right
+        -str operator
+        +evaluate(context) Any
+        +get_dependencies() Set
+    }
+    
+    class DependencyManager {
+        -Dict~Cell,Set~ dependents
+        -Dict~Cell,Set~ dependencies
+        +add_dependency(from Cell, to Cell) void
+        +remove_dependency(from Cell, to Cell) void
+        +get_evaluation_order(cells Set) List
+        +has_circular_dependency(cell Cell) bool
+        +notify_dependents(cell Cell) void
+    }
+    
+    class Command {
+        <<abstract>>
+        +execute() void
+        +undo() void
+    }
+    
+    class SetValueCommand {
+        +execute() void
+        +undo() void
+    }
+    
+    class SetFormulaCmd {
+        +execute() void
+        +undo() void
+    }
+    
+    class DeleteCellCmd {
+        +execute() void
+        +undo() void
+    }
+    
+    class CollaborationManager {
+        -Dict~str,User~ active_users
+        -Dict~CellAddress,User~ cell_locks
+        -List~ChangeListener~ change_listeners
+        +lock_cell(address CellAddress, user User) void
+        +unlock_cell(address CellAddress, user User) void
+        +broadcast_change(change Change) void
+        +resolve_conflict(conflict Conflict) void
+    }
+    
+    Spreadsheet "1" --> "*" Cell : contains
+    Spreadsheet "1" --> "1" DependencyManager : uses
+    Spreadsheet "1" --> "1" FormulaEngine : uses
+    Spreadsheet "1" --> "1" CollaborationManager : uses
+    Cell <|-- ValueCell : inherits
+    Cell <|-- FormulaCell : inherits
+    Cell <|-- EmptyCell : inherits
+    FormulaEngine ..> Expression : creates
+    Expression <|-- LiteralExpr : inherits
+    Expression <|-- CellRefExpr : inherits
+    Expression <|-- BinaryOpExpr : inherits
+    Command <|-- SetValueCommand : inherits
+    Command <|-- SetFormulaCmd : inherits
+    Command <|-- DeleteCellCmd : inherits
+    Spreadsheet ..> Command : executes
 ```
 
 ## 4. Design Patterns Used

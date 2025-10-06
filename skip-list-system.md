@@ -85,50 +85,43 @@ Each node is like a building with different heights:
 
 ## 3. Class Diagram
 
-```text
-┌────────────────────────────────────────────────┐
-│                  SkipList<T>                    │
-├────────────────────────────────────────────────┤
-│ - head: SkipNode<T>                            │
-│ - max_level: int                               │
-│ - level: int  (current max level in use)      │
-│ - size: int                                     │
-│ - p: float  (promotion probability)            │
-├────────────────────────────────────────────────┤
-│ + insert(value: T): bool                       │
-│ + search(value: T): bool                       │
-│ + delete(value: T): bool                       │
-│ + contains(value: T): bool                     │
-│ + size(): int                                   │
-│ + is_empty(): bool                             │
-│ + clear(): void                                │
-│ + get_range(start: T, end: T): List[T]        │
-│ - random_level(): int                          │
-└────────────────────────────────────────────────┘
-                    │
-                    │ contains
-                    ▼
-┌────────────────────────────────────────────────┐
-│               SkipNode<T>                       │
-├────────────────────────────────────────────────┤
-│ - value: T                                      │
-│ - forward: List[SkipNode<T>]                   │
-│ - level: int                                    │
-├────────────────────────────────────────────────┤
-│ + __init__(value: T, level: int)              │
-│ + get_value(): T                                │
-│ + get_forward(level: int): SkipNode<T>        │
-│ + set_forward(level: int, node: SkipNode<T>)  │
-└────────────────────────────────────────────────┘
-
-┌────────────────────────────────────────────────┐
-│            SkipListIterator<T>                  │
-├────────────────────────────────────────────────┤
-│ - current: SkipNode<T>                         │
-├────────────────────────────────────────────────┤
-│ + has_next(): bool                             │
-│ + next(): T                                     │
-└────────────────────────────────────────────────┘
+```mermaid
+classDiagram
+    class SkipList~T~ {
+        -SkipNode~T~ head
+        -int max_level
+        -int level
+        -int size
+        -float p
+        +insert(value T) bool
+        +search(value T) bool
+        +delete(value T) bool
+        +contains(value T) bool
+        +size() int
+        +is_empty() bool
+        +clear() void
+        +get_range(start T, end T) List~T~
+        -random_level() int
+    }
+    
+    class SkipNode~T~ {
+        -T value
+        -List~SkipNode~T~~ forward
+        -int level
+        +get_value() T
+        +get_forward(level int) SkipNode~T~
+        +set_forward(level int, node SkipNode~T~) void
+    }
+    
+    class SkipListIterator~T~ {
+        -SkipNode~T~ current
+        +has_next() bool
+        +next() T
+    }
+    
+    SkipList~T~ "1" --> "*" SkipNode~T~ : contains
+    SkipList~T~ ..> SkipListIterator~T~ : creates
+    SkipListIterator~T~ --> SkipNode~T~ : traverses
 ```
 
 ## 4. Design Patterns Used

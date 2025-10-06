@@ -74,102 +74,93 @@ Design a Trading Platform that handles stock trading with order matching, portfo
 
 ## 3. Class Diagram
 
-```text
-┌────────────────────────────────────────┐
-│              User                       │
-├────────────────────────────────────────┤
-│ - user_id: string                      │
-│ - name: string                         │
-│ - email: string                        │
-│ - balance: Decimal                     │
-└────────────────────────────────────────┘
-                  │
-                  │ has
-                  ▼
-┌────────────────────────────────────────┐
-│           Portfolio                     │
-├────────────────────────────────────────┤
-│ - user: User                           │
-│ - holdings: Dict[symbol, Position]    │
-│ - cash_balance: Decimal                │
-├────────────────────────────────────────┤
-│ + buy(symbol, qty, price): Order      │
-│ + sell(symbol, qty, price): Order     │
-│ + get_position(symbol): Position      │
-│ + calculate_pnl(): Decimal            │
-└────────────────────────────────────────┘
-
-┌────────────────────────────────────────┐
-│            Position                     │
-├────────────────────────────────────────┤
-│ - symbol: string                       │
-│ - quantity: int                        │
-│ - average_price: Decimal               │
-│ - realized_pnl: Decimal                │
-│ - unrealized_pnl: Decimal              │
-└────────────────────────────────────────┘
-
-┌────────────────────────────────────────┐
-│         <<abstract>>                   │
-│            Order                        │
-├────────────────────────────────────────┤
-│ - order_id: string                     │
-│ - user: User                           │
-│ - symbol: string                       │
-│ - side: OrderSide (BUY/SELL)          │
-│ - quantity: int                        │
-│ - filled_quantity: int                 │
-│ - price: Decimal                       │
-│ - status: OrderStatus                  │
-│ - timestamp: datetime                  │
-├────────────────────────────────────────┤
-│ + execute(): bool                      │
-│ + cancel(): bool                       │
-└────────────────────────────────────────┘
-                  △
-        ┌─────────┴─────────┐
-        │                   │
-┌───────────────┐   ┌──────────────┐
-│  MarketOrder  │   │  LimitOrder  │
-├───────────────┤   ├──────────────┤
-│ + execute()   │   │ + execute()  │
-└───────────────┘   └──────────────┘
-
-┌────────────────────────────────────────┐
-│         OrderMatchingEngine            │
-├────────────────────────────────────────┤
-│ - order_books: Dict[symbol, OrderBook]│
-│ - trade_history: List[Trade]          │
-├────────────────────────────────────────┤
-│ + submit_order(order): void           │
-│ + match_orders(symbol): List[Trade]  │
-│ + cancel_order(order_id): bool       │
-└────────────────────────────────────────┘
-
-┌────────────────────────────────────────┐
-│            OrderBook                    │
-├────────────────────────────────────────┤
-│ - symbol: string                       │
-│ - buy_orders: SortedDict              │
-│ - sell_orders: SortedDict             │
-├────────────────────────────────────────┤
-│ + add_order(order): void              │
-│ + match(): List[Trade]                │
-│ + get_best_bid(): Decimal             │
-│ + get_best_ask(): Decimal             │
-└────────────────────────────────────────┘
-
-┌────────────────────────────────────────┐
-│              Trade                      │
-├────────────────────────────────────────┤
-│ - trade_id: string                     │
-│ - symbol: string                       │
-│ - buyer: User                          │
-│ - seller: User                         │
-│ - price: Decimal                       │
-│ - quantity: int                        │
-│ - timestamp: datetime                  │
-└────────────────────────────────────────┘
+```mermaid
+classDiagram
+    class User {
+        -string user_id
+        -string name
+        -string email
+        -Decimal cash_balance
+    }
+    
+    class Portfolio {
+        -User user
+        -Dict~symbol,Position~ holdings
+        -Decimal cash_balance
+        +buy(symbol, qty, price) Order
+        +sell(symbol, qty, price) Order
+        +get_position(symbol) Position
+        +calculate_pnl() Decimal
+    }
+    
+    class Position {
+        -string symbol
+        -int quantity
+        -Decimal average_price
+        -Decimal realized_pnl
+        -Decimal unrealized_pnl
+    }
+    
+    class Order {
+        <<abstract>>
+        -string order_id
+        -User user
+        -string symbol
+        -OrderSide side
+        -int quantity
+        -int filled_quantity
+        -Decimal price
+        -OrderStatus status
+        -datetime timestamp
+        +execute() bool
+        +cancel() bool
+    }
+    
+    class MarketOrder {
+        +execute() bool
+    }
+    
+    class LimitOrder {
+        +execute() bool
+    }
+    
+    class OrderMatchingEngine {
+        -Dict~symbol,OrderBook~ order_books
+        -List~Trade~ trade_history
+        +submit_order(order) void
+        +match_orders(symbol) List~Trade~
+        +cancel_order(order_id) bool
+    }
+    
+    class OrderBook {
+        -string symbol
+        -SortedDict buy_orders
+        -SortedDict sell_orders
+        +add_order(order) void
+        +match() List~Trade~
+        +get_best_bid() Decimal
+        +get_best_ask() Decimal
+    }
+    
+    class Trade {
+        -string trade_id
+        -string symbol
+        -User buyer
+        -User seller
+        -Decimal price
+        -int quantity
+        -datetime timestamp
+    }
+    
+    User "1" --> "1" Portfolio : has
+    Portfolio "1" --> "*" Position : holds
+    Order <|-- MarketOrder : inherits
+    Order <|-- LimitOrder : inherits
+    OrderMatchingEngine "1" --> "*" OrderBook : manages
+    OrderMatchingEngine "1" --> "*" Trade : records
+    OrderBook "1" --> "*" Order : contains
+    Trade "*" --> "1" User : buyer
+    Trade "*" --> "1" User : seller
 ```
 
 ## 4. Design Patterns Used

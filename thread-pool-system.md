@@ -94,88 +94,90 @@ Worker Thread → queue.dequeue() → execute(task) → result
 
 ## 3. Class Diagram
 
-```text
-┌────────────────────────────────────────────────┐
-│              <<interface>>                      │
-│                 Task                            │
-├────────────────────────────────────────────────┤
-│ + execute(): void                              │
-│ + get_name(): string                           │
-└────────────────────────────────────────────────┘
-                    △
-                    │ implements
-                    │
-┌────────────────────────────────────────────────┐
-│             RunnableTask                        │
-├────────────────────────────────────────────────┤
-│ - task_id: string                              │
-│ - function: Callable                           │
-│ - args: tuple                                  │
-│ - kwargs: dict                                 │
-├────────────────────────────────────────────────┤
-│ + execute(): Any                               │
-│ + get_name(): string                           │
-└────────────────────────────────────────────────┘
-
-┌────────────────────────────────────────────────┐
-│           RejectionPolicy                       │
-├────────────────────────────────────────────────┤
-│ + handle_rejection(task, pool): void          │
-└────────────────────────────────────────────────┘
-                    △
-                    │
-        ┌───────────┴───────────┐
-        │                       │
-┌───────────────┐      ┌──────────────────┐
-│ AbortPolicy   │      │  DiscardPolicy   │
-├───────────────┤      ├──────────────────┤
-│ + handle()    │      │ + handle()       │
-└───────────────┘      └──────────────────┘
-
-┌────────────────────────────────────────────────┐
-│              WorkerThread                       │
-├────────────────────────────────────────────────┤
-│ - thread_id: int                               │
-│ - pool: ThreadPool                             │
-│ - running: bool                                │
-├────────────────────────────────────────────────┤
-│ + run(): void                                  │
-│ + stop(): void                                 │
-│ - execute_task(task): void                     │
-└────────────────────────────────────────────────┘
-
-┌────────────────────────────────────────────────┐
-│              ThreadPool                         │
-├────────────────────────────────────────────────┤
-│ - pool_size: int                               │
-│ - max_queue_size: int                          │
-│ - workers: List[WorkerThread]                  │
-│ - task_queue: Queue                            │
-│ - rejection_policy: RejectionPolicy            │
-│ - state: PoolState                             │
-│ - lock: Lock                                   │
-│ - not_empty: Condition                         │
-│ - not_full: Condition                          │
-│ - completed_tasks: int                         │
-├────────────────────────────────────────────────┤
-│ + submit(task): void                           │
-│ + shutdown(): void                             │
-│ + shutdown_now(): List[Task]                   │
-│ + await_termination(timeout): bool             │
-│ + get_active_count(): int                      │
-│ + get_queue_size(): int                        │
-│ + get_completed_count(): int                   │
-│ - start_workers(): void                        │
-│ - execute_task(task): void                     │
-└────────────────────────────────────────────────┘
-
-┌────────────────────────────────────────────────┐
-│         ThreadPoolFactory                       │
-├────────────────────────────────────────────────┤
-│ + create_fixed_pool(size): ThreadPool          │
-│ + create_cached_pool(): ThreadPool             │
-│ + create_single_thread(): ThreadPool           │
-└────────────────────────────────────────────────┘
+```mermaid
+classDiagram
+    class Task {
+        <<interface>>
+        +execute() void
+        +get_name() string
+    }
+    
+    class RunnableTask {
+        -string task_id
+        -Callable function
+        -tuple args
+        -dict kwargs
+        +execute() Any
+        +get_name() string
+    }
+    
+    class RejectionPolicy {
+        <<abstract>>
+        +handle_rejection(task, pool) void
+    }
+    
+    class AbortPolicy {
+        +handle_rejection(task, pool) void
+    }
+    
+    class DiscardPolicy {
+        +handle_rejection(task, pool) void
+    }
+    
+    class DiscardOldestPolicy {
+        +handle_rejection(task, pool) void
+    }
+    
+    class CallerRunsPolicy {
+        +handle_rejection(task, pool) void
+    }
+    
+    class WorkerThread {
+        -int thread_id
+        -ThreadPool pool
+        -bool running
+        +run() void
+        +stop() void
+        -execute_task(task) void
+    }
+    
+    class ThreadPool {
+        -int pool_size
+        -int max_queue_size
+        -List~WorkerThread~ workers
+        -Queue task_queue
+        -RejectionPolicy rejection_policy
+        -PoolState state
+        -Lock lock
+        -Condition not_empty
+        -Condition not_full
+        -int completed_tasks
+        +submit(task) void
+        +shutdown() void
+        +shutdown_now() List~Task~
+        +await_termination(timeout) bool
+        +get_active_count() int
+        +get_queue_size() int
+        +get_completed_count() int
+        -start_workers() void
+        -execute_task(task) void
+    }
+    
+    class ThreadPoolFactory {
+        +create_fixed_pool(size) ThreadPool
+        +create_cached_pool() ThreadPool
+        +create_single_thread() ThreadPool
+    }
+    
+    Task <|.. RunnableTask : implements
+    RejectionPolicy <|-- AbortPolicy : inherits
+    RejectionPolicy <|-- DiscardPolicy : inherits
+    RejectionPolicy <|-- DiscardOldestPolicy : inherits
+    RejectionPolicy <|-- CallerRunsPolicy : inherits
+    ThreadPool "1" --> "*" WorkerThread : manages
+    ThreadPool "1" --> "1" RejectionPolicy : uses
+    ThreadPool "1" --> "*" Task : queues
+    ThreadPoolFactory ..> ThreadPool : creates
 ```
 
 ## 4. Design Patterns Used

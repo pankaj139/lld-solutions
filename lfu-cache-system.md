@@ -197,93 +197,92 @@ Time Complexity: O(1)
 
 ## Class Diagram
 
-```text
-┌─────────────────────────────────┐
-│   LFUCache                      │
-├─────────────────────────────────┤
-│ - capacity: int                 │
-│ - size: int                     │
-│ - min_frequency: int            │
-│ - cache: Map<K, Node>           │
-│ - freq_map: Map<int, DLList>    │
-│ - key_freq: Map<K, int>         │
-│ - hits: int                     │
-│ - misses: int                   │
-│ - evictions: int                │
-├─────────────────────────────────┤
-│ + get(key: K): V                │
-│ + put(key: K, value: V)         │
-│ + size(): int                   │
-│ + clear()                       │
-│ + get_stats(): CacheStats       │
-│ - evict()                       │
-│ - increment_frequency(key: K)   │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Node                          │
-├─────────────────────────────────┤
-│ - key: K                        │
-│ - value: V                      │
-│ - frequency: int                │
-│ - prev: Node                    │
-│ - next: Node                    │
-├─────────────────────────────────┤
-│ + __init__(key, value)          │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   DoublyLinkedList              │
-├─────────────────────────────────┤
-│ - head: Node (sentinel)         │
-│ - tail: Node (sentinel)         │
-│ - size: int                     │
-├─────────────────────────────────┤
-│ + add_to_head(node: Node)       │
-│ + remove_node(node: Node)       │
-│ + remove_tail(): Node           │
-│ + is_empty(): bool              │
-│ + size(): int                   │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   CacheStats                    │
-├─────────────────────────────────┤
-│ - total_gets: int               │
-│ - total_puts: int               │
-│ - hits: int                     │
-│ - misses: int                   │
-│ - evictions: int                │
-│ - hit_rate: float               │
-├─────────────────────────────────┤
-│ + calculate_hit_rate(): float   │
-│ + __str__(): str                │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   EvictionStrategy              │
-│   <<interface>>                 │
-├─────────────────────────────────┤
-│ + evict(cache): K               │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┐
-    │          │          │
-┌───┴───────┐ ┌┴────────┐ ┌┴───────┐
-│LFU        │ │LRU      │ │FIFO    │
-│Strategy   │ │Strategy │ │Strategy│
-└───────────┘ └─────────┘ └────────┘
-
-┌─────────────────────────────────┐
-│   CacheObserver                 │
-│   <<interface>>                 │
-├─────────────────────────────────┤
-│ + on_hit(key)                   │
-│ + on_miss(key)                  │
-│ + on_evict(key, value)          │
-│ + on_put(key, value)            │
-└─────────────────────────────────┘
+```mermaid
+classDiagram
+    class LFUCache~K,V~ {
+        -int capacity
+        -int size
+        -int min_frequency
+        -Map~K,Node~ cache
+        -Map~int,DLList~ freq_map
+        -Map~K,int~ key_freq
+        -int hits
+        -int misses
+        -int evictions
+        +get(key K) V
+        +put(key K, value V) void
+        +size() int
+        +clear() void
+        +get_stats() CacheStats
+        -evict() void
+        -increment_frequency(key K) void
+    }
+    
+    class Node~K,V~ {
+        -K key
+        -V value
+        -int frequency
+        -Node prev
+        -Node next
+        +Node(key, value)
+    }
+    
+    class DoublyLinkedList {
+        -Node head
+        -Node tail
+        -int size
+        +add_to_head(node Node) void
+        +remove_node(node Node) void
+        +remove_tail() Node
+        +is_empty() bool
+        +size() int
+    }
+    
+    class CacheStats {
+        -int total_gets
+        -int total_puts
+        -int hits
+        -int misses
+        -int evictions
+        -float hit_rate
+        +calculate_hit_rate() float
+        +__str__() str
+    }
+    
+    class EvictionStrategy {
+        <<interface>>
+        +evict(cache) K
+    }
+    
+    class LFUStrategy {
+        +evict(cache) K
+    }
+    
+    class LRUStrategy {
+        +evict(cache) K
+    }
+    
+    class FIFOStrategy {
+        +evict(cache) K
+    }
+    
+    class CacheObserver {
+        <<interface>>
+        +on_hit(key) void
+        +on_miss(key) void
+        +on_evict(key, value) void
+        +on_put(key, value) void
+    }
+    
+    EvictionStrategy <|-- LFUStrategy : implements
+    EvictionStrategy <|-- LRUStrategy : implements
+    EvictionStrategy <|-- FIFOStrategy : implements
+    LFUCache "1" --> "*" Node : contains
+    LFUCache "1" --> "*" DoublyLinkedList : manages
+    LFUCache "1" --> "1" CacheStats : tracks
+    LFUCache ..> EvictionStrategy : uses
+    LFUCache ..> CacheObserver : notifies
+    DoublyLinkedList "1" --> "*" Node : links
 ```
 
 ## Component Design

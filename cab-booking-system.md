@@ -144,150 +144,171 @@ Pricing Components
 
 ## 3. Class Diagram
 
-```text
-┌────────────────────────────────────────────────────┐
-│                  CabBookingSystem                   │
-├────────────────────────────────────────────────────┤
-│ - riders: Dict[str, Rider]                         │
-│ - drivers: Dict[str, Driver]                       │
-│ - rides: Dict[str, Ride]                           │
-│ - matching_service: MatchingService                │
-│ - pricing_engine: PricingEngine                    │
-│ - payment_processor: PaymentProcessor              │
-│ - notification_service: NotificationService        │
-├────────────────────────────────────────────────────┤
-│ + register_rider(details): Rider                   │
-│ + register_driver(details): Driver                 │
-│ + request_ride(rider, details): Ride               │
-│ + cancel_ride(ride_id): void                       │
-│ + complete_ride(ride_id): void                     │
-│ + rate_ride(ride_id, rating): void                 │
-└────────────────────────────────────────────────────┘
-
-┌────────────────────────────────────────────────────┐
-│                  User (ABC)                         │
-├────────────────────────────────────────────────────┤
-│ # id: str                                           │
-│ # name: str                                         │
-│ # phone: str                                        │
-│ # email: str                                        │
-│ # rating: float                                     │
-├────────────────────────────────────────────────────┤
-│ + get_details(): Dict                               │
-│ + update_rating(new_rating): void                  │
-└────────────────────────────────────────────────────┘
-            △                    △
-            │                    │
-    ┌───────┴──────┐    ┌───────┴──────┐
-    │    Rider     │    │    Driver    │
-    ├──────────────┤    ├──────────────┤
-    │- preferences │    │- vehicle     │
-    │- wallet      │    │- license     │
-    │              │    │- status      │
-    │              │    │- location    │
-    └──────────────┘    └──────────────┘
-
-┌────────────────────────────────────────────────────┐
-│                     Ride                            │
-├────────────────────────────────────────────────────┤
-│ - id: str                                           │
-│ - rider: Rider                                      │
-│ - driver: Optional[Driver]                          │
-│ - pickup: Location                                  │
-│ - drop: Location                                    │
-│ - cab_type: CabType                                 │
-│ - state: RideState                                  │
-│ - fare: Optional[Fare]                              │
-│ - payment: Optional[Payment]                        │
-├────────────────────────────────────────────────────┤
-│ + request(): void                                   │
-│ + assign_driver(driver): void                      │
-│ + accept(): void                                    │
-│ + start(): void                                     │
-│ + complete(): void                                  │
-│ + cancel(): void                                    │
-│ + change_state(state): void                        │
-└────────────────────────────────────────────────────┘
-
-┌────────────────────────────────────────────────────┐
-│              RideState (ABC)                        │
-├────────────────────────────────────────────────────┤
-│ + handle_accept(ride): void                         │
-│ + handle_start(ride): void                          │
-│ + handle_complete(ride): void                       │
-│ + handle_cancel(ride): void                         │
-└────────────────────────────────────────────────────┘
-            △
-            │
-    ┌───────┴────────────────────────────┐
-    │                                    │
-┌───────────┐  ┌──────────┐  ┌─────────┐
-│ Requested │  │ Accepted │  │ Started │  ...
-└───────────┘  └──────────┘  └─────────┘
-
-┌────────────────────────────────────────────────────┐
-│              MatchingService                        │
-├────────────────────────────────────────────────────┤
-│ - strategy: MatchingStrategy                        │
-├────────────────────────────────────────────────────┤
-│ + find_driver(ride): Optional[Driver]               │
-│ + set_strategy(strategy): void                      │
-└────────────────────────────────────────────────────┘
-
-┌────────────────────────────────────────────────────┐
-│          MatchingStrategy (ABC)                     │
-├────────────────────────────────────────────────────┤
-│ + match(ride, drivers): Optional[Driver]            │
-└────────────────────────────────────────────────────┘
-            △
-            │
-    ┌───────┴────────────────────────┐
-    │                                │
-┌────────────────┐  ┌────────────────┐
-│ ProximityMatch │  │ RatingMatch    │
-└────────────────┘  └────────────────┘
-
-┌────────────────────────────────────────────────────┐
-│              PricingEngine                          │
-├────────────────────────────────────────────────────┤
-│ - strategies: List[PricingStrategy]                 │
-├────────────────────────────────────────────────────┤
-│ + calculate_fare(ride): Fare                        │
-│ + add_strategy(strategy): void                      │
-└────────────────────────────────────────────────────┘
-
-┌────────────────────────────────────────────────────┐
-│          PricingStrategy (ABC)                      │
-├────────────────────────────────────────────────────┤
-│ + calculate(ride, fare): void                       │
-└────────────────────────────────────────────────────┘
-            △
-            │
-    ┌───────┴────────────────────────┐
-    │                                │
-┌───────────────┐  ┌─────────────────┐
-│ BaseFareCalc  │  │ SurgePricing    │
-└───────────────┘  └─────────────────┘
-
-┌────────────────────────────────────────────────────┐
-│          PaymentProcessor                           │
-├────────────────────────────────────────────────────┤
-│ + process_payment(ride, method): bool               │
-│ + refund(payment_id): bool                          │
-└────────────────────────────────────────────────────┘
-
-┌────────────────────────────────────────────────────┐
-│          PaymentMethod (ABC)                        │
-├────────────────────────────────────────────────────┤
-│ + pay(amount): bool                                 │
-└────────────────────────────────────────────────────┘
-            △
-            │
-    ┌───────┴────────────────────────┐
-    │              │                 │
-┌────────┐  ┌──────────┐  ┌─────────┐
-│  Cash  │  │  Card    │  │ Wallet  │
-└────────┘  └──────────┘  └─────────┘
+```mermaid
+classDiagram
+    class CabBookingSystem {
+        -Dict~str,Rider~ riders
+        -Dict~str,Driver~ drivers
+        -Dict~str,Ride~ rides
+        -MatchingService matching_service
+        -PricingEngine pricing_engine
+        -PaymentProcessor payment_processor
+        -NotificationService notification_service
+        +register_rider(details) Rider
+        +register_driver(details) Driver
+        +request_ride(rider, details) Ride
+        +cancel_ride(ride_id) void
+        +complete_ride(ride_id) void
+        +rate_ride(ride_id, rating) void
+    }
+    
+    class User {
+        <<abstract>>
+        #str id
+        #str name
+        #str phone
+        #str email
+        #float rating
+        +get_details() Dict
+        +update_rating(new_rating) void
+    }
+    
+    class Rider {
+        -preferences
+        -wallet
+    }
+    
+    class Driver {
+        -vehicle
+        -license
+        -status
+        -location
+    }
+    
+    class Ride {
+        -str id
+        -Rider rider
+        -Optional~Driver~ driver
+        -Location pickup
+        -Location drop
+        -CabType cab_type
+        -RideState state
+        -Optional~Fare~ fare
+        -Optional~Payment~ payment
+        +request() void
+        +assign_driver(driver) void
+        +accept() void
+        +start() void
+        +complete() void
+        +cancel() void
+        +change_state(state) void
+    }
+    
+    class RideState {
+        <<abstract>>
+        +handle_accept(ride) void
+        +handle_start(ride) void
+        +handle_complete(ride) void
+        +handle_cancel(ride) void
+    }
+    
+    class RequestedState {
+        +handle_accept(ride) void
+    }
+    
+    class AcceptedState {
+        +handle_start(ride) void
+    }
+    
+    class StartedState {
+        +handle_complete(ride) void
+    }
+    
+    class MatchingService {
+        -MatchingStrategy strategy
+        +find_driver(ride) Optional~Driver~
+        +set_strategy(strategy) void
+    }
+    
+    class MatchingStrategy {
+        <<abstract>>
+        +match(ride, drivers) Optional~Driver~
+    }
+    
+    class ProximityMatch {
+        +match(ride, drivers) Optional~Driver~
+    }
+    
+    class RatingMatch {
+        +match(ride, drivers) Optional~Driver~
+    }
+    
+    class PricingEngine {
+        -List~PricingStrategy~ strategies
+        +calculate_fare(ride) Fare
+        +add_strategy(strategy) void
+    }
+    
+    class PricingStrategy {
+        <<abstract>>
+        +calculate(ride, fare) void
+    }
+    
+    class BaseFareCalc {
+        +calculate(ride, fare) void
+    }
+    
+    class SurgePricing {
+        +calculate(ride, fare) void
+    }
+    
+    class PaymentProcessor {
+        +process_payment(ride, method) bool
+        +refund(payment_id) bool
+    }
+    
+    class PaymentMethod {
+        <<abstract>>
+        +pay(amount) bool
+    }
+    
+    class Cash {
+        +pay(amount) bool
+    }
+    
+    class Card {
+        +pay(amount) bool
+    }
+    
+    class Wallet {
+        +pay(amount) bool
+    }
+    
+    User <|-- Rider : inherits
+    User <|-- Driver : inherits
+    RideState <|-- RequestedState : inherits
+    RideState <|-- AcceptedState : inherits
+    RideState <|-- StartedState : inherits
+    MatchingStrategy <|-- ProximityMatch : inherits
+    MatchingStrategy <|-- RatingMatch : inherits
+    PricingStrategy <|-- BaseFareCalc : inherits
+    PricingStrategy <|-- SurgePricing : inherits
+    PaymentMethod <|-- Cash : inherits
+    PaymentMethod <|-- Card : inherits
+    PaymentMethod <|-- Wallet : inherits
+    
+    CabBookingSystem "1" --> "*" Rider : manages
+    CabBookingSystem "1" --> "*" Driver : manages
+    CabBookingSystem "1" --> "*" Ride : manages
+    CabBookingSystem "1" --> "1" MatchingService : uses
+    CabBookingSystem "1" --> "1" PricingEngine : uses
+    CabBookingSystem "1" --> "1" PaymentProcessor : uses
+    Ride "*" --> "1" Rider : for
+    Ride "*" --> "0..1" Driver : assigned to
+    Ride "1" --> "1" RideState : has
+    MatchingService "1" --> "1" MatchingStrategy : uses
+    PricingEngine "1" --> "*" PricingStrategy : uses
+    PaymentProcessor ..> PaymentMethod : uses
 ```
 
 ## 4. Design Patterns Used
