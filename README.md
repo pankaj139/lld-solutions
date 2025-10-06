@@ -1,6 +1,6 @@
 # LLD Solutions - Production-Ready Interview Preparation Repository
 
-A comprehensive collection of **45 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
+A comprehensive collection of **46 Low-Level Design (LLD) systems** with complete implementations in Python and JavaScript. Each system follows industry best practices, implements multiple design patterns, and includes detailed documentation following a consistent ATM-standard framework.
 
 ## 🎉 **Project Status: 100% Complete & Production-Ready**
 
@@ -157,7 +157,7 @@ Performance-critical implementations:
 
 ---
 
-## 🔧 **Utility Systems** (2 Systems)
+## 🔧 **Utility Systems** (3 Systems)
 
 Essential infrastructure components for production applications:
 
@@ -165,6 +165,7 @@ Essential infrastructure components for production applications:
 |---------|--------|------------|------------|-----------------|
 | [Configuration Manager](./configuration-manager-system.md) | ✅ | ✅ | Medium | Singleton, Strategy, Observer, Factory, Decorator, Chain of Responsibility, Template Method (7 patterns) |
 | [Connection Pool](./connection-pool-system.md) | ✅ | ✅ | Medium | Object Pool, Factory, Singleton, State, Strategy, Observer, Template Method (7 patterns) |
+| [Thread Pool](./thread-pool-system.md) | ✅ | ✅ | **Hard** | Object Pool, Command, Strategy, Observer, Factory, Singleton (6 patterns) - Worker thread management, rejection policies |
 
 ---
 
@@ -220,15 +221,15 @@ Complete Gang of Four pattern coverage with implementations across all systems:
 
 ## 📊 **Repository Statistics**
 
-- **Total Systems**: 45 complete LLD problems
-- **Python Implementations**: 45/45 (100% ✅)
-- **JavaScript Implementations**: 45/45 (100% ✅)
+- **Total Systems**: 46 complete LLD problems
+- **Python Implementations**: 46/46 (100% ✅)
+- **JavaScript Implementations**: 46/46 (100% ✅)
 - **Documentation Guides**: 18 comprehensive guides (23,437+ lines)
 - **Design Patterns Documented**: 23 GoF patterns (complete coverage) ✅
-- **Design Pattern Implementations**: 125+ across all systems
+- **Design Pattern Implementations**: 130+ across all systems
 - **Average Patterns per System**: 6.1
-- **System Documentation Files**: 32 markdown files (avg 300+ lines)
-- **Total Lines of Code**: ~43,500+ across all implementations
+- **System Documentation Files**: 33 markdown files (avg 300+ lines)
+- **Total Lines of Code**: ~45,000+ across all implementations
 - **Quality Level**: Production-Ready ⭐⭐⭐⭐⭐
 
 ---
