@@ -253,218 +253,206 @@ Alternative Flow:
 
 ## Class Diagram
 
-```text
-┌─────────────────────────────────┐
-│   Video                         │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - title: str                    │
-│ - url: str                      │
-│ - duration: int (seconds)       │
-│ - thumbnail: str                │
-│ - qualities: List[Quality]      │
-│ - audio_tracks: List[Audio]     │
-│ - subtitles: List[Subtitle]     │
-│ - metadata: Dict                │
-├─────────────────────────────────┤
-│ + get_quality(q): QualityURL    │
-│ + get_subtitle(lang): Subtitle  │
-│ + get_audio_track(id): Audio    │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Quality                       │
-├─────────────────────────────────┤
-│ - resolution: str (720p)        │
-│ - bitrate: int                  │
-│ - url: str                      │
-│ - codec: str                    │
-├─────────────────────────────────┤
-│ + get_bandwidth(): int          │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Subtitle                      │
-├─────────────────────────────────┤
-│ - language: str                 │
-│ - url: str                      │
-│ - format: str (SRT, VTT)        │
-│ - cues: List[SubtitleCue]       │
-├─────────────────────────────────┤
-│ + get_cue_at(time): Cue         │
-│ + parse()                       │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   PlaybackState                 │
-│   <<interface>>                 │
-├─────────────────────────────────┤
-│ + play()                        │
-│ + pause()                       │
-│ + stop()                        │
-│ + seek(time)                    │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┬────────┐
-    │          │          │        │
-┌───┴────┐  ┌──┴────┐  ┌──┴────┐ ┌┴────────┐
-│ Idle   │  │Playing│  │Paused │ │Buffering│
-└────────┘  └───────┘  └───────┘ └─────────┘
-
-┌─────────────────────────────────┐
-│   VideoPlayer                   │
-├─────────────────────────────────┤
-│ - current_video: Video          │
-│ - state: PlaybackState          │
-│ - current_time: float           │
-│ - duration: float               │
-│ - volume: float (0-1)           │
-│ - playback_speed: float         │
-│ - current_quality: Quality      │
-│ - current_subtitle: Subtitle    │
-│ - is_muted: bool                │
-│ - is_fullscreen: bool           │
-│ - buffer_percentage: float      │
-├─────────────────────────────────┤
-│ + load_video(video)             │
-│ + play()                        │
-│ + pause()                       │
-│ + stop()                        │
-│ + seek(time)                    │
-│ + set_volume(vol)               │
-│ + set_speed(speed)              │
-│ + set_quality(quality)          │
-│ + toggle_subtitles()            │
-│ + toggle_fullscreen()           │
-│ + skip_forward(seconds)         │
-│ + skip_backward(seconds)        │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Playlist                      │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - name: str                     │
-│ - videos: List[Video]           │
-│ - current_index: int            │
-│ - repeat_mode: RepeatMode       │
-│ - shuffle_enabled: bool         │
-├─────────────────────────────────┤
-│ + add_video(video)              │
-│ + remove_video(index)           │
-│ + next()                        │
-│ + previous()                    │
-│ + shuffle()                     │
-│ + get_current_video(): Video    │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   BufferManager                 │
-├─────────────────────────────────┤
-│ - buffer_size: int              │
-│ - buffered_ranges: List[Range]  │
-│ - download_speed: float         │
-├─────────────────────────────────┤
-│ + add_to_buffer(data, range)    │
-│ + get_buffered_time(): float    │
-│ + is_buffered(time): bool       │
-│ + estimate_bandwidth(): float   │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   QualitySelector               │
-├─────────────────────────────────┤
-│ - current_quality: Quality      │
-│ - available_qualities: List     │
-│ - auto_mode: bool               │
-│ - bandwidth_estimate: float     │
-├─────────────────────────────────┤
-│ + select_quality_auto()         │
-│ + select_quality_manual(q)      │
-│ + adapt_to_bandwidth(bw)        │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   WatchHistory                  │
-├─────────────────────────────────┤
-│ - user_id: str                  │
-│ - entries: List[HistoryEntry]   │
-├─────────────────────────────────┤
-│ + add_entry(video, time)        │
-│ + get_watch_position(video_id)  │
-│ + get_recent_videos(): List     │
-│ + clear_history()               │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   HistoryEntry                  │
-├─────────────────────────────────┤
-│ - video_id: str                 │
-│ - watch_time: float             │
-│ - total_duration: float         │
-│ - timestamp: datetime           │
-│ - completed: bool               │
-├─────────────────────────────────┤
-│ + get_progress(): float         │
-│ + is_recent(): bool             │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   DownloadManager               │
-├─────────────────────────────────┤
-│ - downloads: Dict[str, Download]│
-│ - storage_limit: int            │
-│ - storage_used: int             │
-├─────────────────────────────────┤
-│ + download_video(video, quality)│
-│ + pause_download(download_id)   │
-│ + cancel_download(download_id)  │
-│ + get_downloads(): List         │
-│ + delete_download(download_id)  │
-│ + get_storage_info(): Dict      │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Download                      │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - video: Video                  │
-│ - quality: Quality              │
-│ - progress: float (0-1)         │
-│ - status: DownloadStatus        │
-│ - file_path: str                │
-│ - size: int                     │
-├─────────────────────────────────┤
-│ + start()                       │
-│ + pause()                       │
-│ + resume()                      │
-│ + cancel()                      │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   RecommendationEngine          │
-├─────────────────────────────────┤
-│ - user_id: str                  │
-│ - watch_history: WatchHistory   │
-├─────────────────────────────────┤
-│ + get_recommendations(): List   │
-│ + get_similar_videos(video_id)  │
-│ + get_trending(): List          │
-│ + get_continue_watching(): List │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   VideoController               │
-├─────────────────────────────────┤
-│ - player: VideoPlayer           │
-│ - history: WatchHistory         │
-│ - downloads: DownloadManager    │
-├─────────────────────────────────┤
-│ + execute_command(cmd)          │
-│ + get_player_state(): State     │
-│ + update_history()              │
-└─────────────────────────────────┘
+```mermaid
+classDiagram
+    class Video {
+        -str id
+        -str title
+        -str url
+        -int duration
+        -str thumbnail
+        -List~Quality~ qualities
+        -List~Audio~ audio_tracks
+        -List~Subtitle~ subtitles
+        -Dict metadata
+        +get_quality(q) QualityURL
+        +get_subtitle(lang) Subtitle
+        +get_audio_track(id) Audio
+    }
+    
+    class Quality {
+        -str resolution
+        -int bitrate
+        -str url
+        -str codec
+        +get_bandwidth() int
+    }
+    
+    class Subtitle {
+        -str language
+        -str url
+        -str format
+        -List~SubtitleCue~ cues
+        +get_cue_at(time) Cue
+        +parse() void
+    }
+    
+    class PlaybackState {
+        <<interface>>
+        +play() void
+        +pause() void
+        +stop() void
+        +seek(time) void
+    }
+    
+    class IdleState {
+        +play() void
+    }
+    
+    class PlayingState {
+        +pause() void
+    }
+    
+    class PausedState {
+        +play() void
+    }
+    
+    class BufferingState {
+        +wait() void
+    }
+    
+    class VideoPlayer {
+        -Video current_video
+        -PlaybackState state
+        -float current_time
+        -float duration
+        -float volume
+        -float playback_speed
+        -Quality current_quality
+        -Subtitle current_subtitle
+        -bool is_muted
+        -bool is_fullscreen
+        -float buffer_percentage
+        +load_video(video) void
+        +play() void
+        +pause() void
+        +stop() void
+        +seek(time) void
+        +set_volume(vol) void
+        +set_speed(speed) void
+        +set_quality(quality) void
+        +toggle_subtitles() void
+        +toggle_fullscreen() void
+        +skip_forward(seconds) void
+        +skip_backward(seconds) void
+    }
+    
+    class Playlist {
+        -str id
+        -str name
+        -List~Video~ videos
+        -int current_index
+        -RepeatMode repeat_mode
+        -bool shuffle_enabled
+        +add_video(video) void
+        +remove_video(index) void
+        +next() Video
+        +previous() Video
+        +shuffle() void
+        +get_current_video() Video
+    }
+    
+    class BufferManager {
+        -int buffer_size
+        -List~Range~ buffered_ranges
+        -float download_speed
+        +add_to_buffer(data, range) void
+        +get_buffered_time() float
+        +is_buffered(time) bool
+        +estimate_bandwidth() float
+    }
+    
+    class QualitySelector {
+        -Quality current_quality
+        -List available_qualities
+        -bool auto_mode
+        -float bandwidth_estimate
+        +select_quality_auto() Quality
+        +select_quality_manual(q) void
+        +adapt_to_bandwidth(bw) Quality
+    }
+    
+    class WatchHistory {
+        -str user_id
+        -List~HistoryEntry~ entries
+        +add_entry(video, time) void
+        +get_watch_position(video_id) float
+        +get_recent_videos() List
+        +clear_history() void
+    }
+    
+    class HistoryEntry {
+        -str video_id
+        -float watch_time
+        -float total_duration
+        -datetime timestamp
+        -bool completed
+        +get_progress() float
+        +is_recent() bool
+    }
+    
+    class DownloadManager {
+        -Dict~str,Download~ downloads
+        -int storage_limit
+        -int storage_used
+        +download_video(video, quality) void
+        +pause_download(download_id) void
+        +cancel_download(download_id) void
+        +get_downloads() List
+        +delete_download(download_id) void
+        +get_storage_info() Dict
+    }
+    
+    class Download {
+        -str id
+        -Video video
+        -Quality quality
+        -float progress
+        -DownloadStatus status
+        -str file_path
+        -int size
+        +start() void
+        +pause() void
+        +resume() void
+        +cancel() void
+    }
+    
+    class RecommendationEngine {
+        -str user_id
+        -WatchHistory watch_history
+        +get_recommendations() List
+        +get_similar_videos(video_id) List
+        +get_trending() List
+        +get_continue_watching() List
+    }
+    
+    class VideoController {
+        -VideoPlayer player
+        -WatchHistory history
+        -DownloadManager downloads
+        +execute_command(cmd) void
+        +get_player_state() State
+        +update_history() void
+    }
+    
+    Video "1" --> "*" Quality : has
+    Video "1" --> "*" Subtitle : has
+    PlaybackState <|.. IdleState : implements
+    PlaybackState <|.. PlayingState : implements
+    PlaybackState <|.. PausedState : implements
+    PlaybackState <|.. BufferingState : implements
+    VideoPlayer "1" --> "1" Video : plays
+    VideoPlayer "1" --> "1" PlaybackState : has
+    VideoPlayer ..> BufferManager : uses
+    VideoPlayer ..> QualitySelector : uses
+    Playlist "1" --> "*" Video : contains
+    WatchHistory "1" --> "*" HistoryEntry : tracks
+    DownloadManager "1" --> "*" Download : manages
+    Download "*" --> "1" Video : for
+    RecommendationEngine ..> WatchHistory : analyzes
+    VideoController "1" --> "1" VideoPlayer : controls
+    VideoController "1" --> "1" WatchHistory : updates
+    VideoController "1" --> "1" DownloadManager : manages
 ```
 
 ## Component Design

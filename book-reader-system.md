@@ -215,211 +215,195 @@ Alternative Flow:
 
 ## Class Diagram
 
-```text
-┌─────────────────────────────────┐
-│   Book                          │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - title: str                    │
-│ - author: str                   │
-│ - isbn: str                     │
-│ - format: BookFormat            │
-│ - file_path: str                │
-│ - total_pages: int              │
-│ - cover_image: str              │
-│ - metadata: Dict                │
-├─────────────────────────────────┤
-│ + get_content(page): str        │
-│ + get_chapter(index): Chapter   │
-│ + search(query): List[Result]   │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Chapter                       │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - title: str                    │
-│ - start_page: int               │
-│ - end_page: int                 │
-│ - content: str                  │
-│ - sub_chapters: List[Chapter]   │
-├─────────────────────────────────┤
-│ + get_content(): str            │
-│ + get_sub_chapter(i): Chapter   │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   ReadingSession                │
-├─────────────────────────────────┤
-│ - session_id: str               │
-│ - book_id: str                  │
-│ - user_id: str                  │
-│ - current_page: int             │
-│ - current_position: float       │
-│ - start_time: datetime          │
-│ - end_time: datetime            │
-│ - pages_read: int               │
-├─────────────────────────────────┤
-│ + update_position(page, pos)    │
-│ + calculate_progress(): float   │
-│ + get_duration(): timedelta     │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Annotation                    │
-│   <<abstract>>                  │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - book_id: str                  │
-│ - page_number: int              │
-│ - created_at: datetime          │
-│ - modified_at: datetime         │
-├─────────────────────────────────┤
-│ + to_dict(): Dict               │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┐
-    │          │          │
-┌───┴────┐  ┌──┴────┐  ┌──┴────┐
-│Bookmark│  │Highlight│ │ Note  │
-└────────┘  └─────────┘  └───────┘
-
-┌─────────────────────────────────┐
-│   Bookmark                      │
-├─────────────────────────────────┤
-│ - name: str                     │
-│ - position: float               │
-├─────────────────────────────────┤
-│ + jump_to()                     │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Highlight                     │
-├─────────────────────────────────┤
-│ - text: str                     │
-│ - color: Color                  │
-│ - start_offset: int             │
-│ - end_offset: int               │
-│ - note: Note                    │
-├─────────────────────────────────┤
-│ + change_color(color)           │
-│ + add_note(text)                │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Note                          │
-├─────────────────────────────────┤
-│ - text: str                     │
-│ - highlight_id: str             │
-├─────────────────────────────────┤
-│ + update_text(text)             │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   ReadingSettings               │
-├─────────────────────────────────┤
-│ - font_family: str              │
-│ - font_size: int                │
-│ - line_spacing: float           │
-│ - theme: Theme                  │
-│ - brightness: float             │
-│ - margin_size: int              │
-│ - text_align: Alignment         │
-├─────────────────────────────────┤
-│ + apply_settings()              │
-│ + reset_to_default()            │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Library                       │
-├─────────────────────────────────┤
-│ - books: Dict[str, Book]        │
-│ - collections: Dict[str, List]  │
-│ - shelves: Dict[str, Shelf]     │
-├─────────────────────────────────┤
-│ + add_book(book): bool          │
-│ + remove_book(book_id): bool    │
-│ + search(query): List[Book]     │
-│ + filter_by(criteria): List     │
-│ + create_collection(name)       │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   BookParser                    │
-│   <<interface>>                 │
-├─────────────────────────────────┤
-│ + parse(file): Book             │
-│ + extract_toc(): List[Chapter]  │
-│ + extract_metadata(): Dict      │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┐
-    │          │          │
-┌───┴─────┐  ┌─┴──────┐ ┌─┴───────┐
-│EPUBParser│ │PDFParser│ │TXTParser│
-└──────────┘  └─────────┘ └─────────┘
-
-┌─────────────────────────────────┐
-│   ReadingState                  │
-│   <<interface>>                 │
-├─────────────────────────────────┤
-│ + open_book()                   │
-│ + close_book()                  │
-│ + turn_page()                   │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┐
-    │          │          │
-┌───┴─────┐  ┌─┴──────┐ ┌─┴────────┐
-│  Idle   │  │ Reading│ │ Finished │
-└─────────┘  └────────┘  └──────────┘
-
-┌─────────────────────────────────┐
-│   Reader                        │
-├─────────────────────────────────┤
-│ - current_book: Book            │
-│ - current_session: Session      │
-│ - settings: ReadingSettings     │
-│ - state: ReadingState           │
-├─────────────────────────────────┤
-│ + open_book(book_id)            │
-│ + close_book()                  │
-│ + turn_page(direction)          │
-│ + jump_to_page(page)            │
-│ + add_highlight(text, color)    │
-│ + add_bookmark(name)            │
-│ + search(query): List[Result]   │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   ReadingStatistics             │
-├─────────────────────────────────┤
-│ - total_pages_read: int         │
-│ - total_time: timedelta         │
-│ - books_completed: int          │
-│ - current_streak: int           │
-│ - reading_speed_wpm: float      │
-├─────────────────────────────────┤
-│ + update_stats(session)         │
-│ + get_daily_stats(): Dict       │
-│ + get_weekly_stats(): Dict      │
-│ + calculate_streak(): int       │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   SyncManager                   │
-├─────────────────────────────────┤
-│ - last_sync: datetime           │
-│ - pending_changes: List         │
-├─────────────────────────────────┤
-│ + sync_progress()               │
-│ + sync_annotations()            │
-│ + sync_library()                │
-│ + resolve_conflicts()           │
-└─────────────────────────────────┘
+```mermaid
+classDiagram
+    class Book {
+        -str id
+        -str title
+        -str author
+        -str isbn
+        -BookFormat format
+        -str file_path
+        -int total_pages
+        -str cover_image
+        -Dict metadata
+        +get_content(page) str
+        +get_chapter(index) Chapter
+        +search(query) List~Result~
+    }
+    
+    class Chapter {
+        -str id
+        -str title
+        -int start_page
+        -int end_page
+        -str content
+        -List~Chapter~ sub_chapters
+        +get_content() str
+        +get_sub_chapter(i) Chapter
+    }
+    
+    class ReadingSession {
+        -str session_id
+        -str book_id
+        -str user_id
+        -int current_page
+        -float current_position
+        -datetime start_time
+        -datetime end_time
+        -int pages_read
+        +update_position(page, pos) void
+        +calculate_progress() float
+        +get_duration() timedelta
+    }
+    
+    class Annotation {
+        <<abstract>>
+        -str id
+        -str book_id
+        -int page_number
+        -datetime created_at
+        -datetime modified_at
+        +to_dict() Dict
+    }
+    
+    class Bookmark {
+        -str name
+        -float position
+        +jump_to() void
+    }
+    
+    class Highlight {
+        -str text
+        -Color color
+        -int start_offset
+        -int end_offset
+        -Note note
+        +change_color(color) void
+        +add_note(text) void
+    }
+    
+    class Note {
+        -str text
+        -str highlight_id
+        +update_text(text) void
+    }
+    
+    class ReadingSettings {
+        -str font_family
+        -int font_size
+        -float line_spacing
+        -Theme theme
+        -float brightness
+        -int margin_size
+        -Alignment text_align
+        +apply_settings() void
+        +reset_to_default() void
+    }
+    
+    class Library {
+        -Dict~str,Book~ books
+        -Dict~str,List~ collections
+        -Dict~str,Shelf~ shelves
+        +add_book(book) bool
+        +remove_book(book_id) bool
+        +search(query) List~Book~
+        +filter_by(criteria) List
+        +create_collection(name) void
+    }
+    
+    class BookParser {
+        <<interface>>
+        +parse(file) Book
+        +extract_toc() List~Chapter~
+        +extract_metadata() Dict
+    }
+    
+    class EPUBParser {
+        +parse(file) Book
+    }
+    
+    class PDFParser {
+        +parse(file) Book
+    }
+    
+    class TXTParser {
+        +parse(file) Book
+    }
+    
+    class ReadingState {
+        <<interface>>
+        +open_book() void
+        +close_book() void
+        +turn_page() void
+    }
+    
+    class IdleState {
+        +open_book() void
+    }
+    
+    class ReadingStateImpl {
+        +turn_page() void
+    }
+    
+    class FinishedState {
+        +close_book() void
+    }
+    
+    class Reader {
+        -Book current_book
+        -ReadingSession current_session
+        -ReadingSettings settings
+        -ReadingState state
+        +open_book(book_id) void
+        +close_book() void
+        +turn_page(direction) void
+        +jump_to_page(page) void
+        +add_highlight(text, color) void
+        +add_bookmark(name) void
+        +search(query) List~Result~
+    }
+    
+    class ReadingStatistics {
+        -int total_pages_read
+        -timedelta total_time
+        -int books_completed
+        -int current_streak
+        -float reading_speed_wpm
+        +update_stats(session) void
+        +get_daily_stats() Dict
+        +get_weekly_stats() Dict
+        +calculate_streak() int
+    }
+    
+    class SyncManager {
+        -datetime last_sync
+        -List pending_changes
+        +sync_progress() void
+        +sync_annotations() void
+        +sync_library() void
+        +resolve_conflicts() void
+    }
+    
+    Book "1" --> "*" Chapter : contains
+    Annotation <|-- Bookmark : extends
+    Annotation <|-- Highlight : extends
+    Annotation <|-- Note : extends
+    Highlight "1" --> "0..1" Note : has
+    BookParser <|.. EPUBParser : implements
+    BookParser <|.. PDFParser : implements
+    BookParser <|.. TXTParser : implements
+    ReadingState <|.. IdleState : implements
+    ReadingState <|.. ReadingStateImpl : implements
+    ReadingState <|.. FinishedState : implements
+    Reader "1" --> "1" Book : reads
+    Reader "1" --> "1" ReadingSession : tracks
+    Reader "1" --> "1" ReadingSettings : uses
+    Reader "1" --> "1" ReadingState : has
+    Library "1" --> "*" Book : manages
+    SyncManager ..> Library : syncs
+    SyncManager ..> Annotation : syncs
+    ReadingStatistics ..> ReadingSession : analyzes
 ```
 
 ## Component Design

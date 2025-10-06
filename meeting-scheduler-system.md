@@ -269,198 +269,178 @@ Alternative Flow:
 
 ## Class Diagram
 
-```text
-┌─────────────────────────────────┐
-│   User                          │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - name: str                     │
-│ - email: str                    │
-│ - time_zone: str                │
-│ - calendar: Calendar            │
-├─────────────────────────────────┤
-│ + get_availability(range)       │
-│ + schedule_meeting(meeting)     │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Calendar                      │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - owner: User                   │
-│ - meetings: List[Meeting]       │
-│ - time_zone: str                │
-├─────────────────────────────────┤
-│ + add_meeting(meeting)          │
-│ + remove_meeting(id)            │
-│ + get_meetings(range): List     │
-│ + find_free_slots(dur): List    │
-│ + has_conflict(meeting): bool   │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Meeting                       │
-│   <<abstract>>                  │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - title: str                    │
-│ - description: str              │
-│ - start_time: datetime          │
-│ - end_time: datetime            │
-│ - organizer: User               │
-│ - participants: List[User]      │
-│ - room: Room                    │
-│ - status: MeetingStatus         │
-│ - visibility: Visibility        │
-├─────────────────────────────────┤
-│ + overlaps_with(other): bool    │
-│ + get_duration(): int           │
-│ + is_recurring(): bool          │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┐
-    │          │          │
-┌───┴──────┐ ┌─┴────────┐ ┌┴──────────┐
-│OneOnOne  │ │GroupMeeting│ │Recurring │
-└──────────┘ └───────────┘ └──────────┘
-
-┌─────────────────────────────────┐
-│   RecurringMeeting              │
-├─────────────────────────────────┤
-│ - recurrence_rule: RecurrenceRule│
-│ - occurrences: List[Meeting]    │
-│ - exceptions: Set[date]         │
-├─────────────────────────────────┤
-│ + generate_occurrences()        │
-│ + add_exception(date)           │
-│ + edit_series()                 │
-│ + edit_occurrence(id)           │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   RecurrenceRule                │
-├─────────────────────────────────┤
-│ - frequency: Frequency          │
-│ - interval: int                 │
-│ - until: datetime               │
-│ - count: int                    │
-│ - by_day: List[Weekday]         │
-│ - by_month: List[int]           │
-├─────────────────────────────────┤
-│ + get_next_occurrence(): date   │
-│ + matches(date): bool           │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   TimeSlot                      │
-├─────────────────────────────────┤
-│ - start: datetime               │
-│ - end: datetime                 │
-├─────────────────────────────────┤
-│ + overlaps(other): bool         │
-│ + merge(other): TimeSlot        │
-│ + duration(): timedelta         │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Room                          │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - name: str                     │
-│ - capacity: int                 │
-│ - location: str                 │
-│ - amenities: List[str]          │
-│ - bookings: List[TimeSlot]      │
-├─────────────────────────────────┤
-│ + is_available(slot): bool      │
-│ + book(meeting): bool           │
-│ + cancel_booking(meeting_id)    │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   MeetingInvitation             │
-├─────────────────────────────────┤
-│ - meeting: Meeting              │
-│ - invitee: User                 │
-│ - status: InvitationStatus      │
-│ - sent_at: datetime             │
-├─────────────────────────────────┤
-│ + accept()                      │
-│ + decline()                     │
-│ + tentative()                   │
-│ + propose_new_time(time)        │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   AvailabilityChecker           │
-├─────────────────────────────────┤
-│ - calendars: List[Calendar]     │
-├─────────────────────────────────┤
-│ + check_availability(users,slot)│
-│ + find_free_slots(users, dur)   │
-│ + suggest_times(users, dur)     │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   ConflictDetector              │
-├─────────────────────────────────┤
-│ + detect_conflicts(meeting): [] │
-│ + resolve_conflicts(conflicts)  │
-│ + get_conflict_resolution()     │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   NotificationManager           │
-├─────────────────────────────────┤
-│ - observers: List[Observer]     │
-├─────────────────────────────────┤
-│ + send_invitation(meeting)      │
-│ + send_update(meeting)          │
-│ + send_cancellation(meeting)    │
-│ + send_reminder(meeting, mins)  │
-│ + subscribe(observer)           │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   MeetingBuilder                │
-├─────────────────────────────────┤
-│ - meeting: Meeting              │
-├─────────────────────────────────┤
-│ + set_title(title): Builder     │
-│ + set_time(start, end): Builder │
-│ + add_participant(user): Builder│
-│ + set_room(room): Builder       │
-│ + set_recurrence(rule): Builder │
-│ + build(): Meeting              │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   CalendarManager               │
-│   (Singleton)                   │
-├─────────────────────────────────┤
-│ - calendars: Dict[str, Calendar]│
-│ - rooms: List[Room]             │
-│ - availability_checker          │
-│ - conflict_detector             │
-│ - notification_manager          │
-├─────────────────────────────────┤
-│ + create_meeting(builder)       │
-│ + update_meeting(id, updates)   │
-│ + cancel_meeting(id)            │
-│ + reschedule(id, new_time)      │
-│ + find_meeting_time(users, dur) │
-│ + book_room(room, slot)         │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   TimeZoneConverter             │
-├─────────────────────────────────┤
-│ + convert(time, from_tz, to_tz) │
-│ + to_utc(time, tz): datetime    │
-│ + from_utc(time, tz): datetime  │
-│ + is_dst(time, tz): bool        │
-└─────────────────────────────────┘
+```mermaid
+classDiagram
+    class User {
+        -str id
+        -str name
+        -str email
+        -str time_zone
+        -Calendar calendar
+        +get_availability(range) List
+        +schedule_meeting(meeting) void
+    }
+    
+    class Calendar {
+        -str id
+        -User owner
+        -List~Meeting~ meetings
+        -str time_zone
+        +add_meeting(meeting) void
+        +remove_meeting(id) void
+        +get_meetings(range) List
+        +find_free_slots(dur) List
+        +has_conflict(meeting) bool
+    }
+    
+    class Meeting {
+        <<abstract>>
+        -str id
+        -str title
+        -str description
+        -datetime start_time
+        -datetime end_time
+        -User organizer
+        -List~User~ participants
+        -Room room
+        -MeetingStatus status
+        -Visibility visibility
+        +overlaps_with(other) bool
+        +get_duration() int
+        +is_recurring() bool
+    }
+    
+    class OneOnOneMeeting {
+        +schedule() void
+    }
+    
+    class GroupMeeting {
+        +schedule() void
+    }
+    
+    class RecurringMeeting {
+        -RecurrenceRule recurrence_rule
+        -List~Meeting~ occurrences
+        -Set~date~ exceptions
+        +generate_occurrences() void
+        +add_exception(date) void
+        +edit_series() void
+        +edit_occurrence(id) void
+    }
+    
+    class RecurrenceRule {
+        -Frequency frequency
+        -int interval
+        -datetime until
+        -int count
+        -List~Weekday~ by_day
+        -List~int~ by_month
+        +get_next_occurrence() date
+        +matches(date) bool
+    }
+    
+    class TimeSlot {
+        -datetime start
+        -datetime end
+        +overlaps(other) bool
+        +merge(other) TimeSlot
+        +duration() timedelta
+    }
+    
+    class Room {
+        -str id
+        -str name
+        -int capacity
+        -str location
+        -List~str~ amenities
+        -List~TimeSlot~ bookings
+        +is_available(slot) bool
+        +book(meeting) bool
+        +cancel_booking(meeting_id) void
+    }
+    
+    class MeetingInvitation {
+        -Meeting meeting
+        -User invitee
+        -InvitationStatus status
+        -datetime sent_at
+        +accept() void
+        +decline() void
+        +tentative() void
+        +propose_new_time(time) void
+    }
+    
+    class AvailabilityChecker {
+        -List~Calendar~ calendars
+        +check_availability(users, slot) bool
+        +find_free_slots(users, dur) List
+        +suggest_times(users, dur) List
+    }
+    
+    class ConflictDetector {
+        +detect_conflicts(meeting) List
+        +resolve_conflicts(conflicts) void
+        +get_conflict_resolution() Resolution
+    }
+    
+    class NotificationManager {
+        -List~Observer~ observers
+        +send_invitation(meeting) void
+        +send_update(meeting) void
+        +send_cancellation(meeting) void
+        +send_reminder(meeting, mins) void
+        +subscribe(observer) void
+    }
+    
+    class MeetingBuilder {
+        -Meeting meeting
+        +set_title(title) Builder
+        +set_time(start, end) Builder
+        +add_participant(user) Builder
+        +set_room(room) Builder
+        +set_recurrence(rule) Builder
+        +build() Meeting
+    }
+    
+    class CalendarManager {
+        <<singleton>>
+        -Dict~str,Calendar~ calendars
+        -List~Room~ rooms
+        -AvailabilityChecker availability_checker
+        -ConflictDetector conflict_detector
+        -NotificationManager notification_manager
+        +create_meeting(builder) Meeting
+        +update_meeting(id, updates) void
+        +cancel_meeting(id) void
+        +reschedule(id, new_time) void
+        +find_meeting_time(users, dur) TimeSlot
+        +book_room(room, slot) bool
+    }
+    
+    class TimeZoneConverter {
+        +convert(time, from_tz, to_tz) datetime
+        +to_utc(time, tz) datetime
+        +from_utc(time, tz) datetime
+        +is_dst(time, tz) bool
+    }
+    
+    User "1" --> "1" Calendar : has
+    Calendar "1" --> "*" Meeting : contains
+    Meeting <|-- OneOnOneMeeting : extends
+    Meeting <|-- GroupMeeting : extends
+    Meeting <|-- RecurringMeeting : extends
+    RecurringMeeting "1" --> "1" RecurrenceRule : uses
+    Meeting "*" --> "1" Room : scheduled in
+    Meeting "*" --> "*" User : participants
+    MeetingInvitation "*" --> "1" Meeting : for
+    MeetingInvitation "*" --> "1" User : to
+    CalendarManager "1" --> "*" Calendar : manages
+    CalendarManager "1" --> "1" AvailabilityChecker : uses
+    CalendarManager "1" --> "1" ConflictDetector : uses
+    CalendarManager "1" --> "1" NotificationManager : uses
+    CalendarManager "1" --> "*" Room : manages
+    MeetingBuilder ..> Meeting : creates
+    TimeZoneConverter ..> Calendar : helps
 ```
 
 ## Component Design
