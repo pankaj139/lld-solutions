@@ -82,52 +82,81 @@ Design an autocomplete/typeahead system that can:
 
 ## Class Diagram
 
-```text
-TrieNode
-├── character: char
-├── children: Dict[char, TrieNode]
-├── is_end_of_word: bool
-├── weight: int
-├── word: str
-└── frequency: int
-
-Trie
-├── root: TrieNode
-├── insert(word: str, weight: int)
-├── search(prefix: str)
-├── delete(word: str)
-├── get_all_words_with_prefix(prefix: str)
-└── update_weight(word: str, weight: int)
-
-Suggestion
-├── word: str
-├── weight: int
-├── rank: int
-└── metadata: Dict
-
-AutocompleteSystem
-├── trie: Trie
-├── cache: LRUCache
-├── ranking_strategy: RankingStrategy
-├── search(prefix: str, limit: int)
-├── add_word(word: str, weight: int)
-├── remove_word(word: str)
-├── update_popularity(word: str)
-└── get_suggestions(prefix: str, limit: int)
-
-RankingStrategy (Interface)
-├── rank(suggestions: List[Suggestion])
-└── implementations:
-    ├── PopularityRanking
-    ├── RecencyRanking
-    ├── PersonalizedRanking
-    └── HybridRanking
-
-FuzzyMatcher
-├── max_edit_distance: int
-├── find_similar_words(word: str)
-├── calculate_edit_distance(word1: str, word2: str)
-└── get_fuzzy_suggestions(prefix: str)
+```mermaid
+classDiagram
+    class TrieNode {
+        -char character
+        -Dict~char,TrieNode~ children
+        -bool is_end_of_word
+        -int weight
+        -str word
+        -int frequency
+    }
+    
+    class Trie {
+        -TrieNode root
+        +insert(word str, weight int) void
+        +search(prefix str) List~str~
+        +delete(word str) void
+        +get_all_words_with_prefix(prefix str) List~str~
+        +update_weight(word str, weight int) void
+    }
+    
+    class Suggestion {
+        -str word
+        -int weight
+        -int rank
+        -Dict metadata
+    }
+    
+    class AutocompleteSystem {
+        -Trie trie
+        -LRUCache cache
+        -RankingStrategy ranking_strategy
+        +search(prefix str, limit int) List~Suggestion~
+        +add_word(word str, weight int) void
+        +remove_word(word str) void
+        +update_popularity(word str) void
+        +get_suggestions(prefix str, limit int) List~Suggestion~
+    }
+    
+    class RankingStrategy {
+        <<interface>>
+        +rank(suggestions List~Suggestion~) List~Suggestion~
+    }
+    
+    class PopularityRanking {
+        +rank(suggestions List~Suggestion~) List~Suggestion~
+    }
+    
+    class RecencyRanking {
+        +rank(suggestions List~Suggestion~) List~Suggestion~
+    }
+    
+    class PersonalizedRanking {
+        +rank(suggestions List~Suggestion~) List~Suggestion~
+    }
+    
+    class HybridRanking {
+        +rank(suggestions List~Suggestion~) List~Suggestion~
+    }
+    
+    class FuzzyMatcher {
+        -int max_edit_distance
+        +find_similar_words(word str) List~str~
+        +calculate_edit_distance(word1 str, word2 str) int
+        +get_fuzzy_suggestions(prefix str) List~str~
+    }
+    
+    Trie "1" --> "*" TrieNode : contains
+    AutocompleteSystem "1" --> "1" Trie : uses
+    AutocompleteSystem "1" --> "1" RankingStrategy : uses
+    AutocompleteSystem ..> Suggestion : creates
+    AutocompleteSystem ..> FuzzyMatcher : uses
+    RankingStrategy <|.. PopularityRanking : implements
+    RankingStrategy <|.. RecencyRanking : implements
+    RankingStrategy <|.. PersonalizedRanking : implements
+    RankingStrategy <|.. HybridRanking : implements
 ```
 
 ## Usage Example

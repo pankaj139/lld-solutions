@@ -170,82 +170,75 @@ After adding N4(150):
 
 ## Class Diagram
 
-```text
-┌─────────────────────────┐
-│   HashFunction          │
-│   <<interface>>         │
-├─────────────────────────┤
-│ + hash(key: str): int   │
-└─────────────────────────┘
-           ▲
-           │
-           │ implements
-    ┌──────┴──────┐
-    │             │
-┌───┴────┐   ┌────┴────┐
-│ MD5Hash│   │SHA1Hash │
-└────────┘   └─────────┘
-
-┌─────────────────────────────────┐
-│   VirtualNode                   │
-├─────────────────────────────────┤
-│ - hash_value: int               │
-│ - physical_node: str            │
-│ - replica_index: int            │
-├─────────────────────────────────┤
-│ + __init__(node, index)         │
-│ + get_hash(): int               │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   PhysicalNode                  │
-├─────────────────────────────────┤
-│ - node_id: str                  │
-│ - virtual_nodes: List[Virtual]  │
-│ - weight: int                   │
-│ - keys: Set[str]                │
-├─────────────────────────────────┤
-│ + add_key(key: str)             │
-│ + remove_key(key: str)          │
-│ + get_load(): int               │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   ConsistentHashRing            │
-├─────────────────────────────────┤
-│ - ring: SortedDict              │
-│ - nodes: Dict[str, Physical]    │
-│ - virtual_node_count: int       │
-│ - hash_function: HashFunction   │
-│ - observers: List[Observer]     │
-├─────────────────────────────────┤
-│ + add_node(node_id, weight)     │
-│ + remove_node(node_id)          │
-│ + get_node(key: str): str       │
-│ + get_nodes(key, count): List   │
-│ + get_statistics(): Dict        │
-│ + rebalance()                   │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   KeyManager                    │
-├─────────────────────────────────┤
-│ - ring: ConsistentHashRing      │
-│ - key_mapping: Dict[str, str]   │
-├─────────────────────────────────┤
-│ + add_key(key: str)             │
-│ + remove_key(key: str)          │
-│ + get_key_location(key): str    │
-│ + migrate_keys(from, to)        │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   RingObserver                  │
-│   <<interface>>                 │
-├─────────────────────────────────┤
-│ + on_node_added(node_id)        │
-│ + on_node_removed(node_id)      │
-└─────────────────────────────────┘
+```mermaid
+classDiagram
+    class HashFunction {
+        <<interface>>
+        +hash(key str) int
+    }
+    
+    class MD5Hash {
+        +hash(key str) int
+    }
+    
+    class SHA1Hash {
+        +hash(key str) int
+    }
+    
+    class VirtualNode {
+        -int hash_value
+        -str physical_node
+        -int replica_index
+        +get_hash() int
+    }
+    
+    class PhysicalNode {
+        -str node_id
+        -List~VirtualNode~ virtual_nodes
+        -int weight
+        -Set~str~ keys
+        +add_key(key str) void
+        +remove_key(key str) void
+        +get_load() int
+    }
+    
+    class ConsistentHashRing {
+        -SortedDict ring
+        -Dict~str,PhysicalNode~ nodes
+        -int virtual_node_count
+        -HashFunction hash_function
+        -List~Observer~ observers
+        +add_node(node_id str, weight int) void
+        +remove_node(node_id str) void
+        +get_node(key str) str
+        +get_nodes(key str, count int) List
+        +get_statistics() Dict
+        +rebalance() void
+    }
+    
+    class KeyManager {
+        -ConsistentHashRing ring
+        -Dict~str,str~ key_mapping
+        +add_key(key str) void
+        +remove_key(key str) void
+        +get_key_location(key str) str
+        +migrate_keys(from str, to str) void
+    }
+    
+    class RingObserver {
+        <<interface>>
+        +on_node_added(node_id str) void
+        +on_node_removed(node_id str) void
+    }
+    
+    HashFunction <|.. MD5Hash : implements
+    HashFunction <|.. SHA1Hash : implements
+    PhysicalNode "1" --> "*" VirtualNode : has
+    ConsistentHashRing "1" --> "*" PhysicalNode : contains
+    ConsistentHashRing "1" --> "1" HashFunction : uses
+    ConsistentHashRing "1" --> "*" VirtualNode : manages
+    ConsistentHashRing ..> RingObserver : notifies
+    KeyManager "1" --> "1" ConsistentHashRing : uses
 ```
 
 ## Component Design

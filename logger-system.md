@@ -88,74 +88,93 @@ Simplifies creation of ConsoleAppender, FileAppender, etc.
 
 ## Class Diagram
 
-```text
-┌─────────────────┐
-│     Logger      │ (Singleton)
-├─────────────────┤
-│ - instance      │
-│ - level         │
-│ - appenders[]   │
-├─────────────────┤
-│ + getInstance() │
-│ + setLevel()    │
-│ + addAppender() │
-│ + debug()       │
-│ + info()        │
-│ + warn()        │
-│ + error()       │
-│ + fatal()       │
-└────────┬────────┘
-         │ manages
-         ▼
-┌─────────────────┐
-│   LogAppender   │ (Abstract)
-├─────────────────┤
-│ # formatter     │
-│ # filter        │
-├─────────────────┤
-│ + append()      │
-│ + setFormatter()│
-│ + setFilter()   │
-└────────┬────────┘
-         │
-    ┌────┴────┬───────────┬──────────┐
-    ▼         ▼           ▼          ▼
-┌─────────┐ ┌──────────┐ ┌────────┐ ┌──────────┐
-│Console  │ │  File    │ │Database│ │  Remote  │
-│Appender │ │ Appender │ │Appender│ │ Appender │
-└─────────┘ └──────────┘ └────────┘ └──────────┘
-
-┌─────────────────┐
-│  LogFormatter   │ (Strategy)
-├─────────────────┤
-│ + format()      │
-└────────┬────────┘
-         │
-    ┌────┴────┬──────────┐
-    ▼         ▼          ▼
-┌─────────┐ ┌──────┐ ┌─────┐
-│  Plain  │ │ JSON │ │ XML │
-│Formatter│ │Format│ │Format│
-└─────────┘ └──────┘ └─────┘
-
-┌─────────────────┐
-│    LogFilter    │ (Chain of Responsibility)
-├─────────────────┤
-│ - nextFilter    │
-├─────────────────┤
-│ + shouldLog()   │
-│ + setNext()     │
-└─────────────────┘
-
-┌─────────────────┐
-│   LogRecord     │
-├─────────────────┤
-│ - timestamp     │
-│ - level         │
-│ - message       │
-│ - threadId      │
-│ - source        │
-└─────────────────┘
+```mermaid
+classDiagram
+    class Logger {
+        <<singleton>>
+        -Logger instance
+        -LogLevel level
+        -List~LogAppender~ appenders
+        +getInstance() Logger
+        +setLevel(level) void
+        +addAppender(appender) void
+        +debug(message) void
+        +info(message) void
+        +warn(message) void
+        +error(message) void
+        +fatal(message) void
+    }
+    
+    class LogAppender {
+        <<abstract>>
+        #LogFormatter formatter
+        #LogFilter filter
+        +append(record) void
+        +setFormatter(formatter) void
+        +setFilter(filter) void
+    }
+    
+    class ConsoleAppender {
+        +append(record) void
+    }
+    
+    class FileAppender {
+        -str filename
+        +append(record) void
+    }
+    
+    class DatabaseAppender {
+        -Connection db
+        +append(record) void
+    }
+    
+    class RemoteAppender {
+        -str endpoint
+        +append(record) void
+    }
+    
+    class LogFormatter {
+        <<interface>>
+        +format(record) str
+    }
+    
+    class PlainFormatter {
+        +format(record) str
+    }
+    
+    class JSONFormatter {
+        +format(record) str
+    }
+    
+    class XMLFormatter {
+        +format(record) str
+    }
+    
+    class LogFilter {
+        -LogFilter nextFilter
+        +shouldLog(record) bool
+        +setNext(filter) void
+    }
+    
+    class LogRecord {
+        -datetime timestamp
+        -LogLevel level
+        -str message
+        -str threadId
+        -str source
+    }
+    
+    Logger "1" --> "*" LogAppender : manages
+    LogAppender <|-- ConsoleAppender : extends
+    LogAppender <|-- FileAppender : extends
+    LogAppender <|-- DatabaseAppender : extends
+    LogAppender <|-- RemoteAppender : extends
+    LogFormatter <|.. PlainFormatter : implements
+    LogFormatter <|.. JSONFormatter : implements
+    LogFormatter <|.. XMLFormatter : implements
+    LogAppender --> LogFormatter : uses
+    LogAppender --> LogFilter : filters
+    Logger ..> LogRecord : creates
 ```
 
 ## Component Description

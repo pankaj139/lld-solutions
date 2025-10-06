@@ -283,218 +283,209 @@ Alternative Flow:
 
 ## Class Diagram
 
-```text
-┌─────────────────────────────────┐
-│   User                          │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - name: str                     │
-│ - email: str                    │
-│ - type: UserType (Buyer/Seller)│
-│ - reputation: float             │
-│ - verified: bool                │
-├─────────────────────────────────┤
-│ + place_bid(auction, amount)    │
-│ + create_auction(item)          │
-│ + get_watchlist(): List         │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Item                          │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - title: str                    │
-│ - description: str              │
-│ - category: Category            │
-│ - images: List[str]             │
-│ - condition: Condition          │
-│ - seller: User                  │
-├─────────────────────────────────┤
-│ + get_details(): Dict           │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Auction                       │
-│   <<abstract>>                  │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - item: Item                    │
-│ - seller: User                  │
-│ - starting_price: Decimal       │
-│ - reserve_price: Decimal        │
-│ - current_price: Decimal        │
-│ - bids: List[Bid]               │
-│ - state: AuctionState           │
-│ - start_time: datetime          │
-│ - end_time: datetime            │
-│ - bid_increment: Decimal        │
-├─────────────────────────────────┤
-│ + place_bid(bid): bool          │
-│ + start()                       │
-│ + close()                       │
-│ + determine_winner(): User      │
-│ + is_active(): bool             │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┬─────────┐
-    │          │          │         │
-┌───┴───────┐ ┌┴────────┐ ┌┴───────┐ ┌┴─────────┐
-│English    │ │Dutch    │ │Sealed  │ │Vickrey   │
-│Auction    │ │Auction  │ │Bid     │ │Auction   │
-└───────────┘ └─────────┘ └────────┘ └──────────┘
-
-┌─────────────────────────────────┐
-│   EnglishAuction                │
-├─────────────────────────────────┤
-│ - current_high_bidder: User     │
-│ - auto_extend_enabled: bool     │
-├─────────────────────────────────┤
-│ + place_bid(bid): bool          │
-│ + extend_if_needed()            │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   DutchAuction                  │
-├─────────────────────────────────┤
-│ - price_decrement: Decimal      │
-│ - decrement_interval: int       │
-│ - first_bid_wins: bool          │
-├─────────────────────────────────┤
-│ + decrease_price()              │
-│ + accept_first_bid()            │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   SealedBidAuction              │
-├─────────────────────────────────┤
-│ - bids_hidden: bool             │
-├─────────────────────────────────┤
-│ + place_bid(bid): bool          │
-│ + reveal_bids()                 │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   VickreyAuction                │
-├─────────────────────────────────┤
-│ - second_price: Decimal         │
-├─────────────────────────────────┤
-│ + determine_winner(): User      │
-│ + calculate_price(): Decimal    │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   Bid                           │
-├─────────────────────────────────┤
-│ - id: str                       │
-│ - bidder: User                  │
-│ - amount: Decimal               │
-│ - timestamp: datetime           │
-│ - bid_type: BidType             │
-│ - proxy_max: Decimal            │
-│ - status: BidStatus             │
-├─────────────────────────────────┤
-│ + validate(): bool              │
-│ + is_valid_increment(): bool    │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   ProxyBidder                   │
-├─────────────────────────────────┤
-│ - user: User                    │
-│ - max_bid: Decimal              │
-│ - auction: Auction              │
-├─────────────────────────────────┤
-│ + auto_bid_if_outbid()          │
-│ + calculate_next_bid(): Decimal │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   AuctionState                  │
-│   <<interface>>                 │
-├─────────────────────────────────┤
-│ + start(auction)                │
-│ + place_bid(auction, bid)       │
-│ + close(auction)                │
-│ + cancel(auction)               │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┬────────┐
-    │          │          │        │
-┌───┴─────┐ ┌──┴────┐  ┌──┴────┐ ┌┴────────┐
-│Scheduled│ │Active │  │Paused │ │Closed   │
-└─────────┘ └───────┘  └───────┘ └─────────┘
-
-┌─────────────────────────────────┐
-│   BidValidator                  │
-│   <<interface>>                 │
-├─────────────────────────────────┤
-│ + validate(bid, auction): bool  │
-│ + set_next(validator)           │
-└─────────────────────────────────┘
-         ▲
-         │
-    ┌────┴─────┬──────────┬─────────┐
-    │          │          │         │
-┌───┴────────┐ ┌┴────────┐ ┌┴───────┐ ┌┴──────────┐
-│Amount      │ │Increment│ │Timing  │ │Fraud      │
-│Validator   │ │Validator│ │Validator│ │Validator  │
-└────────────┘ └─────────┘ └────────┘ └───────────┘
-
-┌─────────────────────────────────┐
-│   PaymentProcessor              │
-├─────────────────────────────────┤
-│ - transactions: List[Txn]       │
-│ - escrow_accounts: Dict         │
-├─────────────────────────────────┤
-│ + process_payment(auction)      │
-│ + refund(user, amount)          │
-│ + payout_seller(auction)        │
-│ + calculate_fees(amount)        │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   NotificationManager           │
-│   (Observer)                    │
-├─────────────────────────────────┤
-│ - observers: List[Observer]     │
-├─────────────────────────────────┤
-│ + notify_bid_placed(auction)    │
-│ + notify_outbid(user, auction)  │
-│ + notify_auction_ending(auction)│
-│ + notify_auction_closed(auction)│
-│ + subscribe(observer)           │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   AuctionManager                │
-│   (Singleton)                   │
-├─────────────────────────────────┤
-│ - auctions: Dict[str, Auction]  │
-│ - active_auctions: Set[str]     │
-│ - scheduled_auctions: PriorityQ │
-│ - notification_manager          │
-│ - payment_processor             │
-├─────────────────────────────────┤
-│ + create_auction(details)       │
-│ + start_auction(auction_id)     │
-│ + place_bid(auction_id, bid)    │
-│ + close_auction(auction_id)     │
-│ + get_active_auctions(): List   │
-│ + search_auctions(query): List  │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│   WatchlistManager              │
-├─────────────────────────────────┤
-│ - watchlists: Dict[User, List]  │
-├─────────────────────────────────┤
-│ + add_to_watchlist(user, auction)│
-│ + remove_from_watchlist(...)    │
-│ + get_watchlist(user): List     │
-│ + notify_watched_auctions(user) │
-└─────────────────────────────────┘
+```mermaid
+classDiagram
+    class User {
+        -str id
+        -str name
+        -str email
+        -UserType type
+        -float reputation
+        -bool verified
+        +place_bid(auction, amount) Bid
+        +create_auction(item) Auction
+        +get_watchlist() List
+    }
+    
+    class Item {
+        -str id
+        -str title
+        -str description
+        -Category category
+        -List~str~ images
+        -Condition condition
+        -User seller
+        +get_details() Dict
+    }
+    
+    class Auction {
+        <<abstract>>
+        -str id
+        -Item item
+        -User seller
+        -Decimal starting_price
+        -Decimal reserve_price
+        -Decimal current_price
+        -List~Bid~ bids
+        -AuctionState state
+        -datetime start_time
+        -datetime end_time
+        -Decimal bid_increment
+        +place_bid(bid) bool
+        +start() void
+        +close() void
+        +determine_winner() User
+        +is_active() bool
+    }
+    
+    class EnglishAuction {
+        -User current_high_bidder
+        -bool auto_extend_enabled
+        +place_bid(bid) bool
+        +extend_if_needed() void
+    }
+    
+    class DutchAuction {
+        -Decimal price_decrement
+        -int decrement_interval
+        -bool first_bid_wins
+        +decrease_price() void
+        +accept_first_bid() void
+    }
+    
+    class SealedBidAuction {
+        -bool bids_hidden
+        +place_bid(bid) bool
+        +reveal_bids() void
+    }
+    
+    class VickreyAuction {
+        -Decimal second_price
+        +determine_winner() User
+        +calculate_price() Decimal
+    }
+    
+    class Bid {
+        -str id
+        -User bidder
+        -Decimal amount
+        -datetime timestamp
+        -BidType bid_type
+        -Decimal proxy_max
+        -BidStatus status
+        +validate() bool
+        +is_valid_increment() bool
+    }
+    
+    class ProxyBidder {
+        -User user
+        -Decimal max_bid
+        -Auction auction
+        +auto_bid_if_outbid() void
+        +calculate_next_bid() Decimal
+    }
+    
+    class AuctionState {
+        <<interface>>
+        +start(auction) void
+        +place_bid(auction, bid) void
+        +close(auction) void
+        +cancel(auction) void
+    }
+    
+    class ScheduledState {
+        +start(auction) void
+    }
+    
+    class ActiveState {
+        +place_bid(auction, bid) void
+        +close(auction) void
+    }
+    
+    class PausedState {
+        +resume(auction) void
+    }
+    
+    class ClosedState {
+        +finalize(auction) void
+    }
+    
+    class BidValidator {
+        <<interface>>
+        +validate(bid, auction) bool
+        +set_next(validator) void
+    }
+    
+    class AmountValidator {
+        +validate(bid, auction) bool
+    }
+    
+    class IncrementValidator {
+        +validate(bid, auction) bool
+    }
+    
+    class TimingValidator {
+        +validate(bid, auction) bool
+    }
+    
+    class FraudValidator {
+        +validate(bid, auction) bool
+    }
+    
+    class PaymentProcessor {
+        -List~Transaction~ transactions
+        -Dict escrow_accounts
+        +process_payment(auction) bool
+        +refund(user, amount) void
+        +payout_seller(auction) void
+        +calculate_fees(amount) Decimal
+    }
+    
+    class NotificationManager {
+        -List~Observer~ observers
+        +notify_bid_placed(auction) void
+        +notify_outbid(user, auction) void
+        +notify_auction_ending(auction) void
+        +notify_auction_closed(auction) void
+        +subscribe(observer) void
+    }
+    
+    class AuctionManager {
+        <<singleton>>
+        -Dict~str,Auction~ auctions
+        -Set~str~ active_auctions
+        -PriorityQueue scheduled_auctions
+        -NotificationManager notification_manager
+        -PaymentProcessor payment_processor
+        +create_auction(details) Auction
+        +start_auction(auction_id) void
+        +place_bid(auction_id, bid) bool
+        +close_auction(auction_id) void
+        +get_active_auctions() List
+        +search_auctions(query) List
+    }
+    
+    class WatchlistManager {
+        -Dict~User,List~ watchlists
+        +add_to_watchlist(user, auction) void
+        +remove_from_watchlist(user, auction) void
+        +get_watchlist(user) List
+        +notify_watched_auctions(user) void
+    }
+    
+    Auction <|-- EnglishAuction : inherits
+    Auction <|-- DutchAuction : inherits
+    Auction <|-- SealedBidAuction : inherits
+    Auction <|-- VickreyAuction : inherits
+    AuctionState <|-- ScheduledState : implements
+    AuctionState <|-- ActiveState : implements
+    AuctionState <|-- PausedState : implements
+    AuctionState <|-- ClosedState : implements
+    BidValidator <|-- AmountValidator : implements
+    BidValidator <|-- IncrementValidator : implements
+    BidValidator <|-- TimingValidator : implements
+    BidValidator <|-- FraudValidator : implements
+    Auction "1" --> "1" Item : for
+    Auction "1" --> "1" User : seller
+    Auction "1" --> "*" Bid : receives
+    Auction "1" --> "1" AuctionState : has
+    Bid "*" --> "1" User : from
+    ProxyBidder "1" --> "1" User : represents
+    ProxyBidder "1" --> "1" Auction : bids on
+    AuctionManager "1" --> "*" Auction : manages
+    AuctionManager "1" --> "1" NotificationManager : uses
+    AuctionManager "1" --> "1" PaymentProcessor : uses
+    WatchlistManager ..> Auction : tracks
 ```
 
 ## Component Design
