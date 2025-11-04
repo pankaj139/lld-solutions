@@ -2011,6 +2011,171 @@ class ImageEditor {
 
 ---
 
+## Common Mistakes for Beginners
+
+### Mistake #1: Confusing Adapter with Decorator
+
+**The Confusion**: "Both wrap objects, so they're the same, right?"
+
+**❌ Wrong Understanding**:
+```javascript
+// Thinking Adapter and Decorator are interchangeable
+```
+
+**✅ Right Understanding**:
+
+**Adapter** = Makes incompatible things work together (changes interface)
+```javascript
+// Old API: legacyPrinter.printDocument(text)
+// New API: printer.print(document)
+// Adapter translates between them
+```
+
+**Decorator** = Adds new features (keeps same interface)
+```javascript
+// Basic: coffee.cost() → $5
+// With Milk: milkDecorator.cost() → $7
+// Same interface, added functionality
+```
+
+**Key Difference**: 
+- Adapter → Different interface (incompatibility problem)
+- Decorator → Same interface (enhancement problem)
+
+### Mistake #2: Overusing Facade
+
+**❌ Wrong**:
+```javascript
+// Creating a Facade for every small group of functions
+class MathFacade {
+    add(a, b) { return a + b; }
+    subtract(a, b) { return a - b; }
+}
+
+// This is pointless! Just use the functions directly!
+```
+
+**✅ Right**:
+```javascript
+// Use Facade only for truly complex subsystems
+class VideoConversionFacade {
+    convert(filename, format) {
+        // Hides complexity of:
+        // - VideoFile, AudioMixer, CodecFactory
+        // - BitrateReader, format conversion
+        // - Multiple steps, error handling
+    }
+}
+```
+
+**Key Lesson**: Facade is for simplifying complexity, not creating unnecessary layers!
+
+### Mistake #3: Composite for Non-Hierarchical Data
+
+**❌ Wrong**:
+```javascript
+// Using Composite for a flat list
+class ProductList {
+    add(product) { this.products.push(product); }
+    getTotal() { /* sum all products */ }
+}
+
+// This is just an array! No need for Composite!
+```
+
+**✅ Right**:
+```javascript
+// Use Composite for tree structures
+class Folder {  // Can contain folders and files
+    add(item) { this.children.push(item); }
+    getSize() { return sum of all children; }
+}
+
+class File {  // Leaf node
+    getSize() { return this.size; }
+}
+
+// Tree: Folder → Folder → Files
+```
+
+**Key Lesson**: Composite is specifically for part-whole hierarchies (trees), not flat collections!
+
+### Mistake #4: Proxy vs Decorator Confusion
+
+**The Confusion**: "When do I use Proxy vs Decorator?"
+
+**Quick Rule**:
+- **Proxy** → Control access, lazy loading, protection
+- **Decorator** → Add features, enhance behavior
+
+**Example**:
+```javascript
+// Proxy: "I'll load this heavy image only when needed"
+class ImageProxy {
+    display() {
+        if (!this.realImage) {
+            this.realImage = new RealImage();  // Load on demand
+        }
+        this.realImage.display();
+    }
+}
+
+// Decorator: "I'll add a border to this image"
+class BorderDecorator {
+    display() {
+        this.image.display();
+        this.addBorder();  // Extra feature
+    }
+}
+```
+
+### Mistake #5: Flyweight When Not Needed
+
+**❌ Premature Optimization**:
+```javascript
+// Using Flyweight for 10 objects
+class TreeFlyweight { /* ... */ }
+
+// Overkill! 10 objects are fine!
+```
+
+**✅ Right**:
+```javascript
+// Use Flyweight for thousands/millions of objects
+class TreeFlyweight { /* ... */ }
+
+// Creating a forest with 100,000 trees
+// Sharing common data (type, color, texture) saves massive memory!
+```
+
+**Key Lesson**: Flyweight is for memory optimization with large quantities. Don't use it for small datasets!
+
+---
+
+## Practice Exercises
+
+### Exercise 1: Adapter
+**Task**: Create an adapter for a legacy payment system
+- Old interface: `processOldPayment(amount)`
+- New interface: `process(paymentDetails)`
+
+### Exercise 2: Decorator
+**Task**: Create decorators for a Text component
+- Base: PlainText
+- Decorators: Bold, Italic, Underline
+- Chain them: `new Underline(new Italic(new Bold(text)))`
+
+### Exercise 3: Facade
+**Task**: Create a HomeTheaterFacade that simplifies:
+- Turning on TV, sound system, DVD player
+- Dimming lights
+- Setting volume
+- One method: `watchMovie()`
+
+**Try these before looking at the complete implementations!**
+
+---
+
 ## Summary
 
 ### Key Takeaways

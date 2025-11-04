@@ -2379,4 +2379,230 @@ mindmap
 - **5 most common**: Strategy, Observer, Command, State, Template Method
 - Choose based on **communication needs**
 
+---
+
+## Common Mistakes for Beginners
+
+### Mistake #1: Confusing Strategy with State
+
+**The #1 Confusion**: "Strategy and State look the same!"
+
+**Key Difference**:
+
+**Strategy** → Client chooses algorithm
+```javascript
+// Client decides which algorithm to use
+const processor = new PaymentProcessor();
+processor.setStrategy(new CreditCardPayment());  // Client chooses
+processor.process(100);
+
+processor.setStrategy(new PayPalPayment());  // Client switches
+processor.process(200);
+```
+
+**State** → Object changes state automatically
+```javascript
+// State transitions happen internally
+const vendingMachine = new VendingMachine();
+vendingMachine.insertCoin();  // State changes: Idle → HasMoney
+vendingMachine.selectProduct();  // State changes: HasMoney → Dispensing
+// States know about each other, client doesn't choose states
+```
+
+**Quick Rule**:
+- Strategy = "I want to use **THIS** algorithm" (external choice)
+- State = "I'm **IN** this state" (internal transition)
+
+### Mistake #2: Observer with Too Many Subscribers
+
+**❌ Performance Problem**:
+```javascript
+// Notifying 10,000 observers on every tiny change
+stockTicker.setPrice(150.00);  // Notifies 10,000 subscribers
+stockTicker.setPrice(150.01);  // Notifies 10,000 subscribers again
+stockTicker.setPrice(150.02);  // Another 10,000 notifications!
+
+// This can freeze your app!
+```
+
+**✅ Solutions**:
+```javascript
+// Solution 1: Batch updates
+stockTicker.batchUpdates([150.00, 150.01, 150.02]);
+stockTicker.notifyOnce();  // One notification for all changes
+
+// Solution 2: Throttle notifications
+stockTicker.setPrice(150.00);  // Notify after 1 second
+stockTicker.setPrice(150.01);  // Batched
+stockTicker.setPrice(150.02);  // Batched
+// Notifies once with final value
+
+// Solution 3: Filter significant changes
+stockTicker.setPrice(150.00);  // No notification (< 1% change)
+stockTicker.setPrice(155.00);  // Notification (> 1% change)
+```
+
+**Key Lesson**: Observer is powerful but can have performance costs with many subscribers!
+
+### Mistake #3: Command Without Undo Logic
+
+**❌ Incomplete Implementation**:
+```javascript
+class AddTextCommand {
+    execute() {
+        this.editor.addText(this.text);
+    }
+    
+    undo() {
+        // Empty! Forgot to implement!
+    }
+}
+
+// Undo button doesn't work!
+```
+
+**✅ Complete Implementation**:
+```javascript
+class AddTextCommand {
+    constructor(editor, text) {
+        this.editor = editor;
+        this.text = text;
+    }
+    
+    execute() {
+        this.editor.addText(this.text);
+    }
+    
+    undo() {
+        // Must save enough info to undo!
+        this.editor.deleteText(this.text.length);
+    }
+}
+```
+
+**Key Lesson**: Command pattern needs both execute() AND undo() properly implemented!
+
+### Mistake #4: Template Method with No Abstract Methods
+
+**❌ Missing the Point**:
+```javascript
+// Not really Template Method
+class DataProcessor {
+    process() {
+        this.loadData();
+        this.transformData();
+        this.saveData();
+    }
+    
+    // All methods are concrete (no customization)
+    loadData() { /* ... */ }
+    transformData() { /* ... */ }
+    saveData() { /* ... */ }
+}
+
+// No point in using Template Method here!
+```
+
+**✅ Real Template Method**:
+```javascript
+class DataProcessor {
+    // Template method (final, can't override)
+    process() {
+        this.loadData();
+        this.transformData();  // Subclasses customize this
+        this.saveData();
+    }
+    
+    loadData() { /* concrete */ }
+    transformData() { throw new Error('Must override'); }  // Abstract
+    saveData() { /* concrete */ }
+}
+
+class CSVProcessor extends DataProcessor {
+    transformData() { /* CSV-specific logic */ }
+}
+
+class JSONProcessor extends DataProcessor {
+    transformData() { /* JSON-specific logic */ }
+}
+```
+
+**Key Lesson**: Template Method requires some abstract/overridable methods. Otherwise, it's just a regular method!
+
+### Mistake #5: Using Pattern Names Without Understanding
+
+**❌ Cargo Cult Programming**:
+```javascript
+// "I'll use Observer because my tutorial used it"
+// But I don't understand why...
+
+class MyClass {
+    // Copied Observer code from internet
+    // But don't understand what it does
+    // Just hoping it works!
+}
+```
+
+**✅ Understanding First**:
+```javascript
+// "I need Observer because:
+//  1. When stock price changes
+//  2. Multiple displays need to update
+//  3. Displays are independent
+//  4. Can add/remove displays dynamically
+//  Therefore, Observer is the right choice!"
+
+class StockTicker {
+    // Now implementing Observer with understanding
+}
+```
+
+**Key Lesson**: Always understand WHY you're using a pattern, not just HOW to code it!
+
+---
+
+## Quick Reference for Choosing Behavioral Patterns
+
+| Your Need | Use This Pattern | Don't Use If |
+|-----------|------------------|--------------|
+| Different algorithms, client chooses | **Strategy** | Algorithms don't vary |
+| Notify many objects of changes | **Observer** | Only 1-2 objects to notify |
+| Need undo/redo | **Command** | No undo needed |
+| Behavior changes with state | **State** | No state transitions |
+| Algorithm structure, vary steps | **Template Method** | No common structure |
+| Pass request through chain | **Chain of Responsibility** | Single handler is enough |
+| Centralize complex communications | **Mediator** | Simple interactions |
+| Save/restore object state | **Memento** | State is simple |
+
+---
+
+## Practice Exercises
+
+### Exercise 1: Strategy vs State
+**Task**: Identify which pattern to use:
+1. Different sorting algorithms (bubble, quick, merge)
+2. A traffic light (red, yellow, green states)
+3. Different payment methods (credit card, PayPal)
+4. A media player (playing, paused, stopped)
+
+**Answers**: 1 & 3 = Strategy, 2 & 4 = State
+
+### Exercise 2: Observer
+**Task**: Implement a weather station that:
+- Has temperature, humidity, pressure
+- Notifies displays when weather changes
+- Support multiple displays
+- Allow displays to subscribe/unsubscribe
+
+### Exercise 3: Command
+**Task**: Implement text editor commands:
+- InsertText (with undo)
+- DeleteText (with undo)
+- History to track all commands
+- Undo/Redo functionality
+
+**Try these to solidify your understanding!**
+
+---
+
 **Remember**: Behavioral patterns focus on **HOW** objects **communicate** and distribute **responsibility**!

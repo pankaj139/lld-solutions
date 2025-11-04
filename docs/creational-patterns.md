@@ -1701,6 +1701,178 @@ In JavaScript: Module scope or private static field
 
 ---
 
+## Common Mistakes for Beginners
+
+### Mistake #1: Overusing Singleton
+
+**❌ Wrong Mindset**:
+```javascript
+// Beginner thinks: "Singleton looks cool! Let me use it everywhere!"
+
+class UserManager {
+    static #instance = null;
+    static getInstance() { /* ... */ }
+}
+
+class ProductManager {
+    static #instance = null;
+    static getInstance() { /* ... */ }
+}
+
+class OrderManager {
+    static #instance = null;
+    static getInstance() { /* ... */ }
+}
+
+// Everything is a Singleton! This is bad!
+```
+
+**✅ Right Approach**:
+```javascript
+// Only use Singleton when you truly need ONE instance
+class Configuration {  // ✅ Good - one config for app
+    static #instance = null;
+    static getInstance() { /* ... */ }
+}
+
+// For others, use normal classes:
+class UserManager {  // ✅ Good - might need multiple
+    constructor() { /* ... */ }
+}
+```
+
+**Key Lesson**: Singleton creates global state (hard to test). Only use for truly global resources!
+
+### Mistake #2: Confusing Factory Method with Simple Functions
+
+**❌ Wrong**:
+```javascript
+// This is NOT Factory Method pattern!
+function createUser(name) {
+    return new User(name);
+}
+
+// This is just a helper function
+```
+
+**✅ Right**:
+```javascript
+// Real Factory Method uses inheritance/polymorphism
+class UserFactory {
+    createUser() {
+        return new User();  // Subclasses override this
+    }
+}
+
+class AdminFactory extends UserFactory {
+    createUser() {
+        return new AdminUser();  // Different implementation
+    }
+}
+```
+
+**Key Lesson**: Factory Method involves inheritance and letting subclasses decide what to create.
+
+### Mistake #3: Builder for Simple Objects
+
+**❌ Overkill**:
+```javascript
+// DON'T use Builder for 2-3 parameters
+class User {
+    constructor(name, email) {
+        this.name = name;
+        this.email = email;
+    }
+}
+
+// This is unnecessary!
+class UserBuilder {
+    setName(name) { this.name = name; return this; }
+    setEmail(email) { this.email = email; return this; }
+    build() { return new User(this.name, this.email); }
+}
+```
+
+**✅ Use Builder Only for Complex Objects**:
+```javascript
+// Use Builder for 5+ parameters, especially optional ones
+class UserBuilder {
+    setName(name) { /* ... */ }
+    setEmail(email) { /* ... */ }
+    setPhone(phone) { /* ... */ }
+    setAddress(addr) { /* ... */ }
+    setBio(bio) { /* ... */ }
+    setAvatar(avatar) { /* ... */ }
+    setPreferences(prefs) { /* ... */ }
+    build() { /* creates complex User */ }
+}
+```
+
+**Key Lesson**: Builder adds complexity. Only use when construction is genuinely complex!
+
+### Mistake #4: Not Understanding the Difference
+
+**Common Confusion**:
+```text
+Q: "When should I use Factory vs Builder vs Prototype?"
+A: "They solve different problems!"
+```
+
+**Quick Guide**:
+
+| Pattern | Use When | Example |
+|---------|----------|---------|
+| **Factory** | Need different *types* | Create PDFDocument or WordDocument |
+| **Builder** | One type, *many options* | Create User with 10 optional fields |
+| **Prototype** | *Clone* existing object | Copy game character with setup |
+
+### Mistake #5: Forgetting the "Why"
+
+**❌ Wrong**:
+```javascript
+// Using pattern because tutorial said so
+class Singleton { /* ... */ }
+// But why? Do I really need it?
+```
+
+**✅ Right**:
+```javascript
+// Using pattern because it solves a real problem:
+// "I need exactly ONE database connection pool because
+//  multiple pools waste resources and cause conflicts"
+class ConnectionPool {
+    static #instance = null;
+    static getInstance() { /* ... */ }
+}
+```
+
+**Key Lesson**: Always know *why* you're using a pattern. If you can't explain it, you probably don't need it!
+
+---
+
+## Practice Exercises for Beginners
+
+### Exercise 1: Singleton
+**Task**: Create a Logger singleton that:
+- Logs messages with timestamps
+- Writes to one file
+- Ensures only one instance exists
+
+### Exercise 2: Builder
+**Task**: Create an EmailBuilder that constructs emails with:
+- Required: to, subject
+- Optional: cc, bcc, attachments, priority
+
+### Exercise 3: Factory
+**Task**: Create a NotificationFactory that creates:
+- EmailNotification
+- SMSNotification  
+- PushNotification
+
+**Try implementing these yourself before checking the full pattern documents!**
+
+---
+
 ## Summary
 
 ```mermaid
